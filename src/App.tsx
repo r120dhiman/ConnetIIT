@@ -11,6 +11,7 @@ import { PrivateRoute } from './components/auth/PrivateRoute';
 import { Chat } from './pages/Chat';
 import { Profile } from './pages/Profile';
 import NotFound from './pages/NotFound';
+import Callback from './pages/Callback';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Routes>
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/auth/callback" element={<Callback />} />
               <Route path="/" element={<PrivateRoute><Feed /></PrivateRoute>} />
               <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} />
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}

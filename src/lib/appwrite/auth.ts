@@ -1,4 +1,4 @@
-import { ID} from 'appwrite';
+import { ID, OAuthProvider} from 'appwrite';
 import { account, COLLECTIONS, databases } from './config';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
@@ -64,5 +64,22 @@ export async function isAuthenticated() {
     return !!user;
   } catch {
     return false;
+  }
+}
+
+
+export async function signInWithGoogle() {
+  try {
+    const redirectUrl = `${window.location.origin}/`;
+    const res = await account.createOAuth2Session(
+      OAuthProvider.Google,
+      redirectUrl,
+      `${window.location.origin}/sign-in`
+    );
+    console.log("res", res);
+    
+  } catch (error) {
+    console.error('Google auth error:', error);
+    throw error;
   }
 }
