@@ -2,7 +2,7 @@
 import { BrowserRouter } from 'react-router';
 import { Routes, Route } from 'react-router';
 import { AuthProvider } from './contexts/AuthContext';
-import { Header } from './components/layout/Header';
+// import { Header } from './components/layout/Header';
 import { Feed } from './pages/Feed';
 // import { Challenges } from './pages/Challenges';
 import { SignIn } from './pages/SignIn';
@@ -12,6 +12,7 @@ import { Chat } from './pages/Chat';
 import { Profile } from './pages/Profile';
 import NotFound from './pages/NotFound';
 import Callback from './pages/Callback';
+import OnBoarding from './pages/OnBoarding';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
               <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} />
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}
               <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
+              <Route path="/onboarding" element={<PrivateRoute><OnBoarding/></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="*" element={<NotFound/>} />
             </Routes>

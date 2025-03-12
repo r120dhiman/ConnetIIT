@@ -10,7 +10,6 @@ export async function signUp(email: string, password: string, name: string) {
     console.log("account created", user);
     console.log("account created", user.$id);
     
-    
     // Create session
     await account.createEmailPasswordSession(email, password);
 
@@ -19,7 +18,7 @@ export async function signUp(email: string, password: string, name: string) {
       DATABASE_ID,
       COLLECTIONS.USERS,
       user.$id,
-      {id:user.$id,name, email}
+      {id:user.$id,name, email,isOnBoarded:false}
     )
     console.log("user created", usercreated);
     
@@ -33,7 +32,7 @@ export async function signUp(email: string, password: string, name: string) {
 
 export async function signIn(email: string, password: string) {
   try {
-    await account.createEmailPasswordSession(email, password);
+    await account.createEmailPasswordSession(email, password);  
     return account.get();
   } catch (error) {
     console.error('Sign in error:', error);
@@ -46,6 +45,43 @@ export async function signOut() {
     await account.deleteSession('current');
   } catch (error) {
     console.error('Sign out error:', error);
+    throw error;
+  }
+}
+
+export async function onboarding(gender: string, interests: string, friendId: string) {
+  try {
+    const user = await account.get();
+   console.log(user);
+   const interestsArray = interests.split(',');
+   const friendIdArray = friendId.split(',');
+
+
+    const userOnBoarded = await databases.updateDocument(
+      DATABASE_ID,
+      COLLECTIONS.USERS,
+      user.$id,
+      {isOnBoarded: true, gender:gender, interests:interestsArray, friendsId:friendIdArray}
+    );
+    return userOnBoarded;
+    
+  } catch (error) {
+    console.error('Onboarding error:', error);
+    throw error;
+  }
+}
+
+export async function onboardingverification(){
+  try {
+    const user = await account.get();
+    const existingUser = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTIONS.USERS,
+      user.$id
+    );
+    return existingUser.isOnBoarded;
+  } catch (error) {
+    console.error('Onboarding error:', error);
     throw error;
   }
 }

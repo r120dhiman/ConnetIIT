@@ -3,13 +3,16 @@ export interface User {
   email: string;
   name: string;
   college: string;
-  skills: string[];
-  currentRank: number;
-  bestRank: number;
-  avatarUrl: string;
+  friendsId: string[];
+  // currentRank: number;
+  // bestRank: number;
+  profileUrl: string;
   bio: string;
-  githubUrl?: string;
-  linkedinUrl?: string;
+  interests: string[];
+  anonymousId: string;
+  gender: string;
+  // githubUrl?: string;
+  // linkedinUrl?: string;
   isOnline:boolean;
   lastSeen:string;
 }
