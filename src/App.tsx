@@ -11,6 +11,7 @@ import { PrivateRoute } from './components/auth/PrivateRoute';
 import { Chat } from './pages/Chat';
 import { Profile } from './pages/Profile';
 import NotFound from './pages/NotFound';
+import OnBoarding from './pages/OnBoarding';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} />
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}
               <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
+              <Route path="/onboarding" element={<PrivateRoute><OnBoarding/></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="*" element={<NotFound/>} />
             </Routes>

@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { signIn } from '../../lib/appwrite/auth';
 import { Mail, Lock } from 'lucide-react';
+import { databases } from '../../lib/appwrite/config';
+import { COLLECTIONS } from '../../lib/appwrite/config';
+
+// Get DATABASE_ID from environment variable
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 export function SignInForm() {
   const navigate = useNavigate();
@@ -12,12 +17,20 @@ export function SignInForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
     try {
-      await signIn(email, password);
-      navigate('/feed');
+      const user = await signIn(email, password);
+      const userData = await databases.getDocument(
+        DATABASE_ID,
+        COLLECTIONS.USERS,
+        user.$id
+      );
+      
+      if (!userData.isOnBoarded) {
+        navigate('/onboarding');
+      } else {
+        navigate('/feed');
+      }
+    
     } catch (err) {
       setError('Failed to sign in. Please check your credentials.');
     } finally {

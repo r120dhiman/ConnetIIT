@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User } from '../../types';
 import { updateProfile } from '../../lib/appwrite/users';
 import { GitHubSection } from './GitHubSection';
+import { profile } from 'console';
 
 interface ProfileFormProps {
   user: User;
@@ -12,11 +13,16 @@ export function ProfileForm({ user, onCancel }: ProfileFormProps) {
   const [formData, setFormData] = useState({
     id:user.id,
     name: user.name,
+    email:user.email,
     college: user.college || '',
+    // profilePic:user.profileUrl,
+    interests: user.interests.join(', ') || '',
     bio: user.bio || '',
-    skills: user.skills?.join(', ') || '',
-    githubUrl: user.githubUrl || '',
-    linkedinUrl: user.linkedinUrl || '',
+
+    gender: user.gender || 'Prefer not to say', // Add default gender
+    // skills: user.skills?.join(', ') || '',
+    // githubUrl: user.githubUrl || '',
+    // linkedinUrl: user.linkedinUrl || '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +35,7 @@ export function ProfileForm({ user, onCancel }: ProfileFormProps) {
     try {
       await updateProfile({
         ...formData,
-        skills: formData.skills.split(',').map(skill => skill.trim()).filter(Boolean),
+        interests: formData.interests.split(',').map(skill => skill.trim()).filter(Boolean),
       });
       onCancel();
     } catch (err) {
@@ -91,19 +97,19 @@ export function ProfileForm({ user, onCancel }: ProfileFormProps) {
 
           <div>
             <label htmlFor="skills" className="block text-sm font-medium text-gray-700">
-              Skills (comma-separated)
+            Interests (comma-separated)
             </label>
             <input
               type="text"
               id="skills"
-              value={formData.skills}
-              onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+              value={formData.interests}
+              onChange={(e) => setFormData({ ...formData, interests: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300"
               placeholder="React, TypeScript, Node.js"
             />
           </div>
 
-          <div>
+          {/* <div>
             <label htmlFor="linkedinUrl" className="block text-sm font-medium text-gray-700">
               LinkedIn URL
             </label>
@@ -114,7 +120,7 @@ export function ProfileForm({ user, onCancel }: ProfileFormProps) {
               onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
               className="mt-1 block w-full rounded-md border-gray-300"
             />
-          </div>
+          </div> */}
 
           <div className="flex justify-end space-x-4 pt-4">
             <button
@@ -135,7 +141,7 @@ export function ProfileForm({ user, onCancel }: ProfileFormProps) {
         </div>
       </form>
 
-      <GitHubSection />
+      {/* <GitHubSection /> */}
     </div>
   );
 }
