@@ -24,8 +24,10 @@ export function SignUpForm() {
     setLoading(true);
 
     try {
-      await signUp(email, password, name);
-      navigate('/onboarding');
+      const { user, userDoc } = await signUp(email, password, name);
+      if (!userDoc.isOnBoarded) {
+        navigate('/onboarding');
+      }
     } catch (err) {
       setError("Failed to create account. Please try again.");
     } finally {

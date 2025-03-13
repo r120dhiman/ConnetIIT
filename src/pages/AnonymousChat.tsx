@@ -3,8 +3,8 @@ import { requestAnonymousChat } from '../utils/matchmaking';
 import { Link } from 'react-router';
 import { Query } from 'appwrite';
 import { databases, COLLECTIONS, account } from '../lib/appwrite/config';
-import { Users, ArrowLeft, Search, Tags } from 'lucide-react'; // Import icons
-import { motion } from 'framer-motion'; // Import for animations
+import { Users, ArrowLeft, Search, Tags } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
@@ -35,15 +35,35 @@ const AnonymousChat: React.FC = () => {
 
   const handleRequestChat = async () => {
     setLoading(true);
-    try {
-      console.log(anonymousId, hobbies, mode);
-      const chatData = await requestAnonymousChat(anonymousId, hobbies, mode);
-      setChat(chatData);
-    } catch (error) {
-      console.error("Error requesting chat:", error);
-      alert(error.message);
-    }
-    setLoading(false);
+    setChat(null);
+    const startTime = Date.now();
+    const searchDuration = 5000; // 5 seconds
+
+    const searchForMatch = async () => {
+      if (Date.now() - startTime >= searchDuration) {
+        setLoading(false);
+        alert('No match found after 5 seconds.');
+        return;
+      }
+
+      try {
+        console.log(anonymousId, hobbies, mode);
+        const chatData = await requestAnonymousChat(anonymousId, hobbies, mode);
+        if (chatData && chatData.$id) {
+          setChat(chatData);
+          setLoading(false);
+          return;
+        }
+
+        setTimeout(searchForMatch, 1000); // Retry every second
+      } catch (error) {
+        console.error("Error requesting chat:", error);
+        alert(error.message);
+        setLoading(false);
+      }
+    };
+
+    searchForMatch();
   };
 
   return (

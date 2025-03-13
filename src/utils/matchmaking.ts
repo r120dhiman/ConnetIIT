@@ -1,5 +1,5 @@
 import { databases, COLLECTIONS } from '../lib/appwrite/config';
-
+import { Query } from 'appwrite';
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 console.log('[matchmaking] Initializing with DATABASE_ID:', DATABASE_ID);
@@ -16,10 +16,6 @@ export async function requestAnonymousChat(
   mode: "interest" | "random"
 ) {
   console.log('[requestAnonymousChat] Starting matchmaking request:', { userId, hobbies, mode });
-  if (mode === "random" && randomQueue.length === 0) {
-    console.log("No users in the random queue.");
-    throw new Error("No users available. Please try again later.");
-  }
   try {
     cleanupQueues();
 
@@ -28,8 +24,11 @@ export async function requestAnonymousChat(
       DATABASE_ID,
       COLLECTIONS.ANONYMOUS_CHATS,
       [
-        `equal("status", "${ChatStatus.ACTIVE}")`,
-        `or(["equal('senderId', '${userId}')", "equal('receiverId', '${userId}')"])`,
+        Query.equal("status", ChatStatus.ACTIVE),
+        Query.or([
+          Query.equal("senderId", userId),
+          Query.equal("receiverId", userId)
+        ])
       ]
     );
 
@@ -45,6 +44,7 @@ export async function requestAnonymousChat(
       console.log('[requestAnonymousChat] Processing interest-based matching');
       console.log('Current interest queue:', interestQueue);
       const potentialMatch = interestQueue.find((user) =>
+        user.userId !== userId &&
         user.hobbies.some((hobby) => hobbies.includes(hobby))
       );
 
@@ -54,22 +54,26 @@ export async function requestAnonymousChat(
         return await createChat(userId, potentialMatch.userId);
       }
 
-      interestQueue.push({ userId, hobbies, timestamp });
+      if(!interestQueue.find((user) => user.userId === userId)){
+        interestQueue.push({ userId, hobbies, timestamp });
+      }
       console.log("Added to interest-based matchmaking queue. Queue length:", interestQueue.length);
     } else {
       console.log('[requestAnonymousChat] Processing random matching');
       console.log('Current random queue:', randomQueue);
-      if (randomQueue.length > 0) {
-        const matchedUser = randomQueue.shift()!.userId;
+      const matchedUserIndex = randomQueue.findIndex(user => user.userId !== userId);
+
+      if (matchedUserIndex !== -1) {
+        const matchedUser = randomQueue.splice(matchedUserIndex, 1)[0].userId;
         console.log('[requestAnonymousChat] Found random match:', matchedUser);
         return await createChat(userId, matchedUser);
       }
-
-      randomQueue.push({ userId, timestamp });
+      if(!randomQueue.find((user) => user.userId === userId)){
+      randomQueue.push({ userId, timestamp });}
       console.log("Added to random matchmaking queue. Queue length:", randomQueue.length);
     }
-
-    return { message: "Searching for a match..." };
+    console.log('[requestAnonymousChat] No immediate match found, returning search message');
+    return null;
   } catch (error) {
     console.error("[requestAnonymousChat] Error in matchmaking:", error);
     throw error;
@@ -131,17 +135,3 @@ async function createChat(senderId: string, receiverId: string) {
   console.log("[createChat] Match found! Chat created:", newChat);
   return newChat;
 }
-
-
-// export function subscribeToChatUpdates(chatId: string, callback: (updatedChat: any) => void) {
-//     const channel = `databases.${DATABASE_ID}.collections.${COLLECTION_ID}.documents.${chatId}`;
-
-//     const unsubscribe = client.subscribe(channel, (response) => {
-//         if (response.events.includes("databases.*.collections.*.documents.*.update")) {
-//             console.log("Chat updated:", response.payload);
-//             callback(response.payload); // Send updated chat data to UI
-//         }
-//     });
-
-//     return unsubscribe; // Useful for cleanup
-// }

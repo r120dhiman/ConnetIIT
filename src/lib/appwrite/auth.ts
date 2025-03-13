@@ -11,27 +11,31 @@ export async function signUp(email: string, password: string, name: string) {
   try {
     // Create account
     const user = await account.create(ID.unique(), email, password, name);
-    // console.log("account created", user);
-    // console.log("account created", user.$id);
     
     // Create session
     await account.createEmailPasswordSession(email, password);
 
-    //creating random id for user
-
     const randomId = generateUniqueId();
-    console.log("random id", randomId);
-    //Create User
-    await databases.createDocument(
+    
+    // Create User document and wait for it to complete
+    const userDoc = await databases.createDocument(
       DATABASE_ID,
       COLLECTIONS.USERS,
       user.$id,
-      {id:user.$id,name, email,isOnBoarded:false,anonymousId:randomId}
-    )
-    // console.log("user created", usercreated);
-    
-    
-    return account.get();
+      {
+        id: user.$id,
+        name, 
+        email,
+        isOnBoarded: false,
+        anonymousId: randomId
+      }
+    );
+
+    // Return both user and userDoc
+    return {
+      user: await account.get(),
+      userDoc
+    };
   } catch (error) {
     console.error('Sign up error:', error);
     throw error;
