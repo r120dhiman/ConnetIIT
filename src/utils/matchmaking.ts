@@ -16,6 +16,10 @@ export async function requestAnonymousChat(
   mode: "interest" | "random"
 ) {
   console.log('[requestAnonymousChat] Starting matchmaking request:', { userId, hobbies, mode });
+  if (mode === "random" && randomQueue.length === 0) {
+    console.log("No users in the random queue.");
+    throw new Error("No users available. Please try again later.");
+  }
   try {
     cleanupQueues();
 
@@ -78,6 +82,9 @@ function cleanupQueues() {
     interestQueue: interestQueue.length,
     randomQueue: randomQueue.length
   });
+  if(randomQueue.length ===0 && interestQueue.length ===0){
+    console.log("No users in the queue. Skipping cleanup.");
+    return;}
 
   const currentTime = Date.now();
 

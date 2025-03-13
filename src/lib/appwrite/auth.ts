@@ -3,24 +3,32 @@ import { account, COLLECTIONS, databases } from './config';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
+function generateUniqueId(): string {
+  return Math.floor(10000000 + Math.random() * 90000000).toString(); // Generates 8-digit number
+}
+
 export async function signUp(email: string, password: string, name: string) {
   try {
     // Create account
     const user = await account.create(ID.unique(), email, password, name);
-    console.log("account created", user);
-    console.log("account created", user.$id);
+    // console.log("account created", user);
+    // console.log("account created", user.$id);
     
     // Create session
     await account.createEmailPasswordSession(email, password);
 
+    //creating random id for user
+
+    const randomId = generateUniqueId();
+    console.log("random id", randomId);
     //Create User
-    const usercreated = await databases.createDocument(
+    await databases.createDocument(
       DATABASE_ID,
       COLLECTIONS.USERS,
       user.$id,
-      {id:user.$id,name, email,isOnBoarded:false}
+      {id:user.$id,name, email,isOnBoarded:false,anonymousId:randomId}
     )
-    console.log("user created", usercreated);
+    // console.log("user created", usercreated);
     
     
     return account.get();

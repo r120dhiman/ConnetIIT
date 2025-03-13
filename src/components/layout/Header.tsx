@@ -29,6 +29,9 @@ export function Header() {
           <Link to="/feed" className="text-sm font-medium transition-colors hover:text-primary">
             Feed
           </Link>
+          <Link to="/chat-anonymously" className="text-sm font-medium transition-colors hover:text-primary">
+            Random Chat
+          </Link>
           {/* <Link to="/challenges" className="text-sm font-medium transition-colors hover:text-primary">
             <Trophy className="h-4 w-4 inline-block mr-1" />
             Challenges

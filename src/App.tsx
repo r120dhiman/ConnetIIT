@@ -13,14 +13,15 @@ import { Profile } from './pages/Profile';
 import NotFound from './pages/NotFound';
 import Callback from './pages/Callback';
 import OnBoarding from './pages/OnBoarding';
+import AnonymousChat from './pages/AnonymousChat';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen " style={{padding: '0px'}}>
           {/* <Header /> */}
-          <main className="container mx-auto py-6">
+          <main className="container  " style={{padding: '0px'}}>
             <Routes>
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
@@ -29,6 +30,7 @@ function App() {
               <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} />
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}
               <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
+              <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat/></PrivateRoute>} />
               <Route path="/onboarding" element={<PrivateRoute><OnBoarding/></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="*" element={<NotFound/>} />
