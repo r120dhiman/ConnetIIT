@@ -1,4 +1,4 @@
-import { ID, OAuthProvider} from 'appwrite';
+import { ID, OAuthProvider, Query} from 'appwrite';
 import { account, COLLECTIONS, databases } from './config';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
@@ -61,27 +61,94 @@ export async function signOut() {
   }
 }
 
+// export async function onboarding(gender: string, interests: string, friendId: string) {
+//   try {
+//     const user = await account.get();
+//    console.log(user);
+//    const interestsArray = interests.split(',');
+//    const friendIdArray = friendId.split(',');
+
+
+//     const userOnBoarded = await databases.updateDocument(
+//       DATABASE_ID,
+//       COLLECTIONS.USERS,
+//       user.$id,
+//       {isOnBoarded: true, gender:gender, interests:interestsArray, friendsId:friendIdArray}
+//     );
+//     return userOnBoarded;
+    
+//   } catch (error) {
+//     console.error('Onboarding error:', error);
+//     throw error;
+//   }
+// }
+
 export async function onboarding(gender: string, interests: string, friendId: string) {
   try {
     const user = await account.get();
-   console.log(user);
-   const interestsArray = interests.split(',');
-   const friendIdArray = friendId.split(',');
+    const interestsArray = interests.split(',');
+    const friendIdArray = friendId.split(',');
 
-
+    // Onboard the user
     const userOnBoarded = await databases.updateDocument(
       DATABASE_ID,
       COLLECTIONS.USERS,
       user.$id,
-      {isOnBoarded: true, gender:gender, interests:interestsArray, friendsId:friendIdArray}
+      {
+        isOnBoarded: true,
+        gender: gender,
+        interests: interestsArray,
+        friendsId: friendIdArray
+      }
     );
+
+    // Add the user to respective communities
+    await Promise.all(
+      interestsArray.map(async (interest) => {
+        const communities = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.COMMUNITIES,
+          [Query.equal('name', interest)]
+        );
+
+        if (communities.total > 0) {
+          // Community exists: Add user to it
+          const community = communities.documents[0];
+          const updatedMembers = Array.isArray(community.membersList)
+            ? [...new Set([...community.membersList, user.$id])]
+            : [user.$id];
+
+          await databases.updateDocument(
+            DATABASE_ID,
+            COLLECTIONS.COMMUNITIES,
+            community.$id,
+            { membersList: updatedMembers }
+          );
+
+        } else {
+          // Community doesn't exist: Create a new one
+          await databases.createDocument(
+            DATABASE_ID,
+            COLLECTIONS.COMMUNITIES,
+            ID.unique(),
+            {
+              name: interest,
+              membersList: [user.$id],
+              msgLogs: []  // Initialize with an empty array for consistency
+            }
+          );
+        }
+      })
+    );
+
     return userOnBoarded;
-    
+
   } catch (error) {
     console.error('Onboarding error:', error);
     throw error;
   }
 }
+
 
 export async function onboardingverification(){
   try {

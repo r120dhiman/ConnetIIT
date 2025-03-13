@@ -14,6 +14,8 @@ import NotFound from './pages/NotFound';
 import Callback from './pages/Callback';
 import OnBoarding from './pages/OnBoarding';
 import AnonymousChat from './pages/AnonymousChat';
+import Communities from './pages/Communities';
+import Home from './pages/Home';
 
 function App() {
   return (
@@ -21,18 +23,19 @@ function App() {
       <AuthProvider>
         <div className="min-h-screen " style={{padding: '0px'}}>
           {/* <Header /> */}
-          <main className="container  " style={{padding: '0px'}}>
+          <main className="  " style={{padding: '0px'}}>
             <Routes>
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/auth/callback" element={<Callback />} />
-              <Route path="/" element={<PrivateRoute><Feed /></PrivateRoute>} />
-              <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} />
+              <Route path="/" element={<PrivateRoute><Feed/></PrivateRoute>} />
+              {/* <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} /> */}
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}
               <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
               <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat/></PrivateRoute>} />
               <Route path="/onboarding" element={<PrivateRoute><OnBoarding/></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+              <Route path="/communities" element={<PrivateRoute><Communities /></PrivateRoute>} />
               <Route path="*" element={<NotFound/>} />
             </Routes>
           </main>

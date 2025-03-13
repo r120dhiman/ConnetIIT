@@ -12,7 +12,7 @@ function OnBoarding() {
             try {
                 const alreadyOnboarded = await onboardingverification();
                 if (alreadyOnboarded) {
-                    navigate('/feed');
+                    navigate('/');
                 }
             } catch (error) {
                 console.error('Verification error:', error);
@@ -51,7 +51,7 @@ function OnBoarding() {
         );
         
         if(data) {
-            navigate('/feed')
+            navigate('/')
         }
        } catch (error) {
          console.error('Onboarding error:', error);

@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.7",
     "appwrite": "^16.1.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
