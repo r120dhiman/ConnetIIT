@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { requestAnonymousChat } from '../utils/matchmaking';
-import { Link } from 'react-router';
+import React, { useState, useEffect, useRef } from 'react';
+import { requestAnonymousChat, checkForChatMatch } from '../utils/matchmaking';
+import { Link, useNavigate } from 'react-router';
 import { Query } from 'appwrite';
+import ChatWindow from './AnonymousChatWindow';
 import { databases, COLLECTIONS, account } from '../lib/appwrite/config';
 import { Users, ArrowLeft, Search, Tags } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { div } from 'framer-motion/client';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
@@ -14,6 +16,8 @@ const AnonymousChat: React.FC = () => {
   const [mode, setMode] = useState<'interest' | 'random'>('random');
   const [chat, setChat] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const matchCheckIntervalRef = useRef<number | null>(null);
+const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAnonymousId = async () => {
@@ -31,39 +35,68 @@ const AnonymousChat: React.FC = () => {
     };
 
     fetchAnonymousId();
+    
+    // Clean up interval on component unmount
+    return () => {
+      if (matchCheckIntervalRef.current) {
+        clearInterval(matchCheckIntervalRef.current);
+      }
+    };
   }, []);
 
   const handleRequestChat = async () => {
+    if (matchCheckIntervalRef.current) {
+      clearInterval(matchCheckIntervalRef.current);
+      matchCheckIntervalRef.current = null;
+    }
+
     setLoading(true);
     setChat(null);
     const startTime = Date.now();
-    const searchDuration = 5000; // 5 seconds
+    const searchDuration = 15000; // 5 seconds
 
-    const searchForMatch = async () => {
-      if (Date.now() - startTime >= searchDuration) {
+    try {
+      console.log(anonymousId, hobbies, mode);
+      const chatData = await requestAnonymousChat(anonymousId, hobbies, mode);
+      
+      if (chatData && chatData.$id) {
+        // We got a match immediately
+        setChat(chatData);
         setLoading(false);
-        alert('No match found after 5 seconds.');
         return;
       }
-
-      try {
-        console.log(anonymousId, hobbies, mode);
-        const chatData = await requestAnonymousChat(anonymousId, hobbies, mode);
-        if (chatData && chatData.$id) {
-          setChat(chatData);
-          setLoading(false);
-          return;
+      
+      // No immediate match, set up interval to check for matches
+      const checkInterval = setInterval(async () => {
+        try {
+          // Check if we've exceeded search duration
+          if (Date.now() - startTime >= searchDuration) {
+            clearInterval(checkInterval);
+            matchCheckIntervalRef.current = null;
+            setLoading(false);
+            alert('No match found after 5 seconds.');
+            return;
+          }
+          
+          // Check for matches
+          const matchResult = await checkForChatMatch(anonymousId);
+          if (matchResult) {
+            clearInterval(checkInterval);
+            matchCheckIntervalRef.current = null;
+            setChat(matchResult);
+            setLoading(false);
+          }
+        } catch (err) {
+          console.error("Error checking for match:", err);
         }
-
-        setTimeout(searchForMatch, 1000); // Retry every second
-      } catch (error) {
-        console.error("Error requesting chat:", error);
-        alert(error.message);
-        setLoading(false);
-      }
-    };
-
-    searchForMatch();
+      }, 1000);
+      
+      matchCheckIntervalRef.current = checkInterval as unknown as number;
+    } catch (error) {
+      console.error("Error requesting chat:", error);
+      alert(error.message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -178,10 +211,14 @@ const AnonymousChat: React.FC = () => {
               </div>
               <div className="space-y-1 text-sm text-gray-300">
                 <p className="font-mono">ID: {chat.$id}</p>
-                <p>Status: <span className="text-green-400">{chat.status}</span></p>
+                <p>Status: <span className="text-green-400">{chat.receiverId}</span></p>
               </div>
             </motion.div>
           )}
+          {chat &&
+          <div className="flex items-center justify-center mt-4">
+            <ChatWindow chatId={chat.$id} userId={chat.receiverId}/>
+            </div>}
         </div> 
       </motion.div>
     </div>

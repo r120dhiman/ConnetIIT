@@ -1,137 +1,180 @@
 import { databases, COLLECTIONS } from '../lib/appwrite/config';
-import { Query } from 'appwrite';
+import { Query, ID } from 'appwrite';
+
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-
-console.log('[matchmaking] Initializing with DATABASE_ID:', DATABASE_ID);
-
-const interestQueue: { userId: string; hobbies: string[]; timestamp: number }[] = [];
-const randomQueue: { userId: string; timestamp: number }[] = [];
-
-const QUEUE_TTL = 5 * 60 * 1000; // 5 minutes timeout for stale entries
 enum ChatStatus { ACTIVE = "active", ENDED = "ended", PENDING = "pending" }
 
 export async function requestAnonymousChat(
-  userId: string,
-  hobbies: string[],
+  userId: string, 
+  interests: string[],
   mode: "interest" | "random"
 ) {
-  console.log('[requestAnonymousChat] Starting matchmaking request:', { userId, hobbies, mode });
   try {
-    cleanupQueues();
+    console.log('[requestAnonymousChat] Starting with:', { userId, mode });
 
-    console.log('[requestAnonymousChat] Checking for active chats for user:', userId);
+    // Check for active chats first
     const activeChats = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.ANONYMOUS_CHATS,
       [
         Query.equal("status", ChatStatus.ACTIVE),
         Query.or([
-          Query.equal("senderId", userId),
+          Query.equal("senderId", userId), 
           Query.equal("receiverId", userId)
         ])
       ]
     );
 
-    console.log('[requestAnonymousChat] Active chats found:', activeChats.total);
     if (activeChats.total > 0) {
-      console.log("Active chat already exists:", activeChats.documents[0]);
+      console.log('[requestAnonymousChat] User already in active chat');
       return activeChats.documents[0];
     }
 
-    const timestamp = Date.now();
+    // Remove user from queue if already present
+    await removeFromQueue(userId);
 
-    if (mode === "interest") {
-      console.log('[requestAnonymousChat] Processing interest-based matching');
-      console.log('Current interest queue:', interestQueue);
-      const potentialMatch = interestQueue.find((user) =>
-        user.userId !== userId &&
-        user.hobbies.some((hobby) => hobbies.includes(hobby))
-      );
-
-      if (potentialMatch) {
-        console.log('[requestAnonymousChat] Found interest match:', potentialMatch);
-        interestQueue.splice(interestQueue.indexOf(potentialMatch), 1);
-        return await createChat(userId, potentialMatch.userId);
+    // Add new queue entry
+    const queueEntry = await databases.createDocument(
+      DATABASE_ID,
+      COLLECTIONS.QUEUE,
+      ID.unique(),
+      {
+        userId,
+        interests: mode === "interest" ? interests : [],
+        mode,
+        timestamp: new Date().toISOString(),
+        status: "waiting"
       }
+    );
 
-      if(!interestQueue.find((user) => user.userId === userId)){
-        interestQueue.push({ userId, hobbies, timestamp });
-      }
-      console.log("Added to interest-based matchmaking queue. Queue length:", interestQueue.length);
-    } else {
-      console.log('[requestAnonymousChat] Processing random matching');
-      console.log('Current random queue:', randomQueue);
-      const matchedUserIndex = randomQueue.findIndex(user => user.userId !== userId);
+    // Find a match
+    const potentialMatches = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.QUEUE,
+      [
+        Query.notEqual("userId", userId),
+        Query.equal("mode", mode),
+        Query.equal("status", "waiting"),
+        ...(mode === "interest" ? [Query.search("interests", interests.join(" "))] : [])
+      ]
+    );
 
-      if (matchedUserIndex !== -1) {
-        const matchedUser = randomQueue.splice(matchedUserIndex, 1)[0].userId;
-        console.log('[requestAnonymousChat] Found random match:', matchedUser);
-        return await createChat(userId, matchedUser);
+    if (potentialMatches.total > 0) {
+      const match = potentialMatches.documents[0];
+      
+      // Create chat first
+      const chat = await createChat(userId, match.userId);
+      
+      // Then update queue statuses
+      try {
+        await Promise.all([
+          updateQueueStatus(match.$id, chat.$id),
+          updateQueueStatus(queueEntry.$id, chat.$id)
+        ]);
+      } catch (updateError) {
+        console.error("Error updating queue statuses:", updateError);
+        // Consider cleaning up the created chat if queue updates fail
       }
-      if(!randomQueue.find((user) => user.userId === userId)){
-      randomQueue.push({ userId, timestamp });}
-      console.log("Added to random matchmaking queue. Queue length:", randomQueue.length);
+      
+      return chat;
     }
-    console.log('[requestAnonymousChat] No immediate match found, returning search message');
-    return null;
+    return { status: "waiting" };
   } catch (error) {
-    console.error("[requestAnonymousChat] Error in matchmaking:", error);
+    console.error("[requestAnonymousChat] Error:", error);
     throw error;
   }
 }
 
-function cleanupQueues() {
-  console.log('[cleanupQueues] Starting queue cleanup');
-  console.log('Queue lengths before cleanup:', {
-    interestQueue: interestQueue.length,
-    randomQueue: randomQueue.length
-  });
-  if(randomQueue.length ===0 && interestQueue.length ===0){
-    console.log("No users in the queue. Skipping cleanup.");
-    return;}
-
-  const currentTime = Date.now();
-
-  const cleanInterestQueue = interestQueue.filter(
-    (user) => currentTime - user.timestamp < QUEUE_TTL
+async function removeFromQueue(userId: string) {
+  const existingInQueue = await databases.listDocuments(
+    DATABASE_ID,
+    COLLECTIONS.QUEUE,
+    [Query.equal("userId", userId)]
   );
-  const cleanRandomQueue = randomQueue.filter(
-    (user) => currentTime - user.timestamp < QUEUE_TTL
-  );
-
-  interestQueue.length = 0;
-  interestQueue.push(...cleanInterestQueue);
-
-  randomQueue.length = 0;
-  randomQueue.push(...cleanRandomQueue);
-
-  console.log("Queues cleaned. Remaining users:", {
-    interestQueue: interestQueue.length,
-    randomQueue: randomQueue.length,
-  });
+  if (existingInQueue.total > 0) {
+    await databases.deleteDocument(
+      DATABASE_ID,
+      COLLECTIONS.QUEUE,
+      existingInQueue.documents[0].$id
+    );
+  }
 }
 
+async function updateQueueStatus(queueId: string, chatId: string) {
+  try {
+    // First verify the document exists
+    const queueDoc = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTIONS.QUEUE,
+      queueId
+    );
+
+    if (!queueDoc) {
+      console.error(`Queue document ${queueId} not found`);
+      return;
+    }
+
+    await databases.updateDocument(
+      DATABASE_ID,
+      COLLECTIONS.QUEUE,
+      queueId,
+      { 
+        status: "matched", 
+        chatId,
+        updatedAt: new Date().toISOString()
+      }
+    );
+  } catch (error) {
+    console.error(`Error updating queue status for ${queueId}:`, error);
+  }
+}
+
+
 async function createChat(senderId: string, receiverId: string) {
-  console.log('[createChat] Creating new chat:', { senderId, receiverId });
+  console.log('[createChat] Creating chat between:', { senderId, receiverId });
   
-  const chatData = {
-    senderId,
-    receiverId,
-    chatlogs: [],
-    status: ChatStatus.ACTIVE,
-    created_at: new Date().toISOString(),
-    is_reported: false,
-  };
-
-  console.log('[createChat] Chat data prepared:', chatData);
-
   const newChat = await databases.createDocument(
     DATABASE_ID,
     COLLECTIONS.ANONYMOUS_CHATS,
-    "unique()",
-    chatData
+    ID.unique(),
+    {
+      senderId,
+      receiverId,
+      chatlogs: [],
+      createdAt: new Date().toISOString()
+    }
   );
-
-  console.log("[createChat] Match found! Chat created:", newChat);
+const chatId=newChat.$id;
+  console.log("[createChat] Chat created:", newChat.$id);
+  const data={
+    chatId,
+    receiverId,
+  }
+  console.log(newChat.receiverId);
   return newChat;
+}
+
+export async function checkForChatMatch(userId: string) {
+  try {
+    const queueEntries = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.QUEUE,
+      [
+        Query.equal("userId", userId),
+        Query.equal("status", "matched")
+      ]
+    );
+    
+    if (queueEntries.total > 0 && queueEntries.documents[0].chatId) {
+      return await databases.getDocument(
+        DATABASE_ID,
+        COLLECTIONS.ANONYMOUS_CHATS,
+        queueEntries.documents[0].chatId
+      );
+    }
+    return null;
+  } catch (error) {
+    console.error("[checkForChatMatch] Error:", error);
+    throw error;
+  }
 }
