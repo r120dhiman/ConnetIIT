@@ -16,6 +16,7 @@ import OnBoarding from './pages/OnBoarding';
 import AnonymousChat from './pages/AnonymousChat';
 import Communities from './pages/Communities';
 import Home from './pages/Home';
+import Trips from './pages/Trips';
 import ChatRoom from './pages/ChatRoom';
 
 
@@ -39,6 +40,7 @@ function App() {
               <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat /></PrivateRoute>} />
               <Route path="/onboarding" element={<PrivateRoute><OnBoarding/></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+              <Route path="/travel" element={<PrivateRoute><Trips /></PrivateRoute>} />
               <Route path="/communities" element={<PrivateRoute><Communities /></PrivateRoute>} />
               <Route path="*" element={<NotFound/>} />
             </Routes>

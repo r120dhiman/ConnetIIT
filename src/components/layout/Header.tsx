@@ -35,6 +35,9 @@ export function Header() {
           <Link to="/communities" className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 flex items-center">
             Communities
           </Link>
+          <Link to="/travel" className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 flex items-center">
+            Travel Along
+          </Link>
           {/* <Link to="/challenges" className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 flex items-center">
             <Trophy className="h-4 w-4 inline-block mr-2" />
             Challenges

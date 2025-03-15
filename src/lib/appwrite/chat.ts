@@ -2,10 +2,10 @@ import { ID, Query } from 'appwrite';
 import { databases } from './config';
 import { COLLECTIONS } from './config';
 import type { Message } from '../../types/chat';
-import { Client } from 'appwrite';
+// import { Client } from 'appwrite';
 import {client} from './config'
 
-const DATABASE_ID = "6775235f000aeef1a930";
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 export async function sendMessage(message: Omit<Message, 'id' | 'createdAt'>) {
   console.log("msg data",message);
