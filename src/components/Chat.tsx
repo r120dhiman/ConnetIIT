@@ -25,6 +25,28 @@ const Chat: React.FC<ChatProps> = ({ socket, username, roomid }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.removeItem('chatActive');
+    };
+
+    // Check if we have an active chat session
+    const chatActive = sessionStorage.getItem('chatActive');
+    if (!chatActive) {
+      sessionStorage.setItem('chatActive', 'true');
+    } else {
+      navigate('/chat-anonymously');
+    }
+
+    // Add event listener for page refresh/close
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      sessionStorage.removeItem('chatActive');
+    };
+  }, [navigate]);
+
   const handleNewMessage = (data: MessageData) => {
     setMessages((prevMessages) => [...prevMessages, data]);
   };
