@@ -5,6 +5,8 @@ import { Card, CardContent, Typography } from '@mui/material';
 import { Header } from '../components/layout/Header';
 import { MessageSquare, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { getRoomChats, sendRoomChat, subscribeToRoomChats } from '../lib/appwrite/roomChat';
+import { useAuth } from '../contexts/AuthContext';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
@@ -35,6 +37,7 @@ const Communities = () => {
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchCommunities = async () => {
@@ -43,10 +46,22 @@ const Communities = () => {
           DATABASE_ID,
           COLLECTIONS.COMMUNITIES
         );
-        const typedDocuments = response.documents as unknown as Community[];
-        setCommunities(typedDocuments);
-        if (typedDocuments.length > 0) {
-          setSelectedCommunity(typedDocuments[0]);
+        const typedDocuments = response.documents as Community[];
+
+        // Filter communities to only include those where the user is a participant
+        const userCommunities = typedDocuments.filter(community => 
+          community.membersList.includes(user ? user.$id : '')
+        );
+
+        setCommunities(userCommunities);
+        if (userCommunities.length > 0) {
+          const selectedComm = userCommunities[0];
+          console.log("Selected community:", selectedComm); // Debug log for selected community
+          const messages = await getRoomChats(selectedComm.$id); // Fetch messages using community.$id
+          console.log("Fetched messages:", messages); // Debug log for fetched messages
+          const msgLogsContent = messages.map(msg => msg.content); // Extract content from messages
+          
+          setSelectedCommunity({ ...selectedComm, msgLogs: msgLogsContent }); // Set selected community with msgLogs
         }
       } catch (error) {
         console.error('Error fetching communities:', error);
@@ -56,23 +71,42 @@ const Communities = () => {
     fetchCommunities();
   }, []);
 
+  useEffect(() => {
+    if (selectedCommunity) {
+      // Subscribe to room chats for the selected community
+      const unsubscribe = subscribeToRoomChats(selectedCommunity.$id, (newMessage) => {
+        console.log("New message received:", newMessage); // Debugging log
+        setSelectedCommunity(prev => prev ? {
+          ...prev,
+          msgLogs: [...prev.msgLogs, newMessage.content] // Update msgLogs with new message content
+        } : prev);
+      });
+
+      return () => {
+        unsubscribe(); // Clean up the subscription on component unmount
+      };
+    }
+  }, [selectedCommunity]); // Run this effect when selectedCommunity changes
+
+
   const handleSendMessage = async () => {
-    if (!selectedCommunity || !newMessage.trim()) return;
+    if (!selectedCommunity || !newMessage.trim() || !user) return;
 
     try {
-      const updatedMsgLogs = [...selectedCommunity.msgLogs, newMessage];
-      
+      const response = await sendRoomChat(selectedCommunity.$id, newMessage, user.$id);
+      const messageId = response.$id; // Assuming the response contains the message ID
+
       await databases.updateDocument(
         DATABASE_ID,
         COLLECTIONS.COMMUNITIES,
         selectedCommunity.$id,
-        { msgLogs: updatedMsgLogs }
+        { msgLogs: [...selectedCommunity.msgLogs, messageId] } // Push message ID to msgLogs array
       );
 
-      setSelectedCommunity({
-        ...selectedCommunity,
-        msgLogs: updatedMsgLogs
-      });
+      // setSelectedCommunity(prev => prev ? {
+      //   ...prev,
+      //   msgLogs: [...prev.msgLogs, newMessage]
+      // } : prev);
       
       setNewMessage('');
     } catch (error) {

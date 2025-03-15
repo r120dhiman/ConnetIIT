@@ -20,10 +20,12 @@ import {
   InputLabel,
   SelectChangeEvent
 } from '@mui/material';
-import { Plus } from 'lucide-react';
+import { Plus, MessageCircle } from 'lucide-react';
 import { addParticipantToTrip, createTrip, getTrips } from '../lib/appwrite/trip';
 import { useAuth } from '../contexts/AuthContext';
 import { getProfile } from '../lib/appwrite/users';
+import { getRoomChats, sendRoomChat, subscribeToRoomChats } from '../lib/appwrite/roomChat';
+import { Header } from '../components/layout/Header';
 
 interface Trip {
   tripName: string;
@@ -32,7 +34,7 @@ interface Trip {
   to: string;
   date: string;
   isFlexibleDate: boolean;
-  createdBy: string; // This will be filled automatically
+  createdBy: string;
   modeOfTravel: string;
   participants: string[];
 }
@@ -45,7 +47,7 @@ interface FetchedTrip {
   to: string;
   date: string;
   isFlexibleDate: boolean;
-  createdBy: string; // This will be filled automatically
+  createdBy: string;
   modeOfTravel: string;
   participants: string[];
 }
@@ -62,10 +64,14 @@ const Trips: React.FC = () => {
     to: '',
     date: '',
     isFlexibleDate: false,
-    createdBy: user ? user.$id : '', // Automatically set createdBy to user ID
+    createdBy: user ? user.$id : '',
     modeOfTravel: '',
     participants: [user!.$id]
   });
+  const [selectedTrip, setSelectedTrip] = useState<FetchedTrip | null>(null);
+  const [tripMessages, setTripMessages] = useState<any[]>([]);
+  const [isTripChatOpen, setIsTripChatOpen] = useState(false);
+  const [newTripMessage, setNewTripMessage] = useState('');
 
   useEffect(() => {
     const fetchTrips = async () => {
@@ -81,7 +87,7 @@ const Trips: React.FC = () => {
             to: trip.to,
             date: trip.date,
             isFlexibleDate: trip.isFlexibleDate,
-            createdBy: trip.createdBy === user?.$id ? 'Me' : userProfile.name, // Set createdBy to 'Me' if created by current user
+            createdBy: trip.createdBy === user?.$id ? 'Me' : userProfile.name,
             modeOfTravel: trip.modeOfTravel,
             participants: trip.participants
           };
@@ -94,6 +100,25 @@ const Trips: React.FC = () => {
 
     fetchTrips();
   }, [user]);
+
+  useEffect(() => {
+    if (selectedTrip) {
+      const fetchTripChats = async () => {
+        const messages = await getRoomChats(selectedTrip.id);
+        setTripMessages(messages);
+      };
+
+      fetchTripChats();
+
+      const unsubscribe = subscribeToRoomChats(selectedTrip.id, (newMessage) => {
+        setTripMessages(prev => [...prev, newMessage]);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [selectedTrip]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -109,7 +134,7 @@ const Trips: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user) return; // Only proceed if user exists
+    if (!user) return;
 
     const today = new Date().toISOString().split('T')[0];
     if (!newTrip.tripName || !newTrip.date) {
@@ -124,8 +149,8 @@ const Trips: React.FC = () => {
     try {
       const createdTrip = await createTrip({
         ...newTrip,
-        createdBy: user.$id, // Use actual user ID
-        date: new Date(newTrip.date) // Ensure date is in Date format
+        createdBy: user.$id,
+        date: new Date(newTrip.date)
       });
       setTrips(prev => [...prev, { ...newTrip, id: createdTrip.$id }]);
 
@@ -136,9 +161,9 @@ const Trips: React.FC = () => {
         to: '',
         date: '',
         isFlexibleDate: false,
-        createdBy: user ? user.$id : '', // Reset createdBy to user ID
+        createdBy: user ? user.$id : '',
         modeOfTravel: '',
-        participants: [user.$id], // Ensure the user is added as a participant
+        participants: [user.$id],
       });
       handleClose();
     } catch (error) {
@@ -148,10 +173,10 @@ const Trips: React.FC = () => {
   };
 
   const handleJoinTrip = async (tripId: string) => {
-    if (!user) return; // Ensure user is logged in
+    if (!user) return;
 
     try {
-      await addParticipantToTrip(tripId, user.$id); // Add the user as a participant to the trip
+      await addParticipantToTrip(tripId, user.$id);
       console.log(`User with ID: ${user.$id} joined trip with ID: ${tripId}`);
     } catch (error) {
       console.error('Error joining trip:', error);
@@ -159,8 +184,20 @@ const Trips: React.FC = () => {
     }
   };
 
+  const handleSendTripMessage = async () => {
+    if (!selectedTrip || !newTripMessage.trim() || !user) return;
+
+    try {
+      await sendRoomChat(selectedTrip.id, newTripMessage, user.$id);
+      setNewTripMessage('');
+    } catch (error) {
+      console.error('Error sending trip message:', error);
+    }
+  };
+
   return (
-    <Box sx={{ padding: 3, position: 'relative', minHeight: '100vh', backgroundColor: '#eaeff1' }}>
+    <Box sx={{ padding: 3, position: 'relative', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
+      <Header/>
       <Typography variant="h4" gutterBottom align="center" color="primary" sx={{ fontWeight: 'bold' }}>
         Explore Your Trips
       </Typography>
@@ -169,11 +206,9 @@ const Trips: React.FC = () => {
         {trips.map((trip, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Card variant="outlined" sx={{ 
-              boxShadow: 3, 
+              boxShadow: 1, 
               borderRadius: 2, 
-              transition: '0.3s', 
-              '&:hover': { boxShadow: 6 },
-              backgroundColor: trip.createdBy === 'Me' ? '#d1e7dd' : 'white' // Highlight if created by current user
+              backgroundColor: trip.createdBy === 'Me' ? '#d1e7dd' : 'white'
             }}>
               <CardContent>
                 <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>{trip.tripName}</Typography>
@@ -184,8 +219,8 @@ const Trips: React.FC = () => {
                 <Typography>Mode of Travel: <strong>{trip.modeOfTravel}</strong></Typography>
                 <Typography>Flexible Date: <strong>{trip.isFlexibleDate ? 'Yes' : 'No'}</strong></Typography>
                 <Typography>Created By: <strong>{trip.createdBy}</strong></Typography>
-                <Typography>Participants: <strong>{trip.participants.length}</strong></Typography> {/* Show number of participants */}
-                {trip.createdBy !== 'Me' && ( // Only show Join Trip button if not created by current user
+                <Typography>Participants: <strong>{trip.participants.length}</strong></Typography>
+                {trip.createdBy !== 'Me' && (
                   trip.participants?.includes(user!.$id) ? (
                     <Typography variant="body2" color="textSecondary" sx={{ marginTop: 2 }}>
                       Status: Joined
@@ -201,6 +236,18 @@ const Trips: React.FC = () => {
                     </Button>
                   )
                 )}
+                <Button 
+                  variant="outlined" 
+                  color="secondary" 
+                  startIcon={<MessageCircle />} 
+                  onClick={() => {
+                    setSelectedTrip(trip);
+                    setIsTripChatOpen(true);
+                  }}
+                  sx={{ marginTop: 2 }}
+                >
+                  Chat about this trip
+                </Button>
               </CardContent>
             </Card>
           </Grid>
@@ -209,7 +256,7 @@ const Trips: React.FC = () => {
 
       <Fab
         color="primary"
-        sx={{ position: 'fixed', bottom: 16, right: 16, boxShadow: 3 }}
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
         onClick={handleOpen}
       >
         <Plus size={24} />
@@ -317,6 +364,35 @@ const Trips: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {isTripChatOpen && selectedTrip && (
+        <Dialog open={isTripChatOpen} onClose={() => setIsTripChatOpen(false)} sx={{ borderRadius: 2 }}>
+          <DialogTitle sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>{selectedTrip.tripName} Chat</DialogTitle>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', padding: 2 }}>
+            <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '16px' }}>
+              {tripMessages.map((msg, index) => (
+                <Typography key={index} sx={{ padding: 1, borderRadius: 1, backgroundColor: '#e3f2fd', marginBottom: 1 }}>
+                  {msg.content}
+                </Typography>
+              ))}
+            </div>
+            <TextField
+              value={newTripMessage}
+              onChange={(e) => setNewTripMessage(e.target.value)}
+              placeholder="Type a message..."
+              fullWidth
+              variant="outlined"
+              sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+            />
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'space-between' }}>
+            <Button onClick={() => setIsTripChatOpen(false)} color="secondary" variant="outlined" sx={{ borderRadius: 1 }}>Close</Button>
+            <Button onClick={handleSendTripMessage} variant="contained" color="primary" sx={{ borderRadius: 1 }}>
+              Send
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   );
 };

@@ -13,7 +13,6 @@ export function useChat(otherUserId: string) {
     if (!user) return;
     console.log("otheruser", otherUserId);
     
-
     const loadMessages = async () => {
       try {
         const response = await getMessages(user.$id, otherUserId);
@@ -29,6 +28,7 @@ export function useChat(otherUserId: string) {
 
     // Subscribe to new messages
     const unsubscribe = subscribeToMessages(user.$id, (newMessage) => {
+      console.log("New message received:", newMessage); // Debugging log
       setMessages((prev) => [...prev, newMessage]);
     });
 
