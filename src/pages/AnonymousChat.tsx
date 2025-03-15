@@ -67,7 +67,7 @@ const [Roomno, setRoomno] = useState();
         console.log(chatData);
         navigate('/chat-room', {
           state: {
-            Room: chatData.receiverId, 
+            Room: chatData.senderId, 
             senderId: chatData.senderId,
             receiverId: chatData.receiverId
           }
@@ -96,8 +96,7 @@ const [Roomno, setRoomno] = useState();
             setLoading(false);
             navigate('/chat-room', {
               state: {
-                Room:matchResult.receiverId, 
-                
+                Room:matchResult.senderId, 
                 senderId: matchResult.receiverId,
                 receiverId: matchResult.senderId
               }

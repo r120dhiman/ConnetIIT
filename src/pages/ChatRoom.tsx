@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 import io from "socket.io-client";
 import Chat from "../components/Chat";
 
-const socket = io("https://connetiit.onrender.com");
+const socket = io("http://localhost:3000");
 
 interface ChatRoomProps {
   senderId?: string;
