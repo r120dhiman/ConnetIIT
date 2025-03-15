@@ -104,9 +104,9 @@ export function Header() {
         } lg:hidden flex-col w-full fixed top-16 right-0 bg-white h-[calc(100vh-4rem)] overflow-y-auto shadow-lg z-50`}>
           {/* Navigation links */}
           <nav className="flex flex-col lg:flex-row w-full lg:w-auto lg:ml-8 space-y-2 lg:space-y-0 lg:space-x-8 p-4 lg:p-0">
-            <Link to="/feed" className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 flex items-center px-4 py-2 lg:p-0">
+            {/* <Link to="/feed" className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 flex items-center px-4 py-2 lg:p-0">
               Feed
-            </Link>
+            </Link> */}
             <Link to="/chat-anonymously" className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 flex items-center px-4 py-2 lg:p-0">
               Random Chat
             </Link>

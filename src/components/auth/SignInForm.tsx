@@ -32,7 +32,7 @@ export function SignInForm() {
       if (!userData.isOnBoarded) {
         navigate('/onboarding');
       } else {
-        navigate('/feed');
+        navigate('/');
       }
     } catch (err) {
       setError("Failed to sign in. Please check your credentials.");
