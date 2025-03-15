@@ -398,3 +398,4 @@ const Trips: React.FC = () => {
 };
 
 export default Trips;
+
