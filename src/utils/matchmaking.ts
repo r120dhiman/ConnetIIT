@@ -1,7 +1,9 @@
+
 import { databases, COLLECTIONS } from '../lib/appwrite/config';
 import { Query, ID } from 'appwrite';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+
 enum ChatStatus { ACTIVE = "active", ENDED = "ended", PENDING = "pending" }
 
 export async function requestAnonymousChat(
@@ -10,9 +12,6 @@ export async function requestAnonymousChat(
   mode: "interest" | "random"
 ) {
   try {
-    console.log('[requestAnonymousChat] Starting with:', { userId, mode });
-
-    // Check for active chats first
     const activeChats = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.ANONYMOUS_CHATS,
@@ -121,7 +120,7 @@ async function updateQueueStatus(queueId: string, chatId: string) {
       { 
         status: "matched", 
         chatId,
-        updatedAt: new Date().toISOString()
+        // updatedAt: new Date().toISOString()
       }
     );
   } catch (error) {
@@ -132,7 +131,7 @@ async function updateQueueStatus(queueId: string, chatId: string) {
 
 async function createChat(senderId: string, receiverId: string) {
   console.log('[createChat] Creating chat between:', { senderId, receiverId });
-  
+
   const newChat = await databases.createDocument(
     DATABASE_ID,
     COLLECTIONS.ANONYMOUS_CHATS,
@@ -141,7 +140,7 @@ async function createChat(senderId: string, receiverId: string) {
       senderId,
       receiverId,
       chatlogs: [],
-      createdAt: new Date().toISOString()
+      // createdAt: new Date().toISOString()
     }
   );
 const chatId=newChat.$id;
@@ -150,6 +149,7 @@ const chatId=newChat.$id;
     chatId,
     receiverId,
   }
+
   console.log(newChat.receiverId);
   return newChat;
 }

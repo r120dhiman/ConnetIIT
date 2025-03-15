@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { requestAnonymousChat, checkForChatMatch } from '../utils/matchmaking';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate,useLocation } from 'react-router';
 import { Query } from 'appwrite';
-import ChatWindow from './AnonymousChatWindow';
+
 import { databases, COLLECTIONS, account } from '../lib/appwrite/config';
+
+
 import { Users, ArrowLeft, Search, Tags } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { div } from 'framer-motion/client';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
@@ -18,6 +19,8 @@ const AnonymousChat: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const matchCheckIntervalRef = useRef<number | null>(null);
 const navigate = useNavigate();
+const [Roomno, setRoomno] = useState();
+
 
   useEffect(() => {
     const fetchAnonymousId = async () => {
@@ -55,14 +58,20 @@ const navigate = useNavigate();
     const startTime = Date.now();
     const searchDuration = 15000; // 5 seconds
 
+
     try {
       console.log(anonymousId, hobbies, mode);
       const chatData = await requestAnonymousChat(anonymousId, hobbies, mode);
-      
       if (chatData && chatData.$id) {
-        // We got a match immediately
-        setChat(chatData);
         setLoading(false);
+        console.log(chatData);
+        navigate('/chat-room', {
+          state: {
+            Room: chatData.receiverId, 
+            senderId: chatData.senderId,
+            receiverId: chatData.receiverId
+          }
+        });
         return;
       }
       
@@ -85,6 +94,14 @@ const navigate = useNavigate();
             matchCheckIntervalRef.current = null;
             setChat(matchResult);
             setLoading(false);
+            navigate('/chat-room', {
+              state: {
+                Room:matchResult.receiverId, 
+                
+                senderId: matchResult.receiverId,
+                receiverId: matchResult.senderId
+              }
+            });
           }
         } catch (err) {
           console.error("Error checking for match:", err);
@@ -97,6 +114,7 @@ const navigate = useNavigate();
       alert(error.message);
       setLoading(false);
     }
+    
   };
 
   return (
@@ -217,7 +235,8 @@ const navigate = useNavigate();
           )}
           {chat &&
           <div className="flex items-center justify-center mt-4">
-            <ChatWindow chatId={chat.$id} userId={chat.receiverId}/>
+            
+            
             </div>}
         </div> 
       </motion.div>
