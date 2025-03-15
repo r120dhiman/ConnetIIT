@@ -17,6 +17,8 @@ import AnonymousChat from './pages/AnonymousChat';
 import Communities from './pages/Communities';
 import Home from './pages/Home';
 import Trips from './pages/Trips';
+import ChatRoom from './pages/ChatRoom';
+
 
 function App() {
   return (
@@ -28,12 +30,14 @@ function App() {
             <Routes>
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
+              {/* <Route path="/chat12" element={<ChatTry/>} /> */}
               <Route path="/auth/callback" element={<Callback />} />
               <Route path="/" element={<PrivateRoute><Feed/></PrivateRoute>} />
               {/* <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} /> */}
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}
               <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
-              <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat/></PrivateRoute>} />
+              <Route path="/chat-room" element={<PrivateRoute><ChatRoom/></PrivateRoute>} />
+              <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat /></PrivateRoute>} />
               <Route path="/onboarding" element={<PrivateRoute><OnBoarding/></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="/travel" element={<PrivateRoute><Trips /></PrivateRoute>} />
