@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { onboarding, onboardingverification } from '../lib/appwrite/auth';
+import { onboarding, onboardingverification, getCurrentUser } from '../lib/appwrite/auth';
 import { useNavigate } from 'react-router';
 
 function OnBoarding() {
@@ -8,27 +8,33 @@ function OnBoarding() {
     const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
-        const checkOnboarding = async () => {
+        const checkAuth = async () => {
             try {
-                const alreadyOnboarded = await onboardingverification();
-                if (alreadyOnboarded) {
-                    navigate('/');
+                const user = await getCurrentUser();
+                if (!user) {
+                    navigate('/sign-in', { replace: true });
+                    console.log("I am here bro");
+                    return;
+                }
+                
+                const isOnboarded = await onboardingverification();
+                if (isOnboarded) {
+                    navigate('/', { replace: true });
                 }
             } catch (error) {
-                console.error('Verification error:', error);
+                console.error('Auth check error:', error);
+                console.log("yaha hu bhai");
+                navigate('/sign-in', { replace: true });
             } finally {
                 setIsChecking(false);
             }
         };
 
-        checkOnboarding();
+        checkAuth();
     }, [navigate]);
 
-    // Don't render the form while checking onboarding status
     if (isChecking) {
-        return <div className="min-h-screen flex items-center justify-center">
-            Loading...
-        </div>;
+        return <div>Loading...</div>;
     }
 
     const handleOnBoarding = async(e: React.FormEvent<HTMLFormElement>) => {
@@ -37,9 +43,12 @@ function OnBoarding() {
         const formData = new FormData(e.currentTarget);
         const gender = formData.get('gender');
         const selectedInterests = Array.from(e.currentTarget.interests.selectedOptions).map(option => option.value);
-        const friendId = formData.get('friendsId');
+        let friendId = formData.get('friendsId');
+        if(!friendId){
+            friendId=" ";
+        }
 
-        if (!gender || selectedInterests.length === 0 || !friendId) {
+        if (!gender || selectedInterests.length === 0 ) {
             alert('Please fill in all fields');
             return;
         }

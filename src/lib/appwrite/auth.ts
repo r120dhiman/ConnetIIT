@@ -33,7 +33,7 @@ export async function signUp(email: string, password: string, name: string) {
 
     // Return both user and userDoc
     return {
-      user: await account.get(),
+      user,
       userDoc
     };
   } catch (error) {

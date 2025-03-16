@@ -11,6 +11,12 @@ export function SignIn() {
         <h1 className="text-2xl font-bold mt-4">Welcome back to ConnectIT</h1>
         <p className="text-gray-600 mt-2">Sign in to continue to your account</p>
       </div>
+      <p className="mt-4 text-center text-sm text-gray-600">
+         Getting Problem SignIn after SignUp{' '}
+            <a href="/" className="text-primary hover:underline font-medium transition-colors duration-200 ease-in-out">
+            Move to Home
+            </a>
+        </p>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <SignInForm />
@@ -21,6 +27,7 @@ export function SignIn() {
             Sign up
           </Link>
         </p>
+        
       </div>
     </div>
   );

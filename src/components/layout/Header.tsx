@@ -43,10 +43,10 @@ export function Header() {
         {/* Desktop Navigation */}
         <div className="hidden lg:flex lg:items-center lg:justify-between lg:flex-1 lg:ml-8">
           <nav className="flex items-center space-x-6">
-            <Link to="/feed" className="nav-link group">
+            {/* <Link to="/feed" className="nav-link group">
               <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Feed</span>
               <div className="h-0.5 w-0 group-hover:w-full bg-indigo-600 transition-all duration-200" />
-            </Link>
+            </Link> */}
             <Link to="/chat-anonymously" className="nav-link group">
               <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Random Chat</span>
               <div className="h-0.5 w-0 group-hover:w-full bg-indigo-600 transition-all duration-200" />
