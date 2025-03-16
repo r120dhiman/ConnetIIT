@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { io } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
 
-const SOCKET_SERVER_URL = 'http://localhost:3000';
+const SOCKET_SERVER_URL = 'https://connetiit.onrender.com';
 // Initialize socket connection
 const socket = io(SOCKET_SERVER_URL);
 
