@@ -13,7 +13,6 @@ function OnBoarding() {
                 const user = await getCurrentUser();
                 if (!user) {
                     navigate('/sign-in', { replace: true });
-                    console.log("I am here bro");
                     return;
                 }
                 
@@ -23,7 +22,6 @@ function OnBoarding() {
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
-                console.log("yaha hu bhai");
                 navigate('/sign-in', { replace: true });
             } finally {
                 setIsChecking(false);

@@ -12,12 +12,12 @@ export async function signUp(email: string, password: string, name: string) {
     // Create account
     const user = await account.create(ID.unique(), email, password, name);
     
-    // Create session
+    // Important: Create session immediately after signup
     await account.createEmailPasswordSession(email, password);
 
     const randomId = generateUniqueId();
     
-    // Create User document and wait for it to complete
+    // Create User document
     const userDoc = await databases.createDocument(
       DATABASE_ID,
       COLLECTIONS.USERS,
@@ -26,15 +26,15 @@ export async function signUp(email: string, password: string, name: string) {
         id: user.$id,
         name, 
         email,
+        password,
         isOnBoarded: false,
         anonymousId: randomId
       }
     );
 
-    // Return both user and userDoc
     return {
-      user,
-      userDoc
+      user: user,
+      userDoc: userDoc
     };
   } catch (error) {
     console.error('Sign up error:', error);

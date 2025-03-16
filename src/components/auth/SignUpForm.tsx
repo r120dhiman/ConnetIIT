@@ -25,11 +25,12 @@ export function SignUpForm() {
 
     try {
       const { user, userDoc } = await signUp(email, password, name);
-      if (!userDoc.isOnBoarded) {
-        navigate('/onboarding');
-      }
-    } catch (err) {
-      setError("Failed to create account. Please try again.");
+      
+      // Always redirect to onboarding for new users
+      navigate('/onboarding', { replace: true });
+    } catch (err: any) {
+      console.error("Signup error:", err);
+      setError(err.message || "Failed to create account. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -121,7 +122,7 @@ export function SignUpForm() {
           {loading ? "Creating Account..." : "Sign Up"}
         </button>
       </form>
-
+{/* 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -155,7 +156,7 @@ export function SignUpForm() {
           />
         </svg>
         Sign up with Google
-      </button>
+      </button> */}
     </div>
   );
 }

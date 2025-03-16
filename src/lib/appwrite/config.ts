@@ -11,15 +11,15 @@ export const storage = new Storage(client);
 export const functions = new Functions(client);
 
 export const COLLECTIONS = {
-  POSTS: '67752371002febb931a1',
-  CHALLENGES: '677562880002b979b665',
-  COMMENTS: '677561d7001da9f2f0de',
-  MESSAGES: '677578060007be19a630',
-  USERS:'67824d4f000959ec966a',
-  ANONYMOUS_CHATS:'67d066fb00343b3675a8',
-  COMMUNITIES:'67d1426400251f663afb',
-  QUEUE:'67d2b616000ddb0a855c',
-  TRIPS:'67d3fdc90004306657f6',
-  ROOMCHAT:'67d504550020d2c7c8f2',
-  TOTAL_ROOMS:'67d48a4b002b54fcee95',
+  POSTS: '67d72c970037543ef10f', //done
+  CHALLENGES: '67d72ff10031f16751cd',//done
+  COMMENTS: '67d72f6d000023e6d4d7',//done
+  MESSAGES: '67d73087000ea52a269e',//done
+  USERS:'67d72ad6003d7b11ce21', //done
+  ANONYMOUS_CHATS:'67d72d80003bc5b385d8',//done
+  COMMUNITIES:'67d72f09002b0ffee954',//done
+  QUEUE:'67d72e120024fcb04feb', //done
+  TRIPS:'67d732dc003598f63d28',//done
+  ROOMCHAT:'67d7312400351aed23a4',//done
+  TOTAL_ROOMS:'67d733ea0007250da40e',//done
 } as const;
