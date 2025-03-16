@@ -4,7 +4,7 @@ import { ArrowLeft, Send, User, Clock, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { io } from 'socket.io-client';
 
-const SOCKET_SERVER_URL = 'http://localhost:3000';
+const SOCKET_SERVER_URL = 'https://connetiit.onrender.com';
 const socket = io(SOCKET_SERVER_URL);
 
 interface Message {
