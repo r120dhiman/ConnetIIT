@@ -28,6 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
+        console.log(currentUser,"cureent useer");
+        
 
         if (currentUser) {
           const profile = await databases.getDocument(
@@ -47,8 +49,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
-  // console.log("user", user);
-  // console.log("userProfile", userProfile);
+  console.log("user", user);
+  console.log("userProfile", userProfile);
   
 
   return (

@@ -1,119 +1,128 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { requestAnonymousChat, checkForChatMatch } from '../utils/matchmaking';
-import { Link, useNavigate,useLocation } from 'react-router';
-import { Query } from 'appwrite';
-
-import { databases, COLLECTIONS, account } from '../lib/appwrite/config';
-
-
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router'; // Fixed import
 import { Users, ArrowLeft, Search, Tags } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { io } from 'socket.io-client';
+import { useAuth } from '../contexts/AuthContext';
 
-const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const SOCKET_SERVER_URL = 'http://localhost:3000';
+// Initialize socket connection
+const socket = io(SOCKET_SERVER_URL);
 
 const AnonymousChat: React.FC = () => {
   const [anonymousId, setAnonymousId] = useState('');
   const [hobbies, setHobbies] = useState<string[]>([]);
   const [mode, setMode] = useState<'interest' | 'random'>('random');
-  const [chat, setChat] = useState<any>(null);
+  const [isInQueue, setIsInQueue] = useState(false);
+  const [queuePosition, setQueuePosition] = useState(0);
   const [loading, setLoading] = useState(false);
-  const matchCheckIntervalRef = useRef<number | null>(null);
-const navigate = useNavigate();
-const [Roomno, setRoomno] = useState();
-
+  const navigate = useNavigate();
+  const { userProfile } = useAuth();
 
   useEffect(() => {
-    const fetchAnonymousId = async () => {
-      try {
-        const user = await account.get();
-        if (!user) return;
-        const userdata = await databases.listDocuments(DATABASE_ID, COLLECTIONS.USERS, [
-          Query.equal("id", user.$id),
-        ]);
-        const randomId = userdata.documents[0].anonymousId;
-        setAnonymousId(randomId.toString());
-      } catch (error) {
-        console.error("Error fetching anonymous ID:", error);
-      }
-    };
-
-    fetchAnonymousId();
-    
-    // Clean up interval on component unmount
-    return () => {
-      if (matchCheckIntervalRef.current) {
-        clearInterval(matchCheckIntervalRef.current);
-      }
-    };
-  }, []);
-
-  const handleRequestChat = async () => {
-    if (matchCheckIntervalRef.current) {
-      clearInterval(matchCheckIntervalRef.current);
-      matchCheckIntervalRef.current = null;
+    if (userProfile) {
+      setAnonymousId(userProfile.anonymousId || `anon_${Math.random().toString(36).substring(2, 10)}`);
+      console.log("User anonymous ID set:", anonymousId);
     }
+  }, [userProfile]);
 
-    setLoading(true);
-    setChat(null);
-    const startTime = Date.now();
-    const searchDuration = 15000; // 5 seconds
+  useEffect(() => {
+    // Setup socket event listeners
+    socket.on('connect', () => {
+      console.log('Connected to socket server');
+    });
 
+    socket.on('queued', (data) => {
+      console.log('Added to queue:', data);
+      setIsInQueue(true);
+      setQueuePosition(data.position);
+    });
 
-    try {
-      console.log(anonymousId, hobbies, mode);
-      const chatData = await requestAnonymousChat(anonymousId, hobbies, mode);
-      if (chatData && chatData.$id) {
-        setLoading(false);
-        console.log(chatData);
-        navigate('/chat-room', {
-          state: {
-            Room: chatData.senderId, 
-            senderId: chatData.senderId,
-            receiverId: chatData.receiverId
-          }
-        });
-        return;
-      }
-      
-      // No immediate match, set up interval to check for matches
-      const checkInterval = setInterval(async () => {
-        try {
-          // Check if we've exceeded search duration
-          if (Date.now() - startTime >= searchDuration) {
-            clearInterval(checkInterval);
-            matchCheckIntervalRef.current = null;
-            setLoading(false);
-            alert('No match found after 5 seconds.');
-            return;
-          }
-          
-          // Check for matches
-          const matchResult = await checkForChatMatch(anonymousId);
-          if (matchResult) {
-            clearInterval(checkInterval);
-            matchCheckIntervalRef.current = null;
-            setChat(matchResult);
-            setLoading(false);
-            navigate('/chat-room', {
-              state: {
-                Room:matchResult.senderId, 
-                senderId: matchResult.receiverId,
-                receiverId: matchResult.senderId
-              }
-            });
-          }
-        } catch (err) {
-          console.error("Error checking for match:", err);
-        }
-      }, 1000);
-      
-      matchCheckIntervalRef.current = checkInterval as unknown as number;
-    } catch (error) {
-      console.error("Error requesting chat:", error);
-      alert(error.message);
+    socket.on('matched', ({ roomId, matchedUser }) => {
+      console.log(`Matched! Room ID: ${roomId}, Matched User:`, matchedUser);
       setLoading(false);
+      setIsInQueue(false);
+      // Navigate to chat room with match information
+      navigate(`/chat-room`, { 
+        state: { 
+          roomId,
+          matchedUser,
+          currentUser: {
+            id: anonymousId,
+            interests: hobbies
+          }
+        } 
+      });
+    });
+
+    socket.on('queue-left', (data) => {
+      console.log('Left queue:', data);
+      setIsInQueue(false);
+      setLoading(false);
+    });
+
+    socket.on('error', (error) => {
+      console.error("Socket error:", error);
+      setLoading(false);
+      setIsInQueue(false);
+      alert(`Error: ${error.message || 'Something went wrong'}`);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from socket server');
+      setIsInQueue(false);
+      setLoading(false);
+    });
+
+    // Cleanup on component unmount
+    return () => {
+      socket.off('connect');
+      socket.off('queued');
+      socket.off('matched');
+      socket.off('queue-left');
+      socket.off('error');
+      socket.off('disconnect');
+      
+      // Leave queue if component unmounts while in queue
+      if (isInQueue) {
+        socket.emit('leave-queue');
+      }
+    };
+  }, [navigate, anonymousId, hobbies]);
+
+  const handleRequestChat = () => {
+    setLoading(true);
+    
+    // Validate inputs
+    if (!anonymousId) {
+      alert('Anonymous ID not available');
+      setLoading(false);
+      return;
     }
     
+    // Format interests - trim and filter empty strings
+    const formattedInterests = hobbies.map(h => h.trim()).filter(h => h !== '');
+    
+    const user = {
+      id: anonymousId,
+      socketId: socket.id,
+      interests: formattedInterests.length > 0 ? formattedInterests : ['general'],
+      mode
+    };
+
+    console.log("Joining queue with:", user);
+    socket.emit('join-queue', user);
+  };
+
+  const handleCancelSearch = () => {
+    socket.emit('leave-queue');
+    setLoading(false);
+    setIsInQueue(false);
+  };
+
+  const handleInterestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const interestString = e.target.value;
+    setHobbies(interestString.split(',').map(item => item.trim()).filter(item => item !== ''));
   };
 
   return (
@@ -153,12 +162,21 @@ const [Roomno, setRoomno] = useState();
               <input
                 type="text"
                 placeholder="Gaming, Music, Travel..."
-                onChange={(e) => setHobbies(e.target.value.split(','))}
+                onChange={handleInterestChange}
                 className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg 
                           focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400
                           text-white backdrop-blur-sm transition-all"
               />
             </div>
+            {hobbies.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {hobbies.map((hobby, index) => (
+                  <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-200 text-purple-800">
+                    {hobby}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Mode Selection */}
@@ -174,70 +192,97 @@ const [Roomno, setRoomno] = useState();
               <option value="random" className="bg-gray-900">Random Match</option>
               <option value="interest" className="bg-gray-900">Interest-based Match</option>
             </select>
+            {mode === 'interest' && (
+              <p className="text-xs text-gray-400 mt-1">
+                You'll be matched with users who share at least one of your interests.
+              </p>
+            )}
           </div>
 
           {/* Find Chat Partner Button */}
-          <button
-            onClick={handleRequestChat}
-            disabled={loading || !anonymousId}
-            className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg
-              font-medium transition-all duration-200 ${
-                loading || !anonymousId
-                  ? 'bg-gray-600 cursor-not-allowed'
-                  : 'bg-purple-600 hover:bg-purple-700 active:transform active:scale-95'
-              } text-white backdrop-blur-sm`}
-          >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <motion.div
-                  animate={{ opacity: [0.3, 1, 0.3] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                  className="w-3 h-3 bg-white rounded-full"
-                ></motion.div>
-                <motion.div
-                  animate={{ opacity: [0.3, 1, 0.3] }}
-                  transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
-                  className="w-3 h-3 bg-white rounded-full"
-                ></motion.div>
-                <motion.div
-                  animate={{ opacity: [0.3, 1, 0.3] }}
-                  transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
-                  className="w-3 h-3 bg-white rounded-full"
-                ></motion.div>
-                Searching...
+          {!isInQueue ? (
+            <button
+              onClick={handleRequestChat}
+              disabled={loading || !anonymousId}
+              className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg
+                font-medium transition-all duration-200 ${
+                  loading || !anonymousId
+                    ? 'bg-gray-600 cursor-not-allowed'
+                    : 'bg-purple-600 hover:bg-purple-700 active:transform active:scale-95'
+                } text-white backdrop-blur-sm`}
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ repeat: Infinity, duration: 1 }}
+                    className="w-3 h-3 bg-white rounded-full"
+                  ></motion.div>
+                  <motion.div
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
+                    className="w-3 h-3 bg-white rounded-full"
+                  ></motion.div>
+                  <motion.div
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
+                    className="w-3 h-3 bg-white rounded-full"
+                  ></motion.div>
+                  Connecting...
+                </div>
+              ) : (
+                <>
+                  <Search className="h-5 w-5" />
+                  Find a Chat Partner
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <div className="p-4 border border-purple-400/20 rounded-lg bg-purple-400/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
+                    <span className="text-purple-300 font-medium">Searching for a match...</span>
+                  </div>
+                  <span className="text-sm text-purple-200">Position: {queuePosition}</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">
+                  {mode === 'interest' 
+                    ? "Looking for someone with similar interests..." 
+                    : "Looking for anyone available to chat..."}
+                </p>
               </div>
-            ) : (
-              <>
-                <Search className="h-5 w-5" />
-                Find a Chat Partner
-              </>
-            )}
-          </button>
+              
+              <button
+                onClick={handleCancelSearch}
+                className="w-full py-2 px-4 rounded-lg border border-red-400/30 bg-red-400/10 hover:bg-red-400/20
+                        text-red-300 font-medium transition-all duration-200"
+              >
+                Cancel Search
+              </button>
+            </div>
+          )}
 
-          {/* Chat Result with Entry Animation */}
-          {chat && (
+          {/* Status Messages */}
+          {isInQueue && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="mt-4 p-4 border border-green-400/20 rounded-lg bg-green-400/10 backdrop-blur-sm"
+              className="mt-4"
             >
-              <div className="flex items-center gap-2 text-green-400 font-semibold mb-2">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                Match Found!
-              </div>
-              <div className="space-y-1 text-sm text-gray-300">
-                <p className="font-mono">ID: {chat.$id}</p>
-                <p>Status: <span className="text-green-400">{chat.receiverId}</span></p>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-400">
+                  <span className="font-bold">{mode === 'interest' ? 'Interest-based' : 'Random'} matching</span>
+                </div>
+                <div className="text-sm text-gray-400">
+                  <span className="font-bold">Anonymous ID:</span> {anonymousId.substring(0, 8)}...
+                </div>
               </div>
             </motion.div>
           )}
-          {chat &&
-          <div className="flex items-center justify-center mt-4">
-            
-            
-            </div>}
-        </div> 
+        </div>
       </motion.div>
     </div>
   );
