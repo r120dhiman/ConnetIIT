@@ -17,14 +17,26 @@ export async function searchPosts(query: string) {
 }
 
 export async function searchUsers(query: string) {
-  return databases.listDocuments(
-    DATABASE_ID,
-    COLLECTIONS.USERS,
-    [
-      Query.search('name', query),
-      Query.limit(10)
-    ]
-  );
+  try {
+    if (!query.trim()) {
+      return { documents: [] };
+    }
+
+    const searchQuery = query.toLowerCase().trim();
+
+    return databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.USERS,
+      [
+        Query.search('name', searchQuery),
+        Query.limit(20),
+        Query.orderDesc('$createdAt')
+      ]
+    );
+  } catch (error) {
+    console.error('Error searching users:', error);
+    throw new Error('Failed to search users');
+  }
 }
 
 export async function searchByTags(tags: string[]) {

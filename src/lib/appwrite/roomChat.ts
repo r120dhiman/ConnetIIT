@@ -52,18 +52,30 @@ export const sendRoomChat = async (roomId: string, content: string, senderId: st
 
 // Realtime subscription for room chats
 export const subscribeToRoomChats = (roomId: string, callback: (message: RoomChatMessage) => void) => {
-  const unsubscribe = client.subscribe(`databases.${DATABASE_ID}.collections.${COLLECTIONS.ROOMCHAT}.documents`, (response) => {
-    // Check if the event is a creation event for the room chat
-    if (response.events.includes('databases.*.collections.*.documents.*.create') && response.payload && (response.payload as RoomChatMessage).roomId === roomId) {
-      // Call the callback with the new message data
-      callback({
-        roomId: (response.payload as RoomChatMessage).roomId,
-        content: (response.payload as RoomChatMessage).content,
-        senderId: (response.payload as RoomChatMessage).senderId,
-        timestamp: (response.payload as RoomChatMessage).timestamp // Ensure this matches the property name in the chat message
-      });
-    }
-  });
+  try {
+    const unsubscribe = client.subscribe(
+      [`databases.${DATABASE_ID}.collections.${COLLECTIONS.ROOMCHAT}.documents`],
+      (response) => {
+        // Only process if it's a create event and matches the room
+        if (
+          response.events.includes('databases.*.collections.*.documents.*.create') && 
+          (response.payload as RoomChatMessage).roomId === roomId
+        ) {
+          callback({
+            roomId: (response.payload as RoomChatMessage).roomId,
+            content: (response.payload as RoomChatMessage).content,
+            senderId: (response.payload as RoomChatMessage).senderId,
+            timestamp: (response.payload as RoomChatMessage).timestamp
+          });
+        }
+      }
+    );
 
-  return unsubscribe; // Return the unsubscribe function
+    return () => {
+      unsubscribe();
+    };
+  } catch (error) {
+    console.error('Error subscribing to room chats:', error);
+    return () => {}; // Return empty cleanup function in case of error
+  }
 };

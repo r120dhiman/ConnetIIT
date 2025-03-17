@@ -75,8 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  console.log("user", user);
-  console.log("userProfile", userProfile);
+  // console.log("user", user);
+  // console.log("userProfile", userProfile);
   
 
   return (

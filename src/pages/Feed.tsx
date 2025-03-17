@@ -3,12 +3,13 @@ import { CreatePost } from '../components/posts/CreatePost';
 import { usePosts } from '../hooks/usePosts';
 import { Header } from '../components/layout/Header';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FriendSuggestions from '../components/friendSuggestions'; // Importing FriendSuggestions component
 import { useAuth } from '../contexts/AuthContext';
 
 export function Feed() {
-  const { posts, loading, error, handleLike } = usePosts();
+  const { posts, loading, error, handleLike, addNewPost, refreshPosts } = usePosts();
+  
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const [showFriendSuggestions, setShowFriendSuggestions] = useState(true); // State to manage visibility of FriendSuggestions
   const { user, userProfile } = useAuth();
@@ -19,6 +20,11 @@ export function Feed() {
 
   const toggleFriendSuggestions = () => {
     setShowFriendSuggestions((prev) => !prev); // Toggle visibility of FriendSuggestions
+  };
+
+  const handlePostCreated = (newPost: any) => {
+    addNewPost(newPost);
+    setIsCreatingPost(false); // Close the create post form
   };
 
   if (loading) {
@@ -66,14 +72,17 @@ export function Feed() {
         
         {isCreatingPost && (
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <CreatePost />
+            <CreatePost 
+              onPostCreated={handlePostCreated}
+              onCancel={() => setIsCreatingPost(false)}
+            />
           </div>
         )}
 
         <div className="space-y-6">
           {posts.map((post) => (
             <PostCard
-              key={post.id}
+              key={post.$id}
               post={post}
               onLike={handleLike}
             />
