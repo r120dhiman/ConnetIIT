@@ -38,7 +38,7 @@ function App() {
               <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
               <Route path="/chat-room" element={<PrivateRoute><ChatRoom/></PrivateRoute>} />
               <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat /></PrivateRoute>} />
-              <Route path="/onboarding" element={<PrivateRoute><OnBoarding/></PrivateRoute>} />
+              <Route path="/onboarding" element={<OnBoarding/>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="/travel" element={<PrivateRoute><Trips /></PrivateRoute>} />
               <Route path="/communities" element={<PrivateRoute><Communities /></PrivateRoute>} />
