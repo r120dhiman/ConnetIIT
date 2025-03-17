@@ -47,7 +47,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             navigate('/onboarding') // Redirect to onboarding page
             return; // Ensure no further code is executed
           }
-          navigate('/');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);

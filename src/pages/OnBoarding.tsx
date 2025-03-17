@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { onboarding,  getCurrentUser } from '../lib/appwrite/auth';
+import React, { useState } from 'react'
+// import { onboarding,  getCurrentUser } from '../lib/appwrite/auth';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 
 function OnBoarding() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [isChecking, setIsChecking] = useState(true);
+    // const [isChecking, setIsChecking] = useState(true);
     const {handleOnboarding} = useAuth();
 
     // useEffect(() => {
