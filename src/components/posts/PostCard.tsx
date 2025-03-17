@@ -3,7 +3,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageSquare, Share2 } from 'lucide-react';
 import { CommentList } from '../comments/CommentList';
 import type { Post } from '../../types';
-import { on } from 'events';
 
 interface PostCardProps {
   post: Post;

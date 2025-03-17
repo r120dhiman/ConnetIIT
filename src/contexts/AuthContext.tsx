@@ -43,10 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           );
           setUserProfile(profile);
            // Redirect to /onboarding if userProfile.isOnBoarded is false
-           if (!profile.isOnBoarded) {
-            navigate('/onboarding') // Redirect to onboarding page
-            return; // Ensure no further code is executed
-          }
+          //  if (!profile.isOnBoarded) {
+          //   navigate('/onboarding') // Redirect to onboarding page
+          //   return; // Ensure no further code is executed
+          // }
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     initAuth();
-  }, [navigate]);
+  }, []);
 
   const handleOnboarding = async (gender: string, interests: string, friendId: string) => {
     try {
