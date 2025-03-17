@@ -55,28 +55,35 @@ io.on("connection", (socket) => {
     console.log(`User ${socket.id} joined room ${roomId}`);
   });
 
-  // Handle room leaving
-  socket.on("leave-room", ({ roomId }) => {
-    socket.leave(roomId);
-    console.log(`User ${socket.id} left room ${roomId} in server.ts` );
-    // Check if the room exists and remove it
+  socket.on("destroyroom", ({ roomId }) => {
+    console.log(`Destroying room ${roomId}`);
+    // Notify all users in the room to leave
+    io.to(roomId).emit("room-destroyed");
+    
+    // Force all sockets to leave the room
+    io.in(roomId).socketsLeave(roomId);
+    
+    // Remove the room from room manager
     const room = roomManager.getRoomByUser(socket.id);
     if (room) {
-      // Notify other users in the room
-      socket.to(room.id).emit("user-disconnected", {
-        message: "Your chat partner has disconnected",
-      });
-      // Clean up the room
       roomManager.removeRoom(room.id);
     }
   });
 
-  // // Handle chat messages
-  // socket.on('send-message', ({ roomId, message }) => {
-  //   // Broadcast to everyone in the room except sender
-  //   socket.to(roomId).emit('receive-message', message);
-  //   console.log(`Message sent in room ${roomId}: ${message.text.substring(0, 20)}...`);
-  // });
+  // Handle room leaving
+  socket.on("leave-room", ({ roomId }) => {
+    socket.leave(roomId);
+    console.log(`User ${socket.id} left room ${roomId}`);
+    
+    // Get the room before the user leaves
+    const room = roomManager.getRoomByUser(socket.id);
+    if (room) {
+      // Notify others and destroy room
+      io.to(roomId).emit("user-disconnected");
+      io.in(roomId).socketsLeave(roomId);
+      roomManager.removeRoom(room.id);
+    }
+  });
 
   // Handle typing indicator
   socket.on("typing", ({ roomId }) => {

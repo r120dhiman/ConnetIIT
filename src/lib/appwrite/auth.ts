@@ -44,8 +44,9 @@ export async function signUp(email: string, password: string, name: string) {
 
 export async function signIn(email: string, password: string) {
   try {
-    await account.createEmailPasswordSession(email, password);  
+   await account.createEmailPasswordSession(email, password); 
     return account.get();
+  
   } catch (error) {
     console.error('Sign in error:', error);
     throw error;

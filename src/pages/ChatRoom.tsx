@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { io } from 'socket.io-client';
 
 const SOCKET_SERVER_URL = 'https://connetiit.onrender.com';
+// const SOCKET_SERVER_URL = 'http://localhost:3000';
 const socket = io(SOCKET_SERVER_URL);
 
 interface Message {
@@ -31,6 +32,19 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    const handleRoomDestroyed = () => {
+      console.log("Room has been destroyed, redirecting...");
+      navigate("/"); // Redirect both users
+    };
+  
+    socket.on("room-destroyed", handleRoomDestroyed);
+  
+    return () => {
+      socket.off("room-destroyed", handleRoomDestroyed);
+    };
+  }, [navigate]);
 
   useEffect(() => {
     // Validate room information
@@ -77,8 +91,17 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
       };
       setMessages(prevMessages => [...prevMessages, disconnectMessage]);
       setPartnerDisconnected(true);
-      // Redirect to chat-anonymously page
-    //   navigate('/chat-anonymously');
+    
+      // Automatically redirect after a short delay
+      setTimeout(() => {
+        navigate('/chat-anonymously');
+      }, 2000); // 2 second delay to show the disconnect message
+    });
+
+    // Handle destroy room event
+    socket.on('room-destroyed', () => {
+      console.log('Room has been destroyed');
+      navigate('/chat-anonymously');
     });
 
     // Cleanup on component unmount
@@ -86,10 +109,16 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
       socket.off('receive-message');
       socket.off('typing');
       socket.off('user-disconnected');
+      socket.off('room-destroyed');
       socket.emit('leave-room', { roomId });
     };
   }, [roomId, matchedUser, currentUser, navigate]);
 
+  const handleBack = () => {
+    socket.emit('destroyroom', { roomId });
+    navigate('/chat-anonymously');
+  };
+  
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -132,6 +161,7 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
         <div className="bg-black/30 p-4 backdrop-blur flex items-center justify-between">
           <Link
             to="/chat-anonymously"
+            onClick={handleBack}
             className="text-white/80 hover:text-white flex items-center gap-2 transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />

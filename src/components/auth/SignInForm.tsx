@@ -41,13 +41,13 @@ export function SignInForm() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      setError("Failed to sign in with Google.");
-    }
-  };
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     await signInWithGoogle();
+  //   } catch (err) {
+  //     setError("Failed to sign in with Google.");
+  //   }
+  // };
 
   return (
     <div className="space-y-6">
@@ -143,3 +143,6 @@ export function SignInForm() {
     </div>
   );
 }
+
+
+
