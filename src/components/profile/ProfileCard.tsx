@@ -1,6 +1,5 @@
-import React from 'react';
+
 import { User } from '../../types';
-import { Github, Linkedin, Trophy } from 'lucide-react';
 
 interface ProfileCardProps {
   user: User;
@@ -25,7 +24,7 @@ export function ProfileCard({ user }: ProfileCardProps) {
       
       <div className="mt-6">
         <h3 className="font-semibold mb-2">About</h3>
-        <p className="text-sm text-muted-foreground text-red-300">{user.bio}</p>
+        <p className="text-sm text-muted-foreground ">{user.bio}</p>
       </div>
 
       <div className="mt-4">
