@@ -1,39 +1,41 @@
 import React, { useState, useEffect } from 'react'
-import { onboarding, onboardingverification, getCurrentUser } from '../lib/appwrite/auth';
+import { onboarding,  getCurrentUser } from '../lib/appwrite/auth';
 import { useNavigate } from 'react-router';
+import { useAuth } from '../contexts/AuthContext';
 
 function OnBoarding() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
+    const {handleOnboarding} = useAuth();
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const user = await getCurrentUser();
-                if (!user) {
-                    navigate('/sign-in', { replace: true });
-                    return;
-                }
+    // useEffect(() => {
+    //     const checkAuth = async () => {
+    //         try {
+    //             const user = await getCurrentUser();
+    //             if (!user) {
+    //                 navigate('/sign-in', { replace: true });
+    //                 return;
+    //             }
                 
-                const isOnboarded = await onboardingverification();
-                if (isOnboarded) {
-                    navigate('/', { replace: true });
-                }
-            } catch (error) {
-                console.error('Auth check error:', error);
-                navigate('/sign-in', { replace: true });
-            } finally {
-                setIsChecking(false);
-            }
-        };
+    //             const isOnboarded = await onboardingverification();
+    //             if (isOnboarded) {
+    //                 navigate('/', { replace: true });
+    //             }
+    //         } catch (error) {
+    //             console.error('Auth check error:', error);
+    //             navigate('/sign-in', { replace: true });
+    //         } finally {
+    //             setIsChecking(false);
+    //         }
+    //     };
 
-        checkAuth();
-    }, [navigate]);
+    //     checkAuth();
+    // }, [navigate]);
 
-    if (isChecking) {
-        return <div>Loading...</div>;
-    }
+    // if (isChecking) {
+    //     return <div>Loading...</div>;
+    // }
 
     const handleOnBoarding = async(e: React.FormEvent<HTMLFormElement>) => {
        try {
@@ -51,15 +53,12 @@ function OnBoarding() {
             return;
         }
 
-        const data = await onboarding(
+        await handleOnboarding(
             gender.toString(), 
             selectedInterests.join(','), 
             friendId.toString()
         );
-        
-        if(data) {
-            navigate('/')
-        }
+        navigate('/');
        } catch (error) {
          console.error('Onboarding error:', error);
        } finally {

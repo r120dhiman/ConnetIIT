@@ -151,20 +151,20 @@ export async function onboarding(gender: string, interests: string, friendId: st
 }
 
 
-export async function onboardingverification(){
-  try {
-    const user = await account.get();
-    const existingUser = await databases.getDocument(
-      DATABASE_ID,
-      COLLECTIONS.USERS,
-      user.$id
-    );
-    return existingUser.isOnBoarded;
-  } catch (error) {
-    console.error('Onboarding error:', error);
-    throw error;
-  }
-}
+// export async function onboardingverification(){
+//   try {
+//     const user = await account.get();
+//     const existingUser = await databases.getDocument(
+//       DATABASE_ID,
+//       COLLECTIONS.USERS,
+//       user.$id
+//     );
+//     return existingUser.isOnBoarded;
+//   } catch (error) {
+//     console.error('Onboarding error:', error);
+//     throw error;
+//   }
+// }
 
 export async function getCurrentUser() {
   try {

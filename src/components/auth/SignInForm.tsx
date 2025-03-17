@@ -2,12 +2,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { signIn } from '../../lib/appwrite/auth';
-import { Mail, Lock } from 'lucide-react';
-import { databases } from '../../lib/appwrite/config';
-import { COLLECTIONS } from '../../lib/appwrite/config';
+import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
 
 // Get DATABASE_ID from environment variable
-const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 export function SignInForm() {
   const navigate = useNavigate();
@@ -15,6 +12,7 @@ export function SignInForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,18 +20,8 @@ export function SignInForm() {
     setLoading(true);
 
     try {
-      const user = await signIn(email, password);
-      const userData = await databases.getDocument(
-        DATABASE_ID,
-        COLLECTIONS.USERS,
-        user.$id
-      );
-      
-      if (!userData.isOnBoarded) {
-        navigate('/onboarding');
-      } else {
-        navigate('/');
-      }
+      await signIn(email, password);
+      navigate('/');
     } catch (err) {
       setError("Failed to sign in. Please check your credentials.");
     } finally {
@@ -89,12 +77,23 @@ export function SignInForm() {
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"} // Toggle between text and password
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-10 w-full rounded-md border-gray-300"
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
           </div>
         </div>
 
