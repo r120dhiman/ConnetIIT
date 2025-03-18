@@ -29,6 +29,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getProfile } from '../lib/appwrite/users';
 import { getRoomChats, sendRoomChat, subscribeToRoomChats } from '../lib/appwrite/roomChat';
 import { Header } from '../components/layout/Header';
+import { toast } from 'react-toastify'; // Import toast
 
 interface Trip {
   tripName: string;
@@ -180,11 +181,11 @@ const Trips: React.FC = () => {
 
     const today = new Date().toISOString().split('T')[0];
     if (!newTrip.tripName || !newTrip.date) {
-      alert('Please fill in all required fields.');
+      toast.error('Please fill in all required fields.'); // Use toast for error
       return;
     }
     if (newTrip.date < today) {
-      alert("Date cannot be in the past.");
+      toast.error("Date cannot be in the past."); // Use toast for error
       return;
     }
 
@@ -220,9 +221,10 @@ const Trips: React.FC = () => {
         participants: [user.$id],
       });
       handleClose();
+      toast.success('Trip created successfully!'); // Use toast for success
     } catch (error) {
       console.error('Error creating trip:', error);
-      alert('Failed to create trip. Please try again.');
+      toast.error('Failed to create trip. Please try again.'); // Use toast for error
     }
   };
 
@@ -251,10 +253,10 @@ const Trips: React.FC = () => {
         } : null);
       }
 
-      alert('Successfully joined the trip!');
+      toast.success('Successfully joined the trip!'); // Use toast for success
     } catch (error) {
       console.error('Error joining trip:', error);
-      alert('Failed to join trip. Please try again.');
+      toast.error('Failed to join trip. Please try again.'); // Use toast for error
     }
   };
 
@@ -264,8 +266,10 @@ const Trips: React.FC = () => {
     try {
       await sendRoomChat(selectedTrip.id, newTripMessage, user.$id);
       setNewTripMessage('');
+      toast.success('Message sent!'); // Use toast for success
     } catch (error) {
       console.error('Error sending trip message:', error);
+      toast.error('Failed to send message.'); // Use toast for error
     }
   };
 
@@ -1167,4 +1171,3 @@ const Trips: React.FC = () => {
 };
 
 export default Trips;
-
