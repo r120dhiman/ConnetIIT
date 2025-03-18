@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../contexts/AuthContext';
-import { signOut } from '../../lib/appwrite/auth';
 import { Laptop, MessageSquare, Trophy, LogOut, User, Menu, X } from 'lucide-react';
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

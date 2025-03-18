@@ -28,6 +28,7 @@
     "nodemon": "^3.1.9",
     "react-dom": "^18.3.1",
     "react-router": "^7.3.0",
+    "react-toastify": "^11.0.5",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.2.1",
