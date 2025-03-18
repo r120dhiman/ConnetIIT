@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageSquare, Share2 } from 'lucide-react';
 import { CommentList } from '../comments/CommentList';
 import type { Post } from '../../types';
+import { getUsersByIds } from '../../lib/appwrite/users';
+import { getCommentsByPostId } from '../../lib/appwrite/comments';
+import { CommentUser } from '../../types/comment';
 
 interface PostCardProps {
   post: Post;
@@ -13,8 +16,43 @@ interface PostCardProps {
 
 export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
-  console.log("PostCard ", post);
-  console.log("onlike", onLike);
+  const [commentUsers, setCommentUsers] = useState<Record<string, CommentUser>>({});
+  const [loading, setLoading] = useState(false);
+
+  // Fetch user data for comments when comments are shown
+  useEffect(() => {
+    if (!showComments) return;
+
+    const fetchCommentUsers = async () => {
+      setLoading(true);
+      try {
+        // Get comments for this post
+        const comments = await getCommentsByPostId(post.$id);
+        
+        // Extract unique user IDs from comments
+        const userIds = [...new Set(comments.map(comment => comment.userId))];
+        
+        if (userIds.length > 0) {
+          // Fetch user data for all comment authors
+          const userDataMap = await getUsersByIds(userIds);
+          setCommentUsers({...users, ...userDataMap});
+        }
+      } catch (error) {
+        console.error('Error fetching comment users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCommentUsers();
+  }, [showComments, post.$id, users]);
+
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
+  console.log("PostCard ", post.$id);
+  // console.log("onlike", onLike);
   
   
 
@@ -55,26 +93,26 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
             <span>{post.likes}</span>
           </button>
           <button
-            onClick={() => setShowComments(!showComments)}
+            onClick={toggleComments}
             className="flex items-center space-x-1 hover:text-primary"
           >
             <MessageSquare className="h-4 w-4" />
             <span>Comments</span>
           </button>
           <button
-            onClick={() => onShare(post.id)}
+            onClick={() => onShare(post.$id)}
             className="flex items-center space-x-1 hover:text-primary"
           >
             <Share2 className="h-4 w-4" />
             <span>Share</span>
           </button>
         </div>
-        {/* <span>{formatDistanceToNow(new Date(post.$createdAt))} ago</span> */}
+        <span>{formatDistanceToNow(new Date(post.$createdAt))} ago</span>
       </div>
 
       {showComments && (
         <div className="mt-4 pt-4 border-t">
-          <CommentList postId={post.id} users={users} />
+          <CommentList postId={post.$id} users={commentUsers} />
         </div>
       )}
     </div>

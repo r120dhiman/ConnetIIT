@@ -1,64 +1,74 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getComments, createComment, likeComment } from '../lib/appwrite/comments';
+import { getCommentsByPostId, createComment, likeComment as likeCommentAPI } from '../lib/appwrite/comments';
 import type { Comment } from '../types/comment';
 
-export function useComments(postId: string) {
-  const { user } = useAuth();
+export const useComments = (postId: string) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
+    const fetchComments = async () => {
+      setLoading(true);
+      try {
+        const fetchedComments = await getCommentsByPostId(postId);
+        setComments(fetchedComments);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchComments();
   }, [postId]);
 
-  const fetchComments = async () => {
-    try {
-      const response = await getComments(postId);
-      setComments(response.documents as Comment[]);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch comments'));
-    } finally {
-      setLoading(false);
+  const addComment = async (content: string, parentId: string = '') => {
+    if (!user) {
+      console.error('User must be logged in to comment');
+      return;
     }
-  };
-
-  const addComment = async (content: string, parentId?: string) => {
-    if (!user) return;
 
     try {
-      const newComment = await createComment({
+      const newComment = await createComment(
         postId,
-        userId: user.id,
+        user.$id,
         content,
-        parentId,
-      });
-      setComments([newComment as Comment, ...comments]);
-    } catch (err) {
-      console.error('Error adding comment:', err);
-      throw err;
+        parentId
+      );
+
+      if (newComment) {
+        setComments(prevComments => [...prevComments, newComment]);
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
     }
   };
 
-  const handleLike = async (commentId: string) => {
+  const likeComment = async (commentId: string) => {
     try {
-      await likeComment(commentId);
-      setComments(comments.map(comment =>
-        comment.id === commentId
-          ? { ...comment, likes: comment.likes + 1 }
-          : comment
-      ));
-    } catch (err) {
-      console.error('Error liking comment:', err);
+      const success = await likeCommentAPI(commentId);
+      
+      if (success) {
+        // Update the comment in the local state
+        setComments(prevComments => 
+          prevComments.map(comment => 
+            comment.$id === commentId 
+              ? { ...comment, likes: (comment.likes || 0) + 1 } 
+              : comment
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error liking comment:', error);
     }
   };
 
   return {
     comments,
     loading,
-    error,
     addComment,
-    likeComment: handleLike,
+    likeComment
   };
-}
+};

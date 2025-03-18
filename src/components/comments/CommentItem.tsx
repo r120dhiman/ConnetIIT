@@ -1,29 +1,32 @@
-import React from 'react';
+
 import { formatDistanceToNow } from 'date-fns';
 import { Heart } from 'lucide-react';
 import type { Comment, CommentUser } from '../../types/comment';
+import { useEffect } from 'react';
 
 interface CommentItemProps {
   comment: Comment;
-  user: CommentUser;
+  // user: CommentUser;
   onLike: (commentId: string) => void;
   onReply: (commentId: string) => void;
 }
 
 export function CommentItem({ comment, user, onLike, onReply }: CommentItemProps) {
+  console.log(comment);
+  
   return (
     <div className="flex space-x-3 py-3">
-      <img
-        src={user.avatarUrl}
+      {/* <img
+        src={user.profileUrl}
         alt={user.name}
         className="h-8 w-8 rounded-full"
-      />
+      /> */}
       <div className="flex-1">
         <div className="bg-gray-50 rounded-lg px-3 py-2">
           <div className="flex items-center justify-between">
-            <span className="font-medium">{user.name}</span>
+            {/* <span className="font-medium">{comment.username}</span> */}
             <span className="text-sm text-gray-500">
-              {formatDistanceToNow(new Date(comment.createdAt))} ago
+              {/* {formatDistanceToNow(new Date(comment.createdAt))} ago */}
             </span>
           </div>
           <p className="mt-1 text-gray-800">{comment.content}</p>

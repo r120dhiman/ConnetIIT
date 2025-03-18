@@ -3,13 +3,14 @@ import { CommentItem } from './CommentItem';
 import { CommentInput } from './CommentInput';
 import { useComments } from '../../hooks/useComments';
 import type { CommentUser } from '../../types/comment';
-
+import { useAuth } from '../../contexts/AuthContext';
 interface CommentListProps {
   postId: string;
   users: Record<string, CommentUser>;
 }
 
 export function CommentList({ postId, users }: CommentListProps) {
+  const {user}=useAuth();
   const { comments, loading, addComment, likeComment } = useComments(postId);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
@@ -31,7 +32,7 @@ export function CommentList({ postId, users }: CommentListProps) {
   return (
     <div className="space-y-4">
       <div className="mb-4">
-        <CommentInput onSubmit={(content) => addComment(content)} />
+        <CommentInput onSubmit={(content,user) => addComment(content,user)} />
       </div>
 
       <div className="space-y-4">
@@ -60,7 +61,7 @@ export function CommentList({ postId, users }: CommentListProps) {
                 <div key={reply.id} className="ml-11 mt-2">
                   <CommentItem
                     comment={reply}
-                    user={users[reply.userId]}
+                    user={users[reply.userId]||" "}
                     onLike={likeComment}
                     onReply={handleReply}
                   />
