@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
-// import { useNavigate } from 'react-router';
-import { signIn } from '../../lib/appwrite/auth';
 import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
-import { databases } from '../../lib/appwrite';
-import { COLLECTIONS } from '../../lib/appwrite/config';
-
-// Get DATABASE_ID from environment variable
-const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+import { useAuth } from '../../contexts/AuthContext';
 
 export function SignInForm() {
-  // const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,27 +16,12 @@ export function SignInForm() {
     setLoading(true);
 
     try {
-      const user = await signIn(email, password);
-      console.log("signiin");
-      
-      // After successful login, get the user's profile
-      const userData = await databases.getDocument(
-        DATABASE_ID,
-        COLLECTIONS.USERS,
-        user.$id
-      );
-      
-      // Use window.location instead of navigate for a full page reload
-      console.log("obs", userData.isOnBoarded);
-      
-      if (!userData.isOnBoarded) {
-        window.location.href = '/onboarding';
-      } else {
-        window.location.href = '/';
-      }
+      await signIn(email, password);
+      // No need to handle redirection here - it's handled in the AuthContext
     } catch (err) {
       console.error("Sign in error:", err);
       setError("Failed to sign in. Please check your credentials.");
+    } finally {
       setLoading(false);
     }
   };
@@ -87,7 +66,7 @@ export function SignInForm() {
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               id="password"
-              type={showPassword ? "text" : "password"} // Toggle between text and password
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-10 w-full rounded-md border-gray-300"
@@ -95,7 +74,7 @@ export function SignInForm() {
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+              onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
             >
               {showPassword ? (

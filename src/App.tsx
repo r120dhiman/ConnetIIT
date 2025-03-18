@@ -11,17 +11,20 @@ import { PrivateRoute } from './components/auth/PrivateRoute';
 import { Chat } from './pages/Chat';
 import { Profile } from './pages/Profile';
 import NotFound from './pages/NotFound';
-import Callback from './pages/Callback';
+// import Callback from './pages/Callback';
 import OnBoarding from './pages/OnBoarding';
 import AnonymousChat from './pages/AnonymousChat';
 import Communities from './pages/Communities';
-import Home from './pages/Home';
+// import Home from './pages/Home';
 import Trips from './pages/Trips';
 import ChatRoom from './pages/ChatRoom';
+import { ToastContainer } from 'react-toastify';
 
 
 function App() {
   return (
+    <>
+    <ToastContainer/>
     <BrowserRouter>
       <AuthProvider>
         <div className="min-h-screen " style={{padding: '0px'}}>
@@ -31,7 +34,7 @@ function App() {
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               {/* <Route path="/chat12" element={<ChatTry/>} /> */}
-              <Route path="/auth/callback" element={<Callback />} />
+              {/* <Route path="/auth/callback" element={<Callback />} /> */}
               <Route path="/" element={<PrivateRoute><Feed/></PrivateRoute>} />
               {/* <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} /> */}
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}
@@ -48,6 +51,7 @@ function App() {
         </div>
       </AuthProvider>
     </BrowserRouter>
+    </>
   );
 }
 
