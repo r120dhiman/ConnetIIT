@@ -11,7 +11,7 @@ export const storage = new Storage(client);
 export const functions = new Functions(client);
 
 export const COLLECTIONS = {
-  POSTS: '67d72c970037543ef10f', //done
+  POSTS: '67d8715d001f8d445d4b', //done
   CHALLENGES: '67d72ff10031f16751cd',//done
   COMMENTS: '67d72f6d000023e6d4d7',//done
   MESSAGES: '67d73087000ea52a269e',//done

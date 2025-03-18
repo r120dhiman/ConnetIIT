@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { createPost } from '../../lib/appwrite/posts';
 
-export function CreatePost() {
+interface CreatePostProps {
+  onPostCreated?: (post: any) => void;
+  onCancel?: () => void;
+}
+
+export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
   const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -24,7 +29,7 @@ export function CreatePost() {
     try {
       console.log("creating post send from frontend");
       
-      await createPost({
+      const newPost = await createPost({
         userId: user.$id,
         title,
         content,
@@ -39,6 +44,11 @@ export function CreatePost() {
       setContent('');
       setGithubUrl('');
       setTags('');
+
+      // Notify parent component
+      if (onPostCreated) {
+        onPostCreated(newPost);
+      }
     } catch (error) {
       console.error('Error creating post:', error);
       setError('Failed to create post. Please try again.');

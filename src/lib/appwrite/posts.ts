@@ -21,23 +21,34 @@ export async function getPosts() {
   }
 }
 
-export async function createPost(post: Omit<Post, 'id' | 'createdAt' | 'likes'>) {
-  console.log('Database ID:', DATABASE_ID);
-  console.log('Collection ID:', COLLECTIONS);
-  
-  console.log("creating post");
-  console.log("creating data", databases);
+export async function createPost(post: {
+  userId: string;
+  title: string;
+  content: string;
+  tags: string[];
+  githubUrl?: string;
+}) {
   try {
+    // Validate required fields
+    if (!post.userId || !post.title || !post.content || !Array.isArray(post.tags)) {
+      throw new Error('Missing required fields');
+    }
+
     const response = await databases.createDocument(
       DATABASE_ID,
       COLLECTIONS.POSTS,
       ID.unique(),
       {
-        ...post,
-        likes: 0,
+        userId: post.userId,
+        title: post.title,
+        content: post.content,
+        tags: post.tags,
+        githubUrl: post.githubUrl || '',
+        likes: 0
       }
     );
-    console.log("create response", response);
+
+    console.log("Post created successfully:", response);
     return response;
   } catch (error) {
     console.error('Error creating post:', error);

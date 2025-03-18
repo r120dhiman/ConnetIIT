@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getPosts, likePost } from '../lib/appwrite/posts';
 import type { Post } from '../types';
 
@@ -7,11 +7,7 @@ export function usePosts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       const fetchedPosts = await getPosts();
       setPosts(fetchedPosts);
@@ -20,9 +16,13 @@ export function usePosts() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleLike = async (postId: string) => {
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleLike = useCallback(async (postId: string) => {
     console.log("usepost like postid", postId);
     
     try {
@@ -36,7 +36,19 @@ export function usePosts() {
     } catch (err) {
       console.error('Error liking post:', err);
     }
-  };
+  }, [posts]);
 
-  return { posts, loading, error, handleLike, refetch: fetchPosts };
+  // Add this function to update posts after creation
+  const addNewPost = useCallback((newPost: Post) => {
+    setPosts(currentPosts => [newPost, ...currentPosts]);
+  }, []);
+
+  return {
+    posts,
+    loading,
+    error,
+    handleLike,
+    addNewPost,
+    refreshPosts: fetchPosts
+  };
 }
