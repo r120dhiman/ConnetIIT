@@ -253,11 +253,7 @@ const Trips: React.FC = () => {
         } : null);
       }
 
-<<<<<<< HEAD
-      alert('Successfully joined the trip!');
-=======
       toast.success('Successfully joined the trip!'); // Use toast for success
->>>>>>> 5db1f801880f76a71fd05fae88ba6a8a1e7e9407
     } catch (error) {
       console.error('Error joining trip:', error);
       toast.error('Failed to join trip. Please try again.'); // Use toast for error
