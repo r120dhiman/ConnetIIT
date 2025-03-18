@@ -158,7 +158,7 @@ const Communities = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 400, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed bottom-0 right-0 w-[32rem] h-[70vh] bg-white shadow-2xl z-40"
+              className="fixed bottom-0 right-0 w-full max-w-[32rem] h-[70vh] bg-white shadow-2xl z-40"
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
