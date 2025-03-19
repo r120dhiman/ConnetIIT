@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { suggestFriends } from '../lib/appwrite/friendSuggester';
+import { Card, CardContent, Typography, Button, CircularProgress, Alert } from "@mui/material";
+import { Users } from "lucide-react";
 
 const FriendSuggestions: React.FC<{ userId: string; userInterests: string[] }> = ({ userId, userInterests }) => {
   const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [displayedSuggestions, setDisplayedSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
@@ -10,21 +13,16 @@ const FriendSuggestions: React.FC<{ userId: string; userInterests: string[] }> =
 
   const fetchSuggestions = async () => {
     setLoading(true);
-    console.log(`Fetching suggestions for userId: ${userId}, page: ${page}`);
     try {
-      const newSuggestions = await suggestFriends(userId, userInterests);
-      console.log(`Received ${newSuggestions.length} suggestions`);
-      if (newSuggestions.length === 0) {
+      const newSuggestions = await suggestFriends(userId, userInterests, page);
+      if (newSuggestions.length < 10) {
         setHasMore(false);
-        console.log('No more suggestions available');
       }
       setSuggestions((prev) => [...prev, ...newSuggestions]);
     } catch (err) {
-      console.error('Error fetching suggestions:', err);
       setError('Failed to fetch suggestions');
     } finally {
       setLoading(false);
-      console.log('Finished fetching suggestions');
     }
   };
 
@@ -32,24 +30,39 @@ const FriendSuggestions: React.FC<{ userId: string; userInterests: string[] }> =
     fetchSuggestions();
   }, [page]);
 
+  useEffect(() => {
+    const startIndex = (page - 1) * 5;
+    const endIndex = startIndex + 5;
+    setDisplayedSuggestions(suggestions.slice(startIndex, endIndex));
+  }, [suggestions, page]);
+
   const handleSeeMore = () => {
     if (hasMore) {
       setPage((prev) => prev + 1);
-      console.log(`Loading more suggestions, new page: ${page + 1}`);
     }
   };
 
   return (
-    <div>
-      <h2>Friend Suggestions</h2>
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
-      <ul>
-        {suggestions.map((user) => (
-          <li key={user.$id}>{user.name}</li>
+    <div className="p-6 max-w-md bg-white rounded-2xl shadow-md space-y-4">
+      <Typography variant="h5" className="text-zinc-800 font-bold flex items-center gap-2">
+        <Users /> Friend Suggestions
+      </Typography>
+      {loading && <CircularProgress className="block" />}
+      {error && <Alert severity="error">{error}</Alert>}
+      <div className="space-y-1">
+        {displayedSuggestions.map((user) => (
+          <Card key={user.$id} className="">
+            <CardContent>
+              <Typography variant="body1">{user.name}</Typography>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
-      {hasMore && <button className='text-zinc-400 font-semibold' onClick={handleSeeMore}>See More</button>}
+      </div>
+      {hasMore && (
+        <Button onClick={handleSeeMore} variant="contained" color="primary" fullWidth>
+          See More
+        </Button>
+      )}
     </div>
   );
 };

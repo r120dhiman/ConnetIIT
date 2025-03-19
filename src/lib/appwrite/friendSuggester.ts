@@ -5,7 +5,7 @@ import { Query } from 'appwrite';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
-export async function suggestFriends(userId: string, userInterests: string[]) {
+export async function suggestFriends(userId: string, userInterests: string[], page: number = 1, limit: number = 10) {
   try {
     console.log(`Suggesting friends for userId: ${userId} with interests: ${userInterests}`);
 
@@ -20,7 +20,9 @@ export async function suggestFriends(userId: string, userInterests: string[]) {
     // Search for users with similar interests
     console.log(`Searching for users with interests: ${userInterests}`);
     const response = await databases.listDocuments(DATABASE_ID, COLLECTIONS.USERS, [
-      Query.equal('interests', userInterests)
+      Query.equal('interests', userInterests),
+      Query.limit(limit), // Limit the number of results
+      Query.offset((page - 1) * limit) // Calculate the offset for pagination
     ]);
     console.log(`Found ${response.documents.length} users with similar interests.`);
 
@@ -28,8 +30,8 @@ export async function suggestFriends(userId: string, userInterests: string[]) {
     const filteredUsers = response.documents.filter((user: any) => user.$id !== userId);
     console.log(`Filtered out current user. Suggestions count: ${filteredUsers.length}`);
 
-    // Shuffle the filtered users and limit to 5 random users
-    const shuffledUsers = filteredUsers.sort(() => 0.5 - Math.random()).slice(0, 5);
+    // Shuffle the filtered users and limit to 10 random users
+    const shuffledUsers = filteredUsers.sort(() => 0.5 - Math.random()).slice(0, limit);
     console.log(`Returning ${shuffledUsers.length} random suggestions.`);
 
     return shuffledUsers;

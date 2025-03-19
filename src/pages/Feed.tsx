@@ -11,7 +11,7 @@ export function Feed() {
   const { posts, loading, error, handleLike, addNewPost, refreshPosts } = usePosts();
   
   const [isCreatingPost, setIsCreatingPost] = useState(false);
-  const [showFriendSuggestions, setShowFriendSuggestions] = useState(true); // State to manage visibility of FriendSuggestions
+  const [showFriendSuggestions, setShowFriendSuggestions] = useState(false); // State to manage visibility of FriendSuggestions
   const { user, userProfile } = useAuth();
 
   const toggleCreatePost = () => {
@@ -51,14 +51,14 @@ export function Feed() {
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
         {/* Adding Friend Suggestions section at the top */}
-        {/* {showFriendSuggestions && (
+        {showFriendSuggestions && (
           <div>
             <FriendSuggestions userId={user!.$id} userInterests={userProfile!.interests} />
           </div>
         )}
             <button onClick={toggleFriendSuggestions} className="text-indigo-600">
               {showFriendSuggestions ? 'Close Friend Suggestions' : 'Show Friend Suggestions'}
-            </button> */}
+            </button>
 
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-gray-900">Feed</h1>
