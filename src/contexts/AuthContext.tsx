@@ -55,6 +55,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const setIsOnline=async (userId:string) => {
+    try {
+      const UserProfile=await databases.updateDocument(DATABASE_ID,COLLECTIONS.USERS,userId,{isOnline:true});
+      setUserProfile(UserProfile);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const setIsOffline=async (userId:string) => {
+    try {
+      const UserProfile=await databases.updateDocument(DATABASE_ID,COLLECTIONS.USERS,userId,{isOnline:false});
+      setUserProfile(UserProfile);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
+
   // Initialize auth state
   useEffect(() => {
     const initAuth = async () => {
@@ -91,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set flag to prevent useEffect from running redundantly
     isAuthenticating.current = true;
     try {
-      console.log('Creating email/password session...'); // Log for status
+      console.log('Creating email/password session...'); // Log for status)
       await account.createEmailPasswordSession(email, password);
       console.log('Session created, fetching current user...'); // Log for status
       const currentUser = await account.get();
@@ -100,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Fetch user profile in the same function
       console.log('Fetching user profile...'); // Log for status
       const profile = await fetchUserProfile(currentUser.$id);
-      
+      setIsOnline(profile.$id);
       // Handle redirection based on onboarding status
       console.log('Sign in successful!'); // Log for status
       
@@ -151,7 +169,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email,
           password,
           isOnBoarded: false,
-          anonymousId: randomId
+          anonymousId: randomId,
+          isOnline:true
         }
       );
       
@@ -174,6 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out function
   const signOut = async () => {
     try {
+      setIsOffline(userProfile.$id); 
       await account.deleteSession('current');
       setUser(null);
       setUserProfile(null);
