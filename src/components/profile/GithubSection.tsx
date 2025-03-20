@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Github } from 'lucide-react';
 import { linkGitHubAccount, unlinkGitHubAccount, isGitHubLinked } from '../../lib/appwrite/github';
+import Loader from '../../components/shared/Loader';
 
 export function GitHubSection() {
   const [linked, setLinked] = useState(false);
@@ -40,7 +41,7 @@ export function GitHubSection() {
   };
 
   if (loading) {
-    return <div>Loading GitHub status...</div>;
+    return <Loader size="small" message="Loading GitHub status..." showFacts={false} />;
   }
 
   return (

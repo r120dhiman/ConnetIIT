@@ -4,6 +4,7 @@ import { Users, ArrowLeft, Search, Tags } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { io } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
+import Loader from '../components/shared/Loader';
 
 const SOCKET_SERVER_URL = 'https://connetiit.onrender.com';
 // const SOCKET_SERVER_URL = 'http://localhost:3000';
@@ -23,7 +24,7 @@ const AnonymousChat: React.FC = () => {
   useEffect(() => {
     if (userProfile) {
       setAnonymousId(userProfile.anonymousId || `anon_${Math.random().toString(36).substring(2, 10)}`);
-      console.log("User anonymous ID set:", anonymousId);
+      // console.log("User anonymous ID set:", anonymousId);
     }
   }, [userProfile]);
 
@@ -40,7 +41,7 @@ const AnonymousChat: React.FC = () => {
     });
 
     socket.on('matched', ({ roomId, matchedUser }) => {
-      console.log(`Matched! Room ID: ${roomId}, Matched User:`, matchedUser);
+      // console.log(`Matched! Room ID: ${roomId}, Matched User:`, matchedUser);
       setLoading(false);
       setIsInQueue(false);
       // Navigate to chat room with match information
@@ -213,24 +214,7 @@ const AnonymousChat: React.FC = () => {
                 } text-white backdrop-blur-sm`}
             >
               {loading ? (
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    animate={{ opacity: [0.3, 1, 0.3] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                    className="w-3 h-3 bg-white rounded-full"
-                  ></motion.div>
-                  <motion.div
-                    animate={{ opacity: [0.3, 1, 0.3] }}
-                    transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
-                    className="w-3 h-3 bg-white rounded-full"
-                  ></motion.div>
-                  <motion.div
-                    animate={{ opacity: [0.3, 1, 0.3] }}
-                    transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
-                    className="w-3 h-3 bg-white rounded-full"
-                  ></motion.div>
-                  Connecting...
-                </div>
+                <Loader size="small" showFacts={false} message="Connecting..." />
               ) : (
                 <>
                   <Search className="h-5 w-5" />

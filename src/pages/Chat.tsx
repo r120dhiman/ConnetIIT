@@ -6,9 +6,20 @@ import { updateUserStatus } from '../lib/appwrite/users';
 import type { User } from '../types';
 import { Header } from '../components/layout/Header';
 
+// Check that this interface matches your actual data structure
+interface User {
+  id: string;
+  name: string;
+  profileUrl: string;
+  college?: string;
+  isOnline?: boolean;
+  lastSeen?: string | null;
+}
+
 export function Chat() {
   const { user } = useAuth();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  console.log(selectedUser);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Update online status
@@ -45,7 +56,7 @@ export function Chat() {
         <div className="col-span-8">
           {selectedUser ? (
             <ChatWindow
-              otherUserId={selectedUser.id}
+              otherUserId={selectedUser}
               otherUserName={selectedUser.name}
               isOnline={selectedUser.isOnline}
               lastSeen={selectedUser.lastSeen}

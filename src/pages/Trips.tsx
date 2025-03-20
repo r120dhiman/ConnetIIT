@@ -30,6 +30,8 @@ import { getProfile } from '../lib/appwrite/users';
 import { getRoomChats, sendRoomChat, subscribeToRoomChats } from '../lib/appwrite/roomChat';
 import { Header } from '../components/layout/Header';
 import { toast } from 'react-toastify'; // Import toast
+import Loader from '../components/shared/Loader';
+import { LoadingScreen } from '../components/shared/LoadingScreen';
 
 interface Trip {
   tripName: string;
@@ -76,6 +78,9 @@ const Trips: React.FC = () => {
   const [tripMessages, setTripMessages] = useState<any[]>([]);
   const [isTripChatOpen, setIsTripChatOpen] = useState(false);
   const [newTripMessage, setNewTripMessage] = useState('');
+  const [joiningTripId, setJoiningTripId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
@@ -111,6 +116,7 @@ const Trips: React.FC = () => {
   };
 
   const fetchTrips = async () => {
+    setIsLoading(true);
     try {
       const fetchedTrips = await getTrips();
       const mappedTrips = await Promise.all(fetchedTrips.map(async trip => {
@@ -131,6 +137,8 @@ const Trips: React.FC = () => {
       setTrips(mappedTrips);
     } catch (error) {
       console.error('Error fetching trips:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -232,6 +240,12 @@ const Trips: React.FC = () => {
     if (!user) return;
 
     try {
+      // Set loading state
+      setJoiningTripId(tripId);
+      
+      // Simulate a slight delay for better UX (remove if actual API is slow enough)
+      // await new Promise(resolve => setTimeout(resolve, 800));
+      
       await addParticipantToTrip(tripId, user.$id);
       
       // Update the local state immediately to reflect the change
@@ -239,7 +253,7 @@ const Trips: React.FC = () => {
         if (trip.id === tripId) {
           return {
             ...trip,
-            participants: [...trip.participants, user.$id] // Add the new participant
+            participants: [...trip.participants, user.$id]
           };
         }
         return trip;
@@ -253,10 +267,13 @@ const Trips: React.FC = () => {
         } : null);
       }
 
-      toast.success('Successfully joined the trip!'); // Use toast for success
+      toast.success('Successfully joined the trip!');
     } catch (error) {
       console.error('Error joining trip:', error);
-      toast.error('Failed to join trip. Please try again.'); // Use toast for error
+      toast.error('Failed to join trip. Please try again.');
+    } finally {
+      // Clear loading state
+      setJoiningTripId(null);
     }
   };
 
@@ -272,6 +289,10 @@ const Trips: React.FC = () => {
       toast.error('Failed to send message.'); // Use toast for error
     }
   };
+
+  if (isLoading) {
+    return <LoadingScreen message="Loading your trips..." />;
+  }
 
   return (
     <Box sx={{ 
@@ -440,19 +461,36 @@ const Trips: React.FC = () => {
                             e.stopPropagation();
                             handleJoinTrip(trip.id);
                           }}
+                          disabled={joiningTripId === trip.id}
                           sx={{ 
                             borderRadius: '10px',
                             textTransform: 'none',
                             borderColor: colors.primary.main,
-                            color: colors.primary.main,
+                            color: joiningTripId === trip.id ? 'transparent' : colors.primary.main,
+                            position: 'relative',
                             '&:hover': {
                               borderColor: colors.primary.dark,
                               backgroundColor: `${colors.primary.main}10`
-                            }
+                            },
+                            minWidth: '90px',
+                            minHeight: '36px'
                           }}
                         >
-                          Join Trip
-                </Button>
+                          {joiningTripId === trip.id ? (
+                            <Box sx={{ 
+                              position: 'absolute',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '100%',
+                              height: '100%',
+                            }}>
+                              <Loader size="small" showFacts={false} />
+                            </Box>
+                          ) : (
+                            "Join Trip"
+                          )}
+                        </Button>
                       )}
                     </Box>
               </CardContent>

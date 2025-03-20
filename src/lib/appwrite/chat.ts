@@ -22,6 +22,7 @@ export async function sendMessage(message: Omit<Message, 'id' | 'createdAt'>) {
 }
 
 export async function getMessages(userId: string, otherUserId: string) {
+  console.log("i am from chat.ts ", otherUserId);
   const response = await databases.listDocuments(
     DATABASE_ID,
     COLLECTIONS.MESSAGES,

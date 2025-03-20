@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { searchUsers } from '../lib/appwrite/users';
+import { searchUsers,allfriends } from '../lib/appwrite/users';
 import { useDebounce } from './useDebounce';
 import type { User } from '../types';
 
@@ -36,4 +36,17 @@ export function useUsers(searchQuery: string) {
   }, [debouncedQuery]);
 
   return { users, loading };
+}
+
+
+
+export async function allFriendsMsg(userId:String) {
+  try {
+    // Replace this with your actual data fetching logic
+    const friends = await allfriends(userId);
+    return { friends };
+  } catch (error) {
+    console.error("Error fetching friends:", error);
+    return { friends: [] };
+  }
 }

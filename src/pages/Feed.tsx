@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import FriendSuggestions from '../components/friendSuggestions'; // Importing FriendSuggestions component
 import { useAuth } from '../contexts/AuthContext';
+import { LoadingScreen } from '../components/shared/LoadingScreen';
 
 export function Feed() {
   const { posts, loading, error, handleLike, addNewPost, refreshPosts } = usePosts();
@@ -28,11 +29,7 @@ export function Feed() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-      </div>
-    );
+    return <LoadingScreen message="Loading your feed..." />;
   }
 
   if (error) {

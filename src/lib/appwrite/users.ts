@@ -26,7 +26,7 @@ export async function updateUserStatus(userId: string, isOnline: boolean) {
     userId,
     { isOnline, lastSeen: new Date().toISOString() }
   );
-  console.log("isOnline updated", updated);
+  // console.log("isOnline updated", updated);
   
   return updated;
 }
@@ -96,4 +96,41 @@ export const getUsersByIds = async (userIds: string[]): Promise<Record<string, U
   }
   
   return userMap;
+};
+
+export const allfriends = async (userId: string): Promise<string[]> => {
+  try {
+    // Get all messages where user is either sender or receiver in a single query
+    const messages = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTIONS.MESSAGES,
+      [
+        Query.or([
+          Query.equal('senderId', userId),
+          Query.equal('receiverId', userId)
+        ])
+      ]
+    );
+
+    // Extract unique user IDs (excluding the user's own ID)
+    const interactedUserIds = new Set<string>();
+    
+    messages.documents.forEach(message => {
+      // If user is the sender, add the receiver
+      if (message.senderId === userId && message.receiverId && message.receiverId !== userId) {
+        interactedUserIds.add(message.receiverId);
+      }
+      
+      // If user is the receiver, add the sender
+      if (message.receiverId === userId && message.senderId && message.senderId !== userId) {
+        interactedUserIds.add(message.senderId);
+      }
+    });
+
+    // Convert Set to Array and return
+    return Array.from(interactedUserIds);
+  } catch (error) {
+    console.error('Error getting users with message interactions:', error);
+    throw error;
+  }
 };

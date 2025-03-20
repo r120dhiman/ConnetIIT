@@ -19,9 +19,25 @@ import Communities from './pages/Communities';
 import Trips from './pages/Trips';
 import ChatRoom from './pages/ChatRoom';
 import { ToastContainer } from 'react-toastify';
-
+import { useState, useEffect } from 'react';
+import { LoadingScreen } from './components/shared/LoadingScreen';
 
 function App() {
+  const [appLoading, setAppLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate checking session, loading fonts, or any initial setup
+    const timer = setTimeout(() => {
+      setAppLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (appLoading) {
+    return <LoadingScreen message="Setting up ConnectIIT..." />;
+  }
+
   return (
     <>
     <ToastContainer/>

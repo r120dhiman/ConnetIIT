@@ -2,12 +2,13 @@ import React from 'react';
 import { ChallengeCard } from '../components/challenges/ChallengeCard';
 import { useChallenges } from '../hooks/useChallenges';
 import { Header } from '../components/layout/Header';
+import { LoadingScreen } from '../components/shared/LoadingScreen';
 
 export function Challenges() {
   const { challenges, loading, error, handleJoin } = useChallenges();
 
   if (loading) {
-    return <div className="text-center">Loading challenges...</div>;
+    return <LoadingScreen message="Loading challenges..." />;
   }
 
   if (error) {

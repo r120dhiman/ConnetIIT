@@ -56,9 +56,9 @@ const Communities = () => {
         setCommunities(userCommunities);
         if (userCommunities.length > 0) {
           const selectedComm = userCommunities[0];
-          console.log("Selected community:", selectedComm); // Debug log for selected community
+          // console.log("Selected community:", selectedComm); // Debug log for selected community
           const messages = await getRoomChats(selectedComm.$id); // Fetch messages using community.$id
-          console.log("Fetched messages:", messages); // Debug log for fetched messages
+          // console.log("Fetched messages:", messages); // Debug log for fetched messages
           const msgLogsContent = messages.map(msg => msg.content); // Extract content from messages
           
           setSelectedCommunity({ ...selectedComm, msgLogs: msgLogsContent }); // Set selected community with msgLogs
@@ -75,7 +75,7 @@ const Communities = () => {
     if (selectedCommunity) {
       // Subscribe to room chats for the selected community
       const unsubscribe = subscribeToRoomChats(selectedCommunity.$id, (newMessage) => {
-        console.log("New message received:", newMessage); // Debugging log
+        // console.log("New message received:", newMessage); // Debugging log
         setSelectedCommunity(prev => prev ? {
           ...prev,
           msgLogs: [...prev.msgLogs, newMessage.content] // Update msgLogs with new message content

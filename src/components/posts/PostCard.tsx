@@ -51,8 +51,6 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
     setShowComments(!showComments);
   };
 
-  console.log("PostCard ", post.$id);
-  // console.log("onlike", onLike);
   
   
 

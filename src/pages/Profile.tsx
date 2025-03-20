@@ -4,20 +4,14 @@ import { ProfileCard } from '../components/profile/ProfileCard';
 import { Header } from '../components/layout/Header';
 import { Pencil, User, Loader } from 'lucide-react';
 import { ProfileForm } from '../components/profile/ProfileForm';
+import { LoadingScreen } from '../components/shared/LoadingScreen';
 
 export function Profile() {
   const { user, userProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
   if (!user || !userProfile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <Loader className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-gray-600">Loading your profile...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Loading your profile..." />;
   }
 
   return (

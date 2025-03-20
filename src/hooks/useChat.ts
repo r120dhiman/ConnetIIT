@@ -11,7 +11,6 @@ export function useChat(otherUserId: string) {
 
   useEffect(() => {
     if (!user) return;
-    console.log("otheruser", otherUserId);
     
     const loadMessages = async () => {
       try {
