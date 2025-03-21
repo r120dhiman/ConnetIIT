@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { sendMessage, getMessages, subscribeToMessages } from '../lib/appwrite/chat';
 import type { Message } from '../types/chat';
+
 import { useAuth } from '../contexts/AuthContext';
 
 export function useChat(otherUserId: string) {
@@ -8,13 +9,12 @@ export function useChat(otherUserId: string) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     if (!user) return;
     
     const loadMessages = async () => {
       try {
-        const response = await getMessages(user.$id, otherUserId);
+        const response = await getMessages(user.$id, otherUserId.$id);
         setMessages(response.documents as Message[]);
       } catch (error) {
         console.error('Error loading messages:', error);
@@ -38,7 +38,8 @@ export function useChat(otherUserId: string) {
 
   const sendNewMessage = async (content: string) => {
     if (!user) return;
-
+    // console.log(otherUserId);
+    // console.log("Current User is ",user.$id);
     try {
       await sendMessage({
         senderId: user.$id,

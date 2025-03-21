@@ -18,6 +18,7 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [commentUsers, setCommentUsers] = useState<Record<string, CommentUser>>({});
   const [loading, setLoading] = useState(false);
+  const [liked, setLiked] = useState(false);
 
   // Fetch user data for comments when comments are shown
   useEffect(() => {
@@ -51,13 +52,15 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
     setShowComments(!showComments);
   };
 
-  
-  
+  const handleLike = () => {
+    onLike(post.$id);
+    setLiked(true);
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-[#262438] text-[#fafafa] rounded-3xl shadow-md p-6">
       <h3 className="text-lg font-semibold mb-2">{post.title}</h3>
-      <p className="text-muted-foreground mb-4">{post.content}</p>
+      <p className=" mb-4">{post.content}</p>
       
       <div className="flex flex-wrap gap-2 mb-4">
         {post.tags.map((tag) => (
@@ -84,8 +87,8 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <div className="flex space-x-4">
           <button
-            onClick={() => onLike(post.$id)}
-            className="flex items-center space-x-1 hover:text-primary"
+            onClick={handleLike}
+            className={`flex items-center space-x-1 ${liked ? 'text-blue-500' : 'text-gray-500'}`}
           >
             <Heart className="h-4 w-4" />
             <span>{post.likes}</span>

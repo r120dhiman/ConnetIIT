@@ -44,7 +44,7 @@ app.get("/health", (req, res) => {
 
 // Socket.IO connection handling
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  // console.log(`User connected: ${socket.id}`);
 
   // Handle matchmaking
   handleMatchmaking(socket, io);
@@ -52,11 +52,11 @@ io.on("connection", (socket) => {
   // Handle room joining
   socket.on("join-room", ({ roomId }) => {
     socket.join(roomId);
-    console.log(`User ${socket.id} joined room ${roomId}`);
+    // console.log(`User ${socket.id} joined room ${roomId}`);
   });
 
   socket.on("destroyroom", ({ roomId }) => {
-    console.log(`Destroying room ${roomId}`);
+    // console.log(`Destroying room ${roomId}`);
     // Notify all users in the room to leave
     io.to(roomId).emit("room-destroyed");
     
@@ -73,7 +73,7 @@ io.on("connection", (socket) => {
   // Handle room leaving
   socket.on("leave-room", ({ roomId }) => {
     socket.leave(roomId);
-    console.log(`User ${socket.id} left room ${roomId}`);
+    // console.log(`User ${socket.id} left room ${roomId}`);
     
     // Get the room before the user leaves
     const room = roomManager.getRoomByUser(socket.id);

@@ -44,7 +44,7 @@ export function Feed() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#1B1730]">
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
         {/* Adding Friend Suggestions section at the top */}
@@ -57,11 +57,11 @@ export function Feed() {
               {showFriendSuggestions ? 'Close Friend Suggestions' : 'Show Friend Suggestions'}
             </button>
 
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">Feed</h1>
+        <div className="flex items-center   justify-between">
+          <h1 className="text-3xl font-bold text-white">Feed</h1>
           <button 
             onClick={toggleCreatePost} 
-            className="bg-indigo-600 text-white px-4 py-2 rounded"
+            className="bg-[#FE744D] text-white px-4 py-2 rounded-xl"
           >
             {isCreatingPost ? 'Cancel' : 'Create Post'}
           </button>

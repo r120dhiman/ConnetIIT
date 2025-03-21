@@ -86,11 +86,12 @@ const Trips: React.FC = () => {
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // Updated colors matching the new theme
   const colors = {
     primary: {
-      main: '#6366f1',
+      main: '#4f46e5', // Adjusted primary color for contrast
       light: '#818cf8',
-      dark: '#4f46e5',
+      dark: '#3b3b8c',
       contrast: '#ffffff'
     },
     secondary: {
@@ -100,14 +101,14 @@ const Trips: React.FC = () => {
       contrast: '#ffffff'
     },
     background: {
-      default: '#f9fafb',
-      paper: '#ffffff',
-      alt: '#f3f4f6',
+      default: '#1B1730', // New background color
+      paper: '#2A2635', // Slightly lighter for paper elements
+      alt: '#2C2A3A', // Alternative background color
     },
     text: {
-      primary: '#1f2937',
-      secondary: '#4b5563',
-      muted: '#9ca3af',
+      primary: '#ffffff', // Changed to white for better contrast
+      secondary: '#e0e0e0', // Lighter gray for secondary text
+      muted: '#b0b0b0',
     },
     success: {
       light: '#dcfce7',
@@ -243,9 +244,6 @@ const Trips: React.FC = () => {
       // Set loading state
       setJoiningTripId(tripId);
       
-      // Simulate a slight delay for better UX (remove if actual API is slow enough)
-      // await new Promise(resolve => setTimeout(resolve, 800));
-      
       await addParticipantToTrip(tripId, user.$id);
       
       // Update the local state immediately to reflect the change
@@ -321,7 +319,7 @@ const Trips: React.FC = () => {
           backgroundColor: colors.background.paper,
           borderRadius: '16px',
           p: { xs: 2, md: 3 },
-          boxShadow: '0 4px 6px -1px rgb(99 102 241 / 0.1)'
+          boxShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.1)'
         }}>
           <Box sx={{ 
             display: 'flex', 
@@ -337,9 +335,9 @@ const Trips: React.FC = () => {
               WebkitTextFillColor: 'transparent',
             }}>
               Your Trips
-                    </Typography>
-                    <Button 
-                      variant="contained" 
+            </Typography>
+            <Button 
+              variant="contained" 
               startIcon={<Plus size={18} />}
               onClick={handleOpen}
               sx={{
@@ -353,7 +351,7 @@ const Trips: React.FC = () => {
               }}
             >
               New Trip
-                    </Button>
+            </Button>
           </Box>
 
           <Grid container spacing={2}>
@@ -373,7 +371,7 @@ const Trips: React.FC = () => {
                     transition: 'all 0.2s ease',
                     boxShadow: selectedTrip?.id === trip.id
                       ? `0 0 0 2px ${colors.primary.main}`
-                      : '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+                      : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
                     '&:hover': {
                       transform: 'translateY(-2px)',
                       boxShadow: `0 10px 15px -3px ${colors.primary.main}20`
@@ -493,11 +491,11 @@ const Trips: React.FC = () => {
                         </Button>
                       )}
                     </Box>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
         </Box>
 
         {/* Desktop Chat Section */}
@@ -508,7 +506,7 @@ const Trips: React.FC = () => {
             borderRadius: '16px',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 4px 6px -1px rgb(99 102 241 / 0.1)'
+            boxShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.1)'
           }}>
             {selectedTrip ? (
               <>
@@ -867,14 +865,9 @@ const Trips: React.FC = () => {
         fullWidth
         sx={{ 
           '& .MuiDialog-paper': { 
-            borderRadius: { xs: '20px 20px 0 0', md: '20px' },
-            m: { xs: 0, md: 2 },
-            position: { xs: 'fixed', md: 'relative' },
-            bottom: { xs: 0, md: 'auto' },
-            width: { xs: '100%', md: '600px' },
-            height: { xs: '100%', md: 'auto' },
-            maxHeight: { xs: '100%', md: '90vh' },
-            overflow: 'hidden',
+            borderRadius: '20px',
+            backgroundColor: colors.background.paper,
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
           }
         }}
       >
@@ -892,17 +885,14 @@ const Trips: React.FC = () => {
             position: 'sticky',
             top: 0,
             zIndex: 2,
+            color: colors.text.primary,
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
           }}>
-            <Typography variant="h5" sx={{ 
-              fontWeight: '600',
-              color: colors.text.primary,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}>
-              <Plus size={24} />
-              Create New Trip
-            </Typography>
+            <Plus size={24} />
+            Create New Trip
           </DialogTitle>
 
           {/* Scrollable Content */}
@@ -929,7 +919,7 @@ const Trips: React.FC = () => {
               padding: '24px !important',
             }}
           >
-            <Box  sx={{ 
+            <Box sx={{ 
               display: 'flex', 
               flexDirection: 'column', 
               gap: 3,
@@ -954,17 +944,11 @@ const Trips: React.FC = () => {
                     required
                     variant="outlined"
                     placeholder="Enter a memorable name for your trip"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        backgroundColor: colors.background.default,
-                        '&:hover': {
-                          backgroundColor: colors.background.alt,
-                        },
-                        '&.Mui-focused': {
-                          backgroundColor: colors.background.paper,
-                        }
-                      }
+                    InputProps={{
+                      style: { color: colors.text.primary },
+                    }}
+                    InputLabelProps={{
+                      style: { color: 'white' }
                     }}
                   />
                   <TextField
@@ -976,6 +960,12 @@ const Trips: React.FC = () => {
                     rows={3}
                     fullWidth
                     placeholder="Describe your trip plans..."
+                    InputProps={{
+                      style: { color: colors.text.primary },
+                    }}
+                    InputLabelProps={{
+                      style: { color: 'white' }
+                    }}
                     variant="outlined"
                     sx={{
                       '& .MuiOutlinedInput-root': {
@@ -1015,6 +1005,12 @@ const Trips: React.FC = () => {
                     fullWidth
                     variant="outlined"
                     placeholder="Starting point"
+                    InputProps={{
+                      style: { color: colors.text.primary },
+                    }}
+                    InputLabelProps={{
+                      style: { color: 'white' }
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
@@ -1030,6 +1026,12 @@ const Trips: React.FC = () => {
                     fullWidth
                     variant="outlined"
                     placeholder="Destination"
+                    InputProps={{
+                      style: { color: colors.text.primary },
+                    }}
+                    InputLabelProps={{
+                      style: { color: 'white' }
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
@@ -1051,7 +1053,7 @@ const Trips: React.FC = () => {
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <TextField
-                    label="Date"
+                    // label="Date"
                     name="date"
                     type="date"
                     value={newTrip.date}
@@ -1060,6 +1062,12 @@ const Trips: React.FC = () => {
                     fullWidth
                     required
                     variant="outlined"
+                    InputProps={{
+                      style: { color: colors.text.primary },
+                    }}
+                    InputLabelProps={{
+                      style: { color: 'white' }
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
@@ -1075,7 +1083,7 @@ const Trips: React.FC = () => {
                         onChange={handleInputChange}
                         sx={{ 
                           '&.Mui-checked': { 
-                            color: colors.primary.main 
+                            color: "white" 
                           }
                         }}
                       />
@@ -1099,7 +1107,6 @@ const Trips: React.FC = () => {
                   Mode of Travel
                 </Typography>
                 <FormControl fullWidth>
-                  {/* <InputLabel id="mode-of-travel-label">Mode of Travel</InputLabel> */}
                   <Select
                     labelId="mode-of-travel-label"
                     name="modeOfTravel"
@@ -1128,8 +1135,8 @@ const Trips: React.FC = () => {
                       }
                     }}
                   >
-                    <MenuItem disabled value="">
-                      <em>Select travel mode</em>
+                    <MenuItem disabled value=""  >
+                      <em className='text-white'>Select travel mode</em>
                     </MenuItem>
                     <MenuItem value="Airways">Airways</MenuItem>
                     <MenuItem value="Railways">Railways</MenuItem>
@@ -1146,6 +1153,10 @@ const Trips: React.FC = () => {
                     onChange={handleInputChange}
                     fullWidth
                     variant="outlined"
+                    InputProps={{
+                      style: { color: colors.text.primary },
+                      placeholder: { color: 'white' }
+                    }}
                     sx={{
                       mt: 2,
                       '& .MuiOutlinedInput-root': {

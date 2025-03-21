@@ -1,4 +1,3 @@
-
 import { User } from '../../types';
 
 interface ProfileCardProps {
@@ -9,7 +8,7 @@ export function ProfileCard({ user }: ProfileCardProps) {
   console.log("user", user);
   
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-[#262438] rounded-lg shadow-md p-6" style={{ color: 'white' }}>
       <div className="flex items-center space-x-4">
         <img
           src={user.profileUrl}
@@ -18,37 +17,37 @@ export function ProfileCard({ user }: ProfileCardProps) {
         />
         <div>
           <h2 className="text-xl font-bold">{user.name}</h2>
-          <p className="text-muted-foreground">{user.college}</p>
+          <p className="text-gray-300">{user.college}</p>
         </div>
       </div>
       
       <div className="mt-6">
         <h3 className="font-semibold mb-2">About</h3>
-        <p className="text-sm text-muted-foreground ">{user.bio}</p>
+        <p className="text-sm text-gray-300">{user.bio}</p>
       </div>
 
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <h3 className="font-semibold mb-2">Friends</h3>
         <div className="flex flex-wrap gap-2">
-          {user.friendsId.map((skill) => (
+          {user.friendsId.map((friendId) => (
             <span
-              key={skill}
-              className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm"
+              key={friendId}
+              className="px-2 py-1 bg-primary text-primary-foreground rounded-md text-sm"
             >
-              {skill}
+              {friendId}
             </span>
           ))}
         </div>
-      </div>
+      </div> */}
       <div className="mt-4">
         <h3 className="font-semibold mb-2">Interests</h3>
         <div className="flex flex-wrap gap-2">
-          {user.interests.map((skill) => (
+          {user.interests.map((interest) => (
             <span
-              key={skill}
-              className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm"
+              key={interest}
+              className="px-3 py-1 bg-[#392639] text-[#FE744D] rounded-xl text-md"
             >
-              {skill}
+              {interest}
             </span>
           ))}
         </div>

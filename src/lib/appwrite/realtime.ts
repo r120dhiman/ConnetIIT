@@ -15,6 +15,7 @@ export function subscribeToCollection(
 
 export function subscribeToLikes(postId: string, callback: (likes: number) => void) {
   return subscribeToCollection(COLLECTIONS.POSTS, (response) => {
+    console.log("Received response for likes subscription:", response);
     if (response.payload.$id === postId) {
       callback(response.payload.likes);
     }

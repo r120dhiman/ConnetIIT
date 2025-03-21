@@ -71,15 +71,15 @@ export function UserList({ searchQuery, onSearchChange, selectedUserId, onSelect
   const isLoading = searchQuery ? loading : loadingFriends;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-[#262438] p-4 rounded-3xl" >
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 bg-[#262438] text-gray-400" />
         <input
           type="text"
           placeholder="Search users..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 w-full rounded-md border-gray-300"
+          className="pl-10 w-full rounded-3xl border-gray-300 text-white bg-[#262438]"
         />
       </div>
       
@@ -101,15 +101,16 @@ export function UserList({ searchQuery, onSearchChange, selectedUserId, onSelect
           <div className="space-y-2">
             {displayUsers.map((user) => (
               <button
-                key={user}
+                key={user.id}
                 onClick={() => {
                   console.log("Selecting user:", user);
                   setSelectedUser(user);
                   onSelectUser(user);
                 }}
-                className={`w-full p-3 text-left rounded-md hover:bg-gray-50 flex items-center justify-between ${
+                className={`w-full p-3 text-left text-white hover:bg-[#302d4b] rounded-3xl flex items-center justify-between ${
                   selectedUserId === user.id ? 'bg-primary/10' : ''
                 }`}
+                
               >
                 <div className="flex items-center space-x-3">
                   <div className="relative">

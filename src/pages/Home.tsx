@@ -7,7 +7,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1B1730]">
         <Header />
         <h1 className="text-4xl font-bold text-center text-blue-600 mt-4">Welcome to Connect IT</h1>
         <button 

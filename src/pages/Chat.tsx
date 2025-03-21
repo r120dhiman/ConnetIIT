@@ -43,7 +43,7 @@ export function Chat() {
       <Header/>
       <div className="grid grid-cols-12 gap-6 h-full">
         {/* Users sidebar */}
-        <div className="col-span-4 bg-white rounded-lg shadow-md p-4">
+        <div className="col-span-4 bg-[#1B1730] rounded-3xl shadow-md m-4">
           <UserList
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -62,7 +62,7 @@ export function Chat() {
               lastSeen={selectedUser.lastSeen}
             />
           ) : (
-            <div className="h-full bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500">
+            <div className="h-full bg-[#262438] rounded-3xl m-4 shadow-md flex items-center justify-center text-gray-500">
               Select a user to start chatting
             </div>
           )}

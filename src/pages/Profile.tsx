@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { ProfileCard } from '../components/profile/ProfileCard';
 import { Header } from '../components/layout/Header';
-import { Pencil, User, Loader } from 'lucide-react';
+import { Pencil, User } from 'lucide-react';
 import { ProfileForm } from '../components/profile/ProfileForm';
 import { LoadingScreen } from '../components/shared/LoadingScreen';
 
@@ -15,20 +15,20 @@ export function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#1B1730', color: 'white' }}>
       <Header />
       
       <main className="max-w-4xl mx-auto py-8 px-4">
         {/* Profile Header */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-[#262438] rounded-xl shadow-sm p-6 mb-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                 <User className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-                <p className="text-gray-500 text-sm">
+                <h1 className="text-2xl font-bold text-white">My Profile</h1>
+                <p className="text-gray-300 text-sm">
                   {isEditing ? 'Edit your profile information' : 'View and manage your profile'}
                 </p>
               </div>
@@ -47,11 +47,19 @@ export function Profile() {
         </div>
 
         {/* Profile Content */}
-        <div className="bg-white rounded-xl shadow-sm">
+        <div className="bg-[#262438] rounded-xl shadow-sm">
           <div className="p-6">
             {isEditing ? (
               <div className="max-w-2xl mx-auto">
-                <ProfileForm user={userProfile} onCancel={() => setIsEditing(false)} />
+                <ProfileForm 
+                  user={userProfile} 
+                  onCancel={() => setIsEditing(false)} 
+                  onSave={() => {
+                    // Optionally, you can add logic here to refresh the userProfile
+                    // after saving changes, if necessary.
+                    setIsEditing(false);
+                  }} 
+                />
               </div>
             ) : (
               <div className="max-w-2xl mx-auto">

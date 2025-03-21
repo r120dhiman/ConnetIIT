@@ -8,7 +8,7 @@ export function SignIn() {
     <div className="max-w-md mx-auto mt-8">
       <div className="text-center mb-8">
         <Laptop className="h-12 w-12 mx-auto text-primary" />
-        <h1 className="text-2xl font-bold mt-4">Welcome back to ConnectIT</h1>
+        <h1 className="text-2xl font-bold mt-4">Welcome back to ConnectIIT</h1>
         <p className="text-gray-600 mt-2">Sign in to continue to your account</p>
       </div>
       <p className="mt-4 text-center text-sm text-gray-600">
@@ -18,7 +18,7 @@ export function SignIn() {
             </a>
         </p>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="m-4 rounded-3xl bg-[#262438] py-3  shadow-md">
         <SignInForm />
         
         <p className="mt-4 text-center text-sm text-gray-600">

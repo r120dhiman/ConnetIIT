@@ -56,7 +56,7 @@ export async function createPost(post: {
   }
 }
 
-export async function likePost(postId: string) {
+export async function likePost(postId: string, userId: string) {
   console.log("post id", postId);
   
   try {
@@ -67,12 +67,32 @@ export async function likePost(postId: string) {
     );
     console.log("liked post", post);
     
-    
+    // Check if the user has already liked the post
+    const user = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTIONS.USERS,
+      userId
+    );
+
+    if (user.posts_liked && user.posts_liked.includes(postId)) {
+      console.log("User has already liked this post.");
+      return; // User has already liked the post, exit the function
+    }
+
+    // Increment the likes count
     await databases.updateDocument(
       DATABASE_ID,
       COLLECTIONS.POSTS,
       postId,
       { likes: (post.likes || 0) + 1 }
+    );
+
+    // Update user's posts_liked array
+    await databases.updateDocument(
+      DATABASE_ID,
+      COLLECTIONS.USERS,
+      userId,
+      { posts_liked: [...(user.posts_liked || []), postId] }
     );
   } catch (error) {
     console.error('Error liking post:', error);

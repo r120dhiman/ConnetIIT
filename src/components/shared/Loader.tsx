@@ -43,22 +43,22 @@ const Loader: React.FC<LoaderProps> = ({
     Math.floor(Math.random() * loadingFacts.length)
   );
 
-  // Colors matching the app theme
+  // Updated colors matching the new theme
   const colors = {
     primary: {
-      main: '#6366f1',
+      main: '#4f46e5', // Adjusted primary color for contrast
       light: '#818cf8',
-      dark: '#4f46e5',
+      dark: '#3b3b8c',
       contrast: '#ffffff'
     },
     text: {
-      primary: '#1f2937',
-      secondary: '#4b5563',
-      muted: '#9ca3af',
+      primary: '#ffffff', // Changed to white for better contrast
+      secondary: '#e0e0e0', // Lighter gray for secondary text
+      muted: '#b0b0b0',
     },
     background: {
-      default: '#f9fafb',
-      paper: '#ffffff',
+      default: '#1B1730', // New background color
+      paper: '#2A2635', // Slightly lighter for paper elements
     }
   };
 
@@ -79,7 +79,6 @@ const Loader: React.FC<LoaderProps> = ({
     
     const interval = setInterval(() => {
       setCurrentFactIndex((prevIndex) => {
-        // Get a new random index that's different from the current one
         let newIndex;
         do {
           newIndex = Math.floor(Math.random() * loadingFacts.length);
@@ -106,7 +105,7 @@ const Loader: React.FC<LoaderProps> = ({
   };
 
   return (
-    <Box sx={containerStyles}>
+    <Box sx={containerStyles} >
       <CircularProgress
         size={sizeValues.spinner}
         thickness={4}

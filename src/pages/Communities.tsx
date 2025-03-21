@@ -39,6 +39,23 @@ const Communities = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { user } = useAuth();
 
+  // Updated colors matching the new theme
+  const colors = {
+    background: {
+      default: '#1B1730', // New background color
+      paper: '#2A2635', // Slightly lighter for paper elements
+      alt: '#2C2A3A', // Alternative background color
+    },
+    text: {
+      primary: '#ffffff', // Changed to white for better contrast
+      secondary: '#e0e0e0', // Lighter gray for secondary text
+      muted: '#b0b0b0',
+    },
+    primary: {
+      main: '#FE744D', // Primary button color
+    },
+  };
+
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
@@ -56,9 +73,7 @@ const Communities = () => {
         setCommunities(userCommunities);
         if (userCommunities.length > 0) {
           const selectedComm = userCommunities[0];
-          // console.log("Selected community:", selectedComm); // Debug log for selected community
           const messages = await getRoomChats(selectedComm.$id); // Fetch messages using community.$id
-          // console.log("Fetched messages:", messages); // Debug log for fetched messages
           const msgLogsContent = messages.map(msg => msg.content); // Extract content from messages
           
           setSelectedCommunity({ ...selectedComm, msgLogs: msgLogsContent }); // Set selected community with msgLogs
@@ -75,7 +90,6 @@ const Communities = () => {
     if (selectedCommunity) {
       // Subscribe to room chats for the selected community
       const unsubscribe = subscribeToRoomChats(selectedCommunity.$id, (newMessage) => {
-        // console.log("New message received:", newMessage); // Debugging log
         setSelectedCommunity(prev => prev ? {
           ...prev,
           msgLogs: [...prev.msgLogs, newMessage.content] // Update msgLogs with new message content
@@ -87,7 +101,6 @@ const Communities = () => {
       };
     }
   }, [selectedCommunity]); // Run this effect when selectedCommunity changes
-
 
   const handleSendMessage = async () => {
     if (!selectedCommunity || !newMessage.trim() || !user) return;
@@ -103,11 +116,6 @@ const Communities = () => {
         { msgLogs: [...selectedCommunity.msgLogs, messageId] } // Push message ID to msgLogs array
       );
 
-      // setSelectedCommunity(prev => prev ? {
-      //   ...prev,
-      //   msgLogs: [...prev.msgLogs, newMessage]
-      // } : prev);
-      
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -115,10 +123,10 @@ const Communities = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100">
+    <div className="min-h-screen" style={{ backgroundColor: colors.background.default }}>
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Header />
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Communities</h1>
+        <h1 className="text-3xl font-bold text-white mb-6">Communities</h1>
         
         {/* Community Navigation */}
         <div className="flex overflow-x-auto py-6 gap-4 mb-8 scrollbar-hide">
@@ -131,7 +139,7 @@ const Communities = () => {
               }}
               className={`px-6 py-3 rounded-full whitespace-nowrap transform transition-all duration-300 hover:scale-105 shadow-md ${
                 selectedCommunity?.$id === community.$id
-                  ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold'
+                  ? 'bg-gradient-to-r from-[#FE744D] to-[#FE744D] text-white font-bold'
                   : 'bg-white hover:bg-gray-50'
               }`}
             >
@@ -144,7 +152,7 @@ const Communities = () => {
         {!isChatOpen && (
           <button
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className="fixed bottom-8 right-8 p-4 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full shadow-lg hover:scale-110 transition-transform z-50"
+            className="fixed bottom-8 right-8 p-4 bg-gradient-to-r from-[#FE744D] to-[#FE744D] rounded-full shadow-lg hover:scale-110 transition-transform z-50"
           >
             <MessageSquare className="h-6 w-6 text-white" />
           </button>
@@ -199,11 +207,12 @@ const Communities = () => {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type your message..."
-                      className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FE744D] focus:border-transparent"
+                      style={{ color: 'white', backgroundColor: '#1B1730' }} // Set input text color to white
                     />
                     <button
                       onClick={handleSendMessage}
-                      className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full font-semibold hover:opacity-90"
+                      className="px-4 py-2 bg-gradient-to-r from-[#FE744D] to-[#FE744D] text-white rounded-full font-semibold hover:opacity-90"
                     >
                       Send
                     </button>

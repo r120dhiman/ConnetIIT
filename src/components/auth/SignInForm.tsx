@@ -27,7 +27,7 @@ export function SignInForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#262438] p-8 rounded-3xl">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
@@ -38,7 +38,7 @@ export function SignInForm() {
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-300"
           >
             Email
           </label>
@@ -49,7 +49,7 @@ export function SignInForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 w-full rounded-md border-gray-300"
+              className="pl-10 w-full rounded-xl px-4 py-2 border-gray-300 bg-[#1B1730] text-white"
               required
             />
           </div>
@@ -58,7 +58,7 @@ export function SignInForm() {
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-300"
           >
             Password
           </label>
@@ -69,7 +69,7 @@ export function SignInForm() {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 w-full rounded-md border-gray-300"
+              className="pl-10 w-full rounded-md border-gray-300 bg-[#1B1730] text-white"
               required
             />
             <button

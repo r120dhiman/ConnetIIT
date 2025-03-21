@@ -8,16 +8,19 @@ import {client} from './config'
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 export async function sendMessage(message: Omit<Message, 'id' | 'createdAt'>) {
-  console.log("msg data",message);
-  
+  // console.log("msg data",message);
+  const msgData={
+   senderId: message.senderId,
+   receiverId:message.receiverId.$id,
+   content:message.content,
+   isRead:false,
+  }
+console.log(msgData);
   return databases.createDocument(
     DATABASE_ID,
     COLLECTIONS.MESSAGES,
     ID.unique(),
-    {
-      ...message,
-      isRead: false,
-    }
+    msgData
   );
 }
 
