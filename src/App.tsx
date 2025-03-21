@@ -21,6 +21,7 @@ import ChatRoom from './pages/ChatRoom';
 import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import { LoadingScreen } from './components/shared/LoadingScreen';
+import Callback from './contexts/callback';
 
 function App() {
   const [appLoading, setAppLoading] = useState(true);
@@ -50,7 +51,7 @@ function App() {
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               {/* <Route path="/chat12" element={<ChatTry/>} /> */}
-              {/* <Route path="/auth/callback" element={<Callback />} /> */}
+              <Route path="/callback" element={<Callback />} />
               <Route path="/" element={<PrivateRoute><Feed/></PrivateRoute>} />
               {/* <Route path="/feed" element={<PrivateRoute><Feed /></PrivateRoute>} /> */}
               {/* <Route path="/challenges" element={<PrivateRoute><Challenges /></PrivateRoute>} /> */}
