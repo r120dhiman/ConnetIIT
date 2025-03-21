@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../contexts/AuthContext';
-import { Laptop, MessageSquare, Trophy, LogOut, User, Menu, X } from 'lucide-react';
+import { Laptop, MessageSquare, Trophy, LogOut, User, Home, Users, Plane } from 'lucide-react';
 
 export function Header() {
-  const { user, signOut } = useAuth();
+  const {  user, signOut, userProfile } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -18,13 +17,19 @@ export function Header() {
   };
 
   return (
+<<<<<<< HEAD
     <header className="sticky top-0 z-50 w-full border-b border-gray-200" style={{ backgroundColor: '#1B1730' }}>
       <div className="container flex flex-wrap items-center justify-between max-w-7xl mx-auto px-4 h-16">
+=======
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm lg:h-16">
+      <div className="container flex items-center justify-between max-w-7xl mx-auto px-4 h-16 lg:flex-row">
+>>>>>>> 84342f55e1ba18c56ea1a8f1564c495cd73d10c1
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3 shrink-0">
           <Laptop className="h-8 w-8 text-white" />
           <span className="font-bold text-xl text-white hidden sm:inline-block">ConnectIIT</span>
         </Link>
+<<<<<<< HEAD
         
         {/* Mobile menu button */}
         <button 
@@ -38,15 +43,20 @@ export function Header() {
             <Menu className="h-6 w-6 text-white" />
           )}
         </button>
+=======
+>>>>>>> 84342f55e1ba18c56ea1a8f1564c495cd73d10c1
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex lg:items-center lg:justify-between lg:flex-1 lg:ml-8">
           <nav className="flex items-center space-x-6">
-            {/* <Link to="/feed" className="nav-link group">
-              <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Feed</span>
-              <div className="h-0.5 w-0 group-hover:w-full bg-indigo-600 transition-all duration-200" />
-            </Link> */}
+            <Link to="/" className="nav-link group">
+              <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Home</span>
+            </Link>
+            <Link to="/chat" className="nav-link group">
+              <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Messages</span>
+            </Link>
             <Link to="/chat-anonymously" className="nav-link group">
+<<<<<<< HEAD
               <span className="text-sm font-medium text-white group-hover:text-[#FE744D] transition-colors">Random Chat</span>
               <div className="h-0.5 w-0 group-hover:w-full bg-[#FE744D] transition-all duration-200" />
             </Link>
@@ -57,11 +67,20 @@ export function Header() {
             <Link to="/travel" className="nav-link group">
               <span className="text-sm font-medium text-white group-hover:text-[#FE744D] transition-colors">Travel Along</span>
               <div className="h-0.5 w-0 group-hover:w-full bg-[#FE744D] transition-all duration-200" />
+=======
+              <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Random Chat</span>
+            </Link>
+            <Link to="/communities" className="nav-link group">
+              <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Communities</span>
+            </Link>
+            <Link to="/travel" className="nav-link group">
+              <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Travel Along</span>
+>>>>>>> 84342f55e1ba18c56ea1a8f1564c495cd73d10c1
             </Link>
           </nav>
 
-          {/* User actions for desktop */}
           <div className="flex items-center space-x-6">
+<<<<<<< HEAD
             <Link to="/chat" className="flex items-center space-x-1 text-white hover:text-[#FE744D] transition-colors">
               <MessageSquare className="h-5 w-5" />
               <span className="text-sm font-medium">Messages</span>
@@ -77,6 +96,13 @@ export function Header() {
                     <User className="h-5 w-5 text-[#FE744D]" />
                   </div>
                   <span className="text-sm font-medium text-white group-hover:text-[#FE744D] transition-colors">{user.name}</span>
+=======
+            {user ? (
+              <div className="flex items-center space-x-6">
+                <Link to="/profile" className="flex items-center space-x-2 group">
+                  <User className="h-5 w-5 text-indigo-600" />
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">{userProfile!.name}</span>
+>>>>>>> 84342f55e1ba18c56ea1a8f1564c495cd73d10c1
                 </Link>
                 <button
                   onClick={handleSignOut}
@@ -96,7 +122,9 @@ export function Header() {
             )}
           </div>
         </div>
+      </div>
 
+<<<<<<< HEAD
         {/* Mobile menu container */}
         <div className={`${
           isMenuOpen ? 'flex' : 'hidden'
@@ -150,6 +178,34 @@ export function Header() {
             )}
           </div>
         </div>
+=======
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-md flex items-center justify-around p-2 lg:hidden">
+        <Link to="/" className="flex flex-col items-center text-gray-700 hover:text-indigo-600">
+          <Home className="h-6 w-6" />
+          <span className="text-xs">Home</span>
+        </Link>
+        <Link to="/chat" className="flex flex-col items-center text-gray-700 hover:text-indigo-600">
+          <MessageSquare className="h-6 w-6" />
+          <span className="text-xs">Messages</span>
+        </Link>
+        <Link to="/chat-anonymously" className="flex flex-col items-center text-gray-700 hover:text-indigo-600">
+          <MessageSquare className="h-6 w-6" />
+          <span className="text-xs">Random Chat</span>
+        </Link>
+        <Link to="/communities" className="flex flex-col items-center text-gray-700 hover:text-indigo-600">
+          <Users className="h-6 w-6" />
+          <span className="text-xs">Communities</span>
+        </Link>
+        <Link to="/travel" className="flex flex-col items-center text-gray-700 hover:text-indigo-600">
+          <Plane className="h-6 w-6" />
+          <span className="text-xs">Travel</span>
+        </Link>
+        <Link to="/profile" className="flex flex-col items-center text-gray-700 hover:text-indigo-600">
+          <User className="h-6 w-6" />
+          <span className="text-xs">Profile</span>
+        </Link>
+>>>>>>> 84342f55e1ba18c56ea1a8f1564c495cd73d10c1
       </div>
     </header>
   );
