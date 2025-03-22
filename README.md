@@ -133,7 +133,7 @@ npm install
 Create a `.env` file in the project root:
 
 ```env
-VITE_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+VITE_APPWRITE_ENDPOINT=https://auth.connectiit.tech/v1
 VITE_APPWRITE_PROJECT_ID=your-project-id
 ```
 
