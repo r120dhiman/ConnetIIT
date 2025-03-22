@@ -355,7 +355,9 @@ const Trips: React.FC = () => {
           </Box>
 
           <Grid container spacing={2}>
-            {trips.map((trip, index) => (
+            {trips.map((trip, index) => {
+              const length=trip.participants.length+1;
+              return (
               <Grid item xs={12} key={index}>
                 <Card 
                   variant="outlined" 
@@ -447,7 +449,7 @@ const Trips: React.FC = () => {
                           borderRadius: 'full',
                           fontSize: '0.875rem'
                         }}>
-                          <span>👥</span> {trip.participants.length}
+                          <span>👥</span> {length}
                         </Box>
                       </Box>
                       
@@ -494,7 +496,7 @@ const Trips: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grid>
-            ))}
+            )})}
           </Grid>
         </Box>
 

@@ -8,10 +8,10 @@ import {client} from './config'
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 export async function sendMessage(message: Omit<Message, 'id' | 'createdAt'>) {
-  // console.log("msg data",message);
+  console.log("msg data",message.receiverId.id);
   const msgData={
    senderId: message.senderId,
-   receiverId:message.receiverId.$id,
+   receiverId:message.receiverId.id,
    content:message.content,
    isRead:false,
   }

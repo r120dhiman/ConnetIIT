@@ -5,6 +5,9 @@ import type { User } from '../../types';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '../../contexts/AuthContext';
 import Loader from '../shared/Loader';
+import { databases } from "../../lib/appwrite";
+import { COLLECTIONS } from "../../lib/appwrite/config";
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 interface UserListProps {
   searchQuery: string;
@@ -18,22 +21,12 @@ export function UserList({ searchQuery, onSearchChange, selectedUserId, onSelect
   const [SelectedUser, setSelectedUser] = useState("");
   
   const { users, loading } = useUsers(searchQuery);
-  const [interactedUsers, setInteractedUsers] = useState<User[]>([]);
+  // const [interactedUsers, setInteractedUsers] = useState<User[]>([]);
   const [loadingFriends, setLoadingFriends] = useState(false);
   const [lastMessages, setLastMessages] = useState<Record<string, string>>({});
 
   // Fetch interacted users (friends) when component mounts
   useEffect(() => {
-    const otherUser=async(userId) => {
-      const response = await databases.getDocument(
-        DATABASE_ID,
-        COLLECTIONS.USERS, // Assuming you have a USERS collection
-        userId
-      );
-
-    }
-    
-
     const fetchFriends = async () => {
       if (!user) return;
       
@@ -42,19 +35,43 @@ export function UserList({ searchQuery, onSearchChange, selectedUserId, onSelect
         const { friends, lastMessages } = await allFriendsMsg(user.$id);
         
         // Make sure interacted users have properly formatted IDs
-        const formattedFriends = friends.map(friend => {
-          // Ensure the ID is mapped consistently - if the API returns $id but your component expects id
-          if (friend.$id && !friend.id) {
-            return {
-              ...friend,
-              id: friend.$id // Map $id to id
-            };
-          }
-          return friend;
-        });
-        
-        console.log("Formatted interacted users:", formattedFriends);
-        setInteractedUsers(formattedFriends);
+        // const formattedFriends = friends.map(friend => {
+        //   if (friend.$id && !friend.id) {
+        //     return {
+        //       ...friend,
+        //       id: friend.$id // Map $id to id
+        //     };
+        //   }
+        //   return friend;
+        // });
+
+        // Fetch user data for each friend and populate the interactedUsers array
+        // const data: User[] = [];
+        // const promises = formattedFriends.map(async (friend) => {
+        //   try {
+        //     const userData = await databases.getDocument(
+        //       DATABASE_ID,
+        //       COLLECTIONS.USERS,
+        //       friend // Use the mapped id
+        //     );
+
+        //     // Push the user data into the data array
+        //     data.push({
+        //       id: userData.$id,
+        //       name: userData.name,
+        //       profileUrl: userData.profileUrl,
+        //       isOnline: userData.isOnline,
+        //       lastSeen: userData.lastSeen,
+        //       college: userData.college,
+        //     });
+        //   } catch (error) {
+        //     console.error("Error fetching user data:", error);
+        //   }
+        // });
+
+        // // Wait for all promises to resolve
+        // await Promise.all(promises);
+        // setInteractedUsers(data); // Set the interacted users state
         setLastMessages(lastMessages || {});
       } catch (error) {
         console.error('Error fetching friends:', error);
@@ -67,11 +84,11 @@ export function UserList({ searchQuery, onSearchChange, selectedUserId, onSelect
   }, [user]);
 
   // Determine which users to display based on search state
-  const displayUsers = searchQuery ? users : interactedUsers;
+  const displayUsers = searchQuery ? users : []; // Use an empty array for interacted users
   const isLoading = searchQuery ? loading : loadingFriends;
 
   return (
-    <div className="h-full flex flex-col bg-[#262438] p-4 rounded-3xl" >
+    <div className="h-full flex flex-col bg-[#262438] p-4 rounded-3xl">
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 bg-[#262438] text-gray-400" />
         <input
@@ -103,14 +120,12 @@ export function UserList({ searchQuery, onSearchChange, selectedUserId, onSelect
               <button
                 key={user.id}
                 onClick={() => {
-                  console.log("Selecting user:", user);
                   setSelectedUser(user);
                   onSelectUser(user);
                 }}
                 className={`w-full p-3 text-left text-white hover:bg-[#302d4b] rounded-3xl flex items-center justify-between ${
                   selectedUserId === user.id ? 'bg-primary/10' : ''
                 }`}
-                
               >
                 <div className="flex items-center space-x-3">
                   <div className="relative">

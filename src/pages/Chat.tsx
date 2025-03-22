@@ -95,7 +95,7 @@ export function Chat() {
                   isOnline={selectedUser.isOnline}
                   lastSeen={selectedUser.lastSeen}
                 />
-                <div className="flex items-center p-4 bg-[#262438] m-4 mt-0 rounded-b-3xl">
+                {/* <div className="flex items-center p-4 bg-[#262438] m-4 mt-0 rounded-b-3xl">
                   <input
                     type="text"
                     value={messageText}
@@ -110,7 +110,7 @@ export function Chat() {
                   >
                     Send
                   </button>
-                </div>
+                </div> */}
               </div>
             ) : (
               <div className="h-full bg-[#262438] rounded-3xl m-4 shadow-md flex items-center justify-center text-gray-500">

@@ -30,6 +30,7 @@ export function ChatArea({ selectedUser }: ChatAreaProps) {
   // Load messages when a user is selected
   useEffect(() => {
     if (!selectedUser || !user) return;
+    console.log("I am from Chat Ares",selectedUser);
     
     const fetchMessages = async () => {
       try {
