@@ -1062,12 +1062,12 @@ const Trips: React.FC = () => {
                     fullWidth
                     required
                     variant="outlined"
-                    InputProps={{
-                      style: { color: colors.text.primary },
-                    }}
-                    InputLabelProps={{
-                      style: { color: 'white' }
-                    }}
+                    // InputProps={{
+                    //   style: { color: colors.text.primary },
+                    // }}
+                    // InputLabelProps={{
+                    //   style: { color: 'white' }
+                    // }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,

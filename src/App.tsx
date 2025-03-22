@@ -48,7 +48,7 @@ function App() {
           {/* <Header /> */}
           <main className="  " style={{padding: '0px'}}>
             <Routes>
-              <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               {/* <Route path="/chat12" element={<ChatTry/>} /> */}
               <Route path="/callback" element={<Callback />} />

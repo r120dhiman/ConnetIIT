@@ -36,13 +36,8 @@ export function SignInForm() {
   };
 
   return (
-<<<<<<< HEAD
-    <div className="space-y-6 bg-[#262438] p-8 rounded-3xl">
-      <form onSubmit={handleSubmit} className="space-y-4">
-=======
     <div className="space-y-6">
       {/* <form onSubmit={handleSubmit} className="space-y-4">
->>>>>>> 84342f55e1ba18c56ea1a8f1564c495cd73d10c1
         {error && (
           <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
             {error}

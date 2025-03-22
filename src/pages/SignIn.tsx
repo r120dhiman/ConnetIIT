@@ -19,11 +19,7 @@ export function SignIn() {
             </a>
         </p> */}
 
-<<<<<<< HEAD
-      <div className="m-4 rounded-3xl bg-[#262438] py-3  shadow-md">
-=======
       <div className="bg-white p-6 rounded-lg shadow-md mb-20">
->>>>>>> 84342f55e1ba18c56ea1a8f1564c495cd73d10c1
         <SignInForm />
         
         {/* <p className="mt-4 text-center text-sm text-gray-600">
