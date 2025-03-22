@@ -2,7 +2,7 @@ import { Client, Account, Databases, Storage, Functions } from 'appwrite';
 
 
 export const client = new Client()
-  .setEndpoint('https://cloud.appwrite.io/v1')
+  .setEndpoint('https://auth.connectiit.tech/v1')
   .setProject('677522710038159eedf4');
 
 export const account = new Account(client);
