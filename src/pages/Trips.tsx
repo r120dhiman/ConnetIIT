@@ -650,7 +650,7 @@ const Trips: React.FC = () => {
         {/* Mobile Chat Drawer */}
         {isMobile && (
           <SwipeableDrawer
-            anchor="bottom"
+            anchor="top"
             open={isDrawerOpen && selectedTrip !== null}
             onClose={() => {
               setIsDrawerOpen(false);
@@ -664,8 +664,8 @@ const Trips: React.FC = () => {
             PaperProps={{
               sx: {
                 height: '90vh',
-                borderTopLeftRadius: '20px',
-                borderTopRightRadius: '20px',
+                borderBottomLeftRadius: '20px',
+                borderBottomRightRadius: '20px',
                 overflow: 'visible',
                 backgroundColor: colors.background.paper,
               }
