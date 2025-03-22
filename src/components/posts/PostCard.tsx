@@ -6,6 +6,12 @@ import type { Post } from '../../types';
 import { getUsersByIds } from '../../lib/appwrite/users';
 import { getCommentsByPostId } from '../../lib/appwrite/comments';
 import { CommentUser } from '../../types/comment';
+import { databases } from '../../lib/appwrite'
+import { COLLECTIONS } from '../../lib/appwrite/config';
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+import { useAuth } from '../../contexts/AuthContext';
+
+
 
 interface PostCardProps {
   post: Post;
@@ -15,6 +21,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
+  const {user}=useAuth();
   const [showComments, setShowComments] = useState(false);
   const [commentUsers, setCommentUsers] = useState<Record<string, CommentUser>>({});
   const [loading, setLoading] = useState(false);
@@ -48,14 +55,87 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
     fetchCommentUsers();
   }, [showComments, post.$id, users]);
 
+  // Check if the post is liked by the user when the component mounts
+  useEffect(() => {
+    const checkIfLiked = async () => {
+      if (user) {
+        try {
+          const userDoc = await databases.getDocument(
+            DATABASE_ID,
+            COLLECTIONS.USERS,
+            user.$id
+          );
+          setLiked(userDoc.posts_liked.includes(post.$id)); // Set liked state based on user's liked posts
+        } catch (error) {
+          console.error('Error fetching user liked posts:', error);
+        }
+      }
+    };
+
+    checkIfLiked();
+  }, [user, post.$id]);
+
   const toggleComments = () => {
     setShowComments(!showComments);
   };
 
-  const handleLike = () => {
-    onLike(post.$id);
-    setLiked(true);
+  const handleLike = async () => {
+    try {
+      const isLiked = await databases.getDocument(
+        DATABASE_ID,
+        COLLECTIONS.USERS,
+        user.$id
+      );
+
+      if (isLiked.posts_liked.includes(post.$id)) {
+        // User is unliking the post
+        post.likes -= 1;
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTIONS.POSTS,
+          post.$id,
+          {
+            likes: post.likes // Correctly update the likes count
+          }
+        );
+        isLiked.posts_liked = isLiked.posts_liked.filter(id => id !== post.$id);
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTIONS.USERS,
+          user.$id,
+          {
+            posts_liked: isLiked.posts_liked // Update the user's posts_liked array
+          }
+        );
+        setLiked(false);
+      } else {
+        // User is liking the post
+        post.likes += 1;
+        isLiked.posts_liked.push(post.$id);
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTIONS.POSTS,
+          post.$id,
+          {
+            likes: post.likes // Correctly update the likes count
+          }
+        );
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTIONS.USERS,
+          user.$id,
+          {
+            posts_liked: isLiked.posts_liked // Update the user's posts_liked array
+          }
+        );
+        setLiked(true);
+      }
+    } catch (error) {
+      console.error('Error updating like status:', error);
+    }
   };
+  
+  
 
   return (
     <div className="bg-[#262438] text-[#fafafa] rounded-3xl shadow-md p-6">
@@ -88,9 +168,9 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
         <div className="flex space-x-4">
           <button
             onClick={handleLike}
-            className={`flex items-center space-x-1 ${liked ? 'text-blue-500' : 'text-gray-500'}`}
+            className={`flex items-center space-x-1 ${liked ? 'text-orange-500' : 'text-gray-500'}`}
           >
-            <Heart className="h-4 w-4" />
+            <Heart className={`h-4 w-4 ${liked ? 'text-orange-500/80' : ''}`} />
             <span>{post.likes}</span>
           </button>
           <button
@@ -100,13 +180,13 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
             <MessageSquare className="h-4 w-4" />
             <span>Comments</span>
           </button>
-          <button
+          {/* <button
             onClick={() => onShare(post.$id)}
             className="flex items-center space-x-1 hover:text-primary"
           >
             <Share2 className="h-4 w-4" />
             <span>Share</span>
-          </button>
+          </button> */}
         </div>
         <span>{formatDistanceToNow(new Date(post.$createdAt))} ago</span>
       </div>

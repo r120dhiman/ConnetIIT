@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { Laptop, MessageSquare, Trophy, LogOut, User, Home, Users, Plane } from 'lucide-react';
 
 export function Header() {
   const { user, signOut, userProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     try {
@@ -28,20 +29,20 @@ export function Header() {
         {/* Desktop Navigation */}
         <div className="hidden lg:flex lg:items-center lg:justify-between lg:flex-1 lg:ml-8">
           <nav className="flex items-center space-x-6">
-            <Link to="/" className="nav-link group">
-              <span className="text-sm font-medium text-gray-300 group-hover:text-indigo-600 transition-colors">Home</span>
+            <Link to="/" className={`nav-link group ${location.pathname === '/' ? 'text-orange-500' : 'text-gray-300'}`}>
+              <span className="text-sm font-medium transition-colors">Home</span>
             </Link>
-            <Link to="/chat" className="nav-link group">
-              <span className="text-sm font-medium text-gray-300 group-hover:text-indigo-600 transition-colors">Messages</span>
+            <Link to="/chat" className={`nav-link group ${location.pathname === '/chat' ? 'text-orange-500' : 'text-gray-300'}`}>
+              <span className="text-sm font-medium transition-colors">Messages</span>
             </Link>
-            <Link to="/chat-anonymously" className="nav-link group">
-              <span className="text-sm font-medium text-gray-300 group-hover:text-indigo-600 transition-colors">Random Chat</span>
+            <Link to="/chat-anonymously" className={`nav-link group ${location.pathname === '/chat-anonymously' ? 'text-orange-500' : 'text-gray-300'}`}>
+              <span className="text-sm font-medium transition-colors">Random Chat</span>
             </Link>
-            <Link to="/communities" className="nav-link group">
-              <span className="text-sm font-medium text-gray-300 group-hover:text-indigo-600 transition-colors">Communities</span>
+            <Link to="/communities" className={`nav-link group ${location.pathname === '/communities' ? 'text-orange-500' : 'text-gray-300'}`}>
+              <span className="text-sm font-medium transition-colors">Communities</span>
             </Link>
-            <Link to="/travel" className="nav-link group">
-              <span className="text-sm font-medium text-gray-300 group-hover:text-indigo-600 transition-colors">Travel Along</span>
+            <Link to="/travel" className={`nav-link group ${location.pathname === '/travel' ? 'text-orange-500' : 'text-gray-300'}`}>
+              <span className="text-sm font-medium transition-colors">Travel Along</span>
             </Link>
           </nav>
 
@@ -74,27 +75,27 @@ export function Header() {
 
       {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 w-full bg-[#1B1730] border-t border-gray-200 shadow-md flex items-center justify-around p-2 lg:hidden">
-        <Link to="/" className="flex flex-col items-center text-gray-300 hover:text-indigo-600">
+        <Link to="/" className={`flex flex-col items-center ${location.pathname === '/' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
           <Home className="h-6 w-6" />
           <span className="text-xs">Home</span>
         </Link>
-        <Link to="/chat" className="flex flex-col items-center text-gray-300 hover:text-indigo-600">
+        <Link to="/chat" className={`flex flex-col items-center ${location.pathname === '/chat' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
           <MessageSquare className="h-6 w-6" />
           <span className="text-xs">Messages</span>
         </Link>
-        <Link to="/chat-anonymously" className="flex flex-col items-center text-gray-300 hover:text-indigo-600">
+        <Link to="/chat-anonymously" className={`flex flex-col items-center ${location.pathname === '/chat-anonymously' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
           <MessageSquare className="h-6 w-6" />
           <span className="text-xs">Random Chat</span>
         </Link>
-        <Link to="/communities" className="flex flex-col items-center text-gray-300 hover:text-indigo-600">
+        <Link to="/communities" className={`flex flex-col items-center ${location.pathname === '/communities' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
           <Users className="h-6 w-6" />
           <span className="text-xs">Communities</span>
         </Link>
-        <Link to="/travel" className="flex flex-col items-center text-gray-300 hover:text-indigo-600">
+        <Link to="/travel" className={`flex flex-col items-center ${location.pathname === '/travel' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
           <Plane className="h-6 w-6" />
           <span className="text-xs">Travel</span>
         </Link>
-        <Link to="/profile" className="flex flex-col items-center text-gray-300 hover:text-indigo-600">
+        <Link to="/profile" className={`flex flex-col items-center ${location.pathname === '/profile' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
           <User className="h-6 w-6" />
           <span className="text-xs">Profile</span>
         </Link>

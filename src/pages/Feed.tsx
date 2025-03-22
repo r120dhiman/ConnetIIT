@@ -68,7 +68,7 @@ export function Feed() {
         </div>
         
         {isCreatingPost && (
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-[#262438] rounded-xl shadow-sm p-6">
             <CreatePost 
               onPostCreated={handlePostCreated}
               onCancel={() => setIsCreatingPost(false)}

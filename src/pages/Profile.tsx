@@ -2,17 +2,28 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { ProfileCard } from '../components/profile/ProfileCard';
 import { Header } from '../components/layout/Header';
-import { Pencil, User } from 'lucide-react';
+import { Pencil, User, LogOut } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { ProfileForm } from '../components/profile/ProfileForm';
 import { LoadingScreen } from '../components/shared/LoadingScreen';
 
 export function Profile() {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
+  const navigate=useNavigate();
   const [isEditing, setIsEditing] = useState(false);
 
   if (!user || !userProfile) {
     return <LoadingScreen message="Loading your profile..." />;
   }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/sign-in');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#1B1730', color: 'white' }}>
@@ -44,6 +55,19 @@ export function Profile() {
               {isEditing ? 'View Profile' : 'Edit Profile'}
             </button>
           </div>
+        </div>
+
+        {/* Sign Out Button */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-red-500 text-white rounded-lg
+              hover:bg-red-600 transition-colors duration-200 
+              active:transform active:scale-95"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
         </div>
 
         {/* Profile Content */}

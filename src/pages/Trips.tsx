@@ -367,7 +367,7 @@ const Trips: React.FC = () => {
                     backgroundColor: selectedTrip?.id === trip.id 
                       ? `${colors.primary.main}10`
                       : trip.createdBy === 'Me' 
-                      ? colors.success.light
+                      ? "bg-[#392639]"
                       : colors.background.paper,
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
@@ -384,13 +384,21 @@ const Trips: React.FC = () => {
                   <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" sx={{ 
                       fontWeight: '600',
-                      color: colors.text.primary,
+                      color: selectedTrip?.id === trip.id 
+                      ? `white`
+                      : trip.createdBy === 'Me' 
+                      ? "bg-[#392639]"
+                      : colors.background.paper,
                       mb: 1
                     }}>
                       {trip.tripName}
                     </Typography>
                     <Typography sx={{ 
-                      color: colors.text.secondary,
+                      color: selectedTrip?.id === trip.id 
+                      ? `white`
+                      : trip.createdBy === 'Me' 
+                      ? "bg-[#392639]"
+                      : colors.background.paper,
                       mb: 2,
                       fontSize: '0.95rem'
                     }}>
@@ -404,22 +412,52 @@ const Trips: React.FC = () => {
                       color: colors.text.muted
                     }}>
                       <Box>
-                        <Typography variant="caption" sx={{ color: colors.text.muted }}>
+                        <Typography variant="caption" sx={{ color: selectedTrip?.id === trip.id 
+                      ? `white`
+                      : trip.createdBy === 'Me' 
+                      ? "#FE744D"
+                      : colors.text.muted}}>
                           From
                         </Typography>
-                        <Typography sx={{ fontWeight: '500' }}>{trip.from}</Typography>
+                        <Typography sx={{ fontWeight: '500',
+                          color: selectedTrip?.id === trip.id 
+                          ? `white`
+                          : trip.createdBy === 'Me' 
+                          ? "#FE744D"
+                          : colors.text.muted
+                         }}>{trip.from}</Typography>
                       </Box>
                       <Box>
-                        <Typography variant="caption" sx={{ color: colors.text.muted }}>
+                        <Typography variant="caption" sx={{ color: selectedTrip?.id === trip.id 
+                      ? `white`
+                      : trip.createdBy === 'Me' 
+                      ? "#FE744D"
+                      : colors.text.muted }}>
                           To
                         </Typography>
-                        <Typography sx={{ fontWeight: '500' }}>{trip.to}</Typography>
+                        <Typography sx={{ fontWeight: '500',
+                          color: selectedTrip?.id === trip.id 
+                          ? `white`
+                          : trip.createdBy === 'Me' 
+                          ? "#FE744D"
+                          : colors.text.muted
+                         }}>{trip.to}</Typography>
                       </Box>
                       <Box>
-                        <Typography variant="caption" sx={{ color: colors.text.muted }}>
+                        <Typography variant="caption" sx={{ color: selectedTrip?.id === trip.id 
+                      ? `white`
+                      : trip.createdBy === 'Me' 
+                      ? "#FE744D"
+                      : colors.text.muted }}>
                           Date
                         </Typography>
-                        <Typography sx={{ fontWeight: '500' }}>{trip.date}</Typography>
+                        <Typography sx={{ fontWeight: '500',
+                          color: selectedTrip?.id === trip.id 
+                          ? `white`
+                          : trip.createdBy === 'Me' 
+                          ? "#FE744D"
+                          : colors.text.muted
+                         }}>{new Date(trip.date).toLocaleDateString()}</Typography>
                       </Box>
                     </Box>
 
@@ -435,15 +473,29 @@ const Trips: React.FC = () => {
                       }}>
                         <Typography sx={{ 
                           fontSize: '0.875rem',
-                          color: colors.text.muted
+                          color: selectedTrip?.id === trip.id 
+                      ? `white`
+                      : trip.createdBy === 'Me' 
+                      ? "#FE744D"
+                      : colors.text.muted
                         }}>
-                          Created by <span style={{ fontWeight: '500' }}>{trip.createdBy}</span>
+                          Created by <span style={{ fontWeight: '500',
+                            color: selectedTrip?.id === trip.id 
+                            ? `white`
+                            : trip.createdBy === 'Me' 
+                            ? "#FE744D"
+                            : colors.text.muted
+                           }}>{trip.createdBy}</span>
                         </Typography>
                         <Box sx={{ 
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
-                          backgroundColor: colors.background.alt,
+                          backgroundColorcolor: selectedTrip?.id === trip.id 
+                      ? `white`
+                      : trip.createdBy === 'Me' 
+                      ? "#FE744D"
+                      : colors.text.muted,
                           px: 1.5,
                           py: 0.5,
                           borderRadius: 'full',
@@ -615,8 +667,8 @@ const Trips: React.FC = () => {
                         borderRadius: '10px',
                         px: 3,
                         textTransform: 'none',
-                        bgcolor: colors.primary.main,
-                        color: colors.primary.contrast,
+                        bgcolor: "#392639",
+                        color: "#FE744D",
                         '&:hover': {
                           bgcolor: colors.primary.dark
                         },
@@ -823,7 +875,7 @@ const Trips: React.FC = () => {
                           borderRadius: '10px',
                           px: 3,
                           textTransform: 'none',
-                          bgcolor: colors.primary.main,
+                          bgcolor: "#392639",
                           color: colors.primary.contrast,
                           '&:hover': {
                             bgcolor: colors.primary.dark

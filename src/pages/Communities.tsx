@@ -152,7 +152,7 @@ const Communities = () => {
         {!isChatOpen && (
           <button
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className="fixed bottom-8 right-8 p-4 bg-gradient-to-r from-[#FE744D] to-[#FE744D] rounded-full shadow-lg hover:scale-110 transition-transform z-50"
+            className="fixed bottom-20 right-8 p-4 bg-gradient-to-r from-[#FE744D] to-[#FE744D] rounded-full shadow-lg hover:scale-110 transition-transform z-50"
           >
             <MessageSquare className="h-6 w-6 text-white" />
           </button>
@@ -166,7 +166,7 @@ const Communities = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 400, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed bottom-0 right-0 w-full max-w-[32rem] h-[70vh] bg-white shadow-2xl z-40"
+              className="fixed bottom-12 right-0 w-full max-w-[32rem] h-[70vh] bg-[#262438] shadow-2xl z-40"
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
@@ -177,19 +177,21 @@ const Communities = () => {
                     onClick={() => setIsChatOpen(false)}
                     className="p-2 hover:bg-gray-100 rounded-full"
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-5 w-5 text-white" />
                   </button>
                 </div>
 
                 {/* Messages Container */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-4  space-y-4">
                   {selectedCommunity.msgLogs.length > 0 ? (
                     selectedCommunity.msgLogs.map((msg, index) => (
-                      <Card key={index} className="transform transition-all duration-200 hover:scale-[1.02]">
-                        <CardContent className="py-3 px-4 bg-gradient-to-r from-white to-gray-50">
-                          <Typography className="text-gray-700">{msg}</Typography>
-                        </CardContent>
-                      </Card>
+                      <div key={index} className={`flex ${msg.senderId !== user.$id ? 'justify-start' : 'justify-end'}`}>
+                        <Card className="transform transition-all duration-200 hover:scale-[1.02]">
+                          <div className="py-1 px-2 bg-[#FE744D]">
+                            <Typography className="text-gray-700">{msg}</Typography>
+                          </div>
+                        </Card>
+                      </div>
                     ))
                   ) : (
                     <Typography className="text-gray-500 text-center italic">

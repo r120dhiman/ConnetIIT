@@ -19,16 +19,11 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    console.log("user", user );
-    
 
     setIsSubmitting(true);
     setError('');
 
-    console.log("entering post send from frontend");
     try {
-      console.log("creating post send from frontend");
-      
       const newPost = await createPost({
         userId: user.$id,
         title,
@@ -36,9 +31,7 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
         githubUrl: githubUrl || undefined,
         tags: tags.split(',').map(tag => tag.trim()).filter(Boolean),
       });
-      console.log("data send from frontend");
-      
-      
+
       // Reset form
       setTitle('');
       setContent('');
@@ -58,7 +51,7 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-6">
+    <form onSubmit={handleSubmit} className="bg-[#262438] rounded-lg shadow-md p-6 mb-6">
       {error && (
         <div className="mb-4 bg-red-50 text-red-500 p-3 rounded-md text-sm">
           {error}
@@ -67,7 +60,7 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
 
       <div className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="title" className="block text-sm font-medium text-white">
             Title
           </label>
           <input
@@ -75,13 +68,13 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="mt-1 block w-full  border-gray-300  bg-[#56517e] shadow-sm rounded-2xl focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="content" className="block text-sm font-medium text-white">
             Content
           </label>
           <textarea
@@ -89,13 +82,13 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={4}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="mt-1 block w-full rounded-2xl bg-[#56517e] border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="githubUrl" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="githubUrl" className="block text-sm font-medium text-white">
             GitHub URL (optional)
           </label>
           <input
@@ -103,12 +96,12 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
             id="githubUrl"
             value={githubUrl}
             onChange={(e) => setGithubUrl(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="mt-1 block w-full rounded-2xl bg-[#56517e] border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2"
           />
         </div>
 
         <div>
-          <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="tags" className="block text-sm font-medium text-white">
             Tags (comma-separated)
           </label>
           <input
@@ -117,14 +110,14 @@ export function CreatePost({ onPostCreated, onCancel }: CreatePostProps) {
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="React, TypeScript, Frontend"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="mt-1 block w-full rounded-2xl bg-[#56517e] border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2"
           />
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+          className="w-full px-4 py-2 bg-[#392639] text-[#FE744D] rounded-3xl hover:bg-[#FE744D] hover:text-white disabled:opacity-50"
         >
           {isSubmitting ? 'Creating...' : 'Create Post'}
         </button>
