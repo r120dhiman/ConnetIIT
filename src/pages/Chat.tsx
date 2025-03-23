@@ -4,7 +4,7 @@ import { UserList } from '../components/chat/UserList';
 import { useAuth } from '../contexts/AuthContext';
 import { updateUserStatus } from '../lib/appwrite/users';
 import type { User } from '../types';
-import { Header } from '../components/layout/Header';
+// import { Header } from '../components/layout/Header';
 
 // Check that this interface matches your actual data structure
 interface User {
@@ -72,7 +72,7 @@ export function Chat() {
   // Desktop view - original layout
   if (!isMobileView) {
     return (<>
-        <Header/>
+        {/* <Header/> */}
       <div className="max-w-6xl mx-auto h-[calc(100vh-4rem)]">
         <div className="grid grid-cols-12 gap-6 h-full">
           {/* Users sidebar */}
@@ -128,7 +128,7 @@ export function Chat() {
   return (
     <>
     <div className="max-w-6xl mx-auto h-[calc(100vh-4rem)] flex flex-col">
-      <Header/>
+      {/* <Header/> */}
       
       {selectedUser ? (
         // Chat view with back button

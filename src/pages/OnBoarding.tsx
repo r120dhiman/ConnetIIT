@@ -90,7 +90,7 @@ function OnBoarding() {
                             <select
                                 name="interests"
                                 multiple
-                                className="mt-1 block w-full pl-3 pr-10 py-2 bg-[#262438] text-base border-[#262438] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                                className="mt-1 block w-full pl-3 text-[#fafafa] pr-10 py-2 bg-[#262438] text-base border-[#262438] focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                                 size={4}
                             >
                                

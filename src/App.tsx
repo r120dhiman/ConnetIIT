@@ -52,12 +52,12 @@ function App() {
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/callback" element={<Callback />} />
-          <Route path="/" element={<PrivateRoute><Feed /></PrivateRoute>} />
-          <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
-          <Route path="/chat-room" element={<PrivateRoute><ChatRoom /></PrivateRoute>} />
+          <Route path="/" element={<PrivateRoute><Header/><Feed /></PrivateRoute>} />
+          <Route path="/chat" element={<PrivateRoute><Header/><Chat /></PrivateRoute>} />
+          <Route path="/chat-room" element={<PrivateRoute><Header/><ChatRoom /></PrivateRoute>} />
           <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat /></PrivateRoute>} />
           <Route path="/onboarding" element={<OnBoarding />} />
-          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><Header/><Profile /></PrivateRoute>} />
           <Route path="/travel" element={<PrivateRoute><Header/><Trips /></PrivateRoute>} />
           <Route path="/communities" element={<PrivateRoute><Header/><Communities /></PrivateRoute>} />
           <Route path="*" element={<NotFound />} />

@@ -25,7 +25,7 @@ export function Header() {
           <Laptop className="h-8 w-8 text-[#fafafa]" />
           <span className="font-bold text-xl text-[#fafafa] hidden sm:inline-block">ConnectIIT</span>
         </Link>
-        <Link to="/chat-anonymously" className={`flex flex-col items-center lg:hidden ${location.pathname === '/chat-anonymously' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600 text-[#1B1730] font-semibold bg-[#FE744D] px-7 py-1 rounded-full`}>
+        <Link to="/chat-anonymously" className={`flex flex-col items-center lg:hidden ${location.pathname === '/chat-anonymously' ? 'text-orange-500' : 'text-gray-300'} text-[#1B1730] font-semibold bg-[#FE744D] px-7 py-1 rounded-full`}>
           <MessageSquare className="h-6 w-6" />
           <span className="text-xs ">Random Chat</span>
         </Link>
@@ -79,23 +79,23 @@ export function Header() {
 
       {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 w-full bg-[#262438] rounded-t-2xl shadow-md flex items-center justify-around p-2 lg:hidden">
-        <Link to="/" className={`flex flex-col items-center ${location.pathname === '/' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
+        <Link to="/" className={`flex flex-col items-center ${location.pathname === '/' ? 'text-orange-500' : 'text-gray-300'}`}>
           <Home className="h-6 w-6" />
           <span className="text-xs">Home</span>
         </Link>
-        <Link to="/chat" className={`flex flex-col items-center ${location.pathname === '/chat' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
+        <Link to="/chat" className={`flex flex-col items-center ${location.pathname === '/chat' ? 'text-orange-500' : 'text-gray-300'}`}>
           <MessageSquare className="h-6 w-6" />
           <span className="text-xs">Messages</span>
         </Link>
-        <Link to="/communities" className={`flex flex-col items-center ${location.pathname === '/communities' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
+        <Link to="/communities" className={`flex flex-col items-center ${location.pathname === '/communities' ? 'text-orange-500' : 'text-gray-300'} `}>
           <Users className="h-6 w-6" />
           <span className="text-xs">Communities</span>
         </Link>
-        <Link to="/travel" className={`flex flex-col items-center ${location.pathname === '/travel' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
+        <Link to="/travel" className={`flex flex-col items-center ${location.pathname === '/travel' ? 'text-orange-500' : 'text-gray-300'}`}>
           <Plane className="h-6 w-6" />
           <span className="text-xs">Travel</span>
         </Link>
-        <Link to="/profile" className={`flex flex-col items-center ${location.pathname === '/profile' ? 'text-orange-500' : 'text-gray-300'} hover:text-indigo-600`}>
+        <Link to="/profile" className={`flex flex-col items-center ${location.pathname === '/profile' ? 'text-orange-500' : 'text-gray-300'} `}>
           <User className="h-6 w-6" />
           <span className="text-xs">Profile</span>
         </Link>

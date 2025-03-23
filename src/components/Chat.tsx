@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserList } from './chat/UserList';
 import { ChatArea } from './chat/ChatArea';
-import { Header } from './layout/Header';
+// import { Header } from './layout/Header';
 import type { User } from '../types';
 
 export function Chat() {
@@ -10,7 +10,7 @@ export function Chat() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      {/* <Header /> */}
       <div className="container mx-auto py-6 px-4">
         <div className="bg-white rounded-lg shadow overflow-hidden" style={{ height: 'calc(100vh - 150px)' }}>
           <div className="grid grid-cols-1 md:grid-cols-3 h-full">
