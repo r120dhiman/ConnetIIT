@@ -28,7 +28,6 @@ import { addParticipantToTrip, createTrip, getTrips } from '../lib/appwrite/trip
 import { useAuth } from '../contexts/AuthContext';
 import { getProfile } from '../lib/appwrite/users';
 import { getRoomChats, sendRoomChat, subscribeToRoomChats } from '../lib/appwrite/roomChat';
-import { Header } from '../components/layout/Header';
 import { toast } from 'react-toastify'; // Import toast
 import Loader from '../components/shared/Loader';
 import { LoadingScreen } from '../components/shared/LoadingScreen';
@@ -293,13 +292,13 @@ const Trips: React.FC = () => {
   }
 
   return (
+
     <Box sx={{ 
       height: '100vh', 
       display: 'flex', 
       flexDirection: 'column',
       backgroundColor: colors.background.default
     }}>
-      <Header />
       
       <Box sx={{ 
         flex: 1, 
@@ -592,7 +591,7 @@ const Trips: React.FC = () => {
                 }}>
                   {tripMessages.map((msg, index) => (
                     <Box key={index} sx={{
-                      alignSelf: msg.userId === user?.$id ? 'flex-end' : 'flex-start',
+                      alignSelf: msg.userId === user?.$id ? 'flex-start' : 'flex-end',
                       maxWidth: '70%',
                       backgroundColor: msg.userId === user?.$id 
                         ? colors.primary.main

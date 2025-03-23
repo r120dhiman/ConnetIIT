@@ -1,7 +1,6 @@
 import React from 'react';
 import { ChallengeCard } from '../components/challenges/ChallengeCard';
 import { useChallenges } from '../hooks/useChallenges';
-import { Header } from '../components/layout/Header';
 import { LoadingScreen } from '../components/shared/LoadingScreen';
 
 export function Challenges() {
@@ -17,7 +16,6 @@ export function Challenges() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Header/>
       <h1 className="text-2xl font-bold mb-6">Challenges</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {challenges.map((challenge) => (

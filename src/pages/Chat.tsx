@@ -71,9 +71,9 @@ export function Chat() {
 
   // Desktop view - original layout
   if (!isMobileView) {
-    return (
-      <div className="max-w-6xl mx-auto h-[calc(100vh-4rem)]">
+    return (<>
         <Header/>
+      <div className="max-w-6xl mx-auto h-[calc(100vh-4rem)]">
         <div className="grid grid-cols-12 gap-6 h-full">
           {/* Users sidebar */}
           <div className="col-span-4 bg-[#1B1730] rounded-3xl shadow-md m-4">
@@ -120,11 +120,13 @@ export function Chat() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   // Mobile view - toggle between search and back button
   return (
+    <>
     <div className="max-w-6xl mx-auto h-[calc(100vh-4rem)] flex flex-col">
       <Header/>
       
@@ -195,6 +197,6 @@ export function Chat() {
           </div>
         </>
       )}
-    </div>
+    </div></>
   );
 }

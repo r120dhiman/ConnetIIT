@@ -1,12 +1,12 @@
 import { PostCard } from '../components/posts/PostCard';
 import { CreatePost } from '../components/posts/CreatePost';
 import { usePosts } from '../hooks/usePosts';
-import { Header } from '../components/layout/Header';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import FriendSuggestions from '../components/friendSuggestions'; // Importing FriendSuggestions component
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingScreen } from '../components/shared/LoadingScreen';
+import { Header } from '../components/layout/Header';
 
 export function Feed() {
   const { posts, loading, error, handleLike, addNewPost, refreshPosts } = usePosts();
@@ -45,7 +45,7 @@ export function Feed() {
 
   return (
     <div className="min-h-screen bg-[#1B1730]">
-      <Header />
+      <Header/>
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
         {/* Adding Friend Suggestions section at the top */}
         {showFriendSuggestions && (

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { databases } from '../lib/appwrite';
 import { COLLECTIONS } from '../lib/appwrite/config';
 import { Card, CardContent, Typography } from '@mui/material';
-import { Header } from '../components/layout/Header';
 import { MessageSquare, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getRoomChats, sendRoomChat, subscribeToRoomChats } from '../lib/appwrite/roomChat';
@@ -74,8 +73,20 @@ const Communities = () => {
         if (userCommunities.length > 0) {
           const selectedComm = userCommunities[0];
           const messages = await getRoomChats(selectedComm.$id); // Fetch messages using community.$id
-          const msgLogsContent = messages.map(msg => msg.content); // Extract content from messages
-          
+          console.log(messages);
+          const msgLogsContent = await Promise.all(
+            messages.map(async (msg) => {
+              const sender = await databases.getDocument(DATABASE_ID, COLLECTIONS.USERS, msg.senderId);
+              return {
+                content: msg.content,
+                senderId: msg.senderId,
+                senderName: sender.name,
+                timeStamp: msg.timestamp,
+              };
+            })
+          );
+
+          console.log(msgLogsContent);
           setSelectedCommunity({ ...selectedComm, msgLogs: msgLogsContent }); // Set selected community with msgLogs
         }
       } catch (error) {
@@ -125,7 +136,6 @@ const Communities = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background.default }}>
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <Header />
         <h1 className="text-3xl font-bold text-white mb-6">Communities</h1>
         
         {/* Community Navigation */}
@@ -170,7 +180,7 @@ const Communities = () => {
             >
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-center p-4 border-b">
-                  <Typography variant="h6" className="font-bold text-gray-800">
+                  <Typography variant="h6" className="font-bold text-[#fafafa]">
                     {selectedCommunity.name} Chat
                   </Typography>
                   <button 
@@ -184,15 +194,19 @@ const Communities = () => {
                 {/* Messages Container */}
                 <div className="flex-1 overflow-y-auto p-4  space-y-4">
                   {selectedCommunity.msgLogs.length > 0 ? (
-                    selectedCommunity.msgLogs.map((msg, index) => (
-                      <div key={index} className={`flex ${msg.senderId !== user.$id ? 'justify-start' : 'justify-end'}`}>
+                    selectedCommunity.msgLogs.map((msg, index) => {
+                      console.log(msg);
+                      return (
+                      <div key={index} className={`flex  ${msg.senderId !== user.$id ? 'justify-start' : 'justify-end'}`}>
                         <div className="transform transition-all duration-200 hover:scale-[1.02]">
-                          <div className="py-1 px-3 rounded-full bg-[#FE744D]">
-                            <Typography className="text-[#fafafa] ">{msg}</Typography>
+                          <div className={`py-1 px-3 rounded-full bg-[#392639] ${msg.senderId ===user.$id ? 'bg-[#392639]':""}`}>
+                            <Typography className="text-[#fafafa] ">{msg.content}</Typography>
+                            <p className='text-white text-xs'>{new Date(msg.timeStamp).toISOString().slice(0, 16).replace("T", " ")}</p>
                           </div>
+                          <p className='text-white'>{msg.senderName.split(' ')[0]}&nbsp;{msg.senderName.split(' ')[1]}</p>
                         </div>
                       </div>
-                    ))
+                    )})
                   ) : (
                     <Typography className="text-gray-500 text-center italic">
                       Start the conversation...

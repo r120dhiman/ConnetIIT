@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { ProfileCard } from '../components/profile/ProfileCard';
-import { Header } from '../components/layout/Header';
 import { Pencil, User, LogOut } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router';
 import { ProfileForm } from '../components/profile/ProfileForm';
@@ -27,7 +26,6 @@ export function Profile() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#1B1730', color: 'white' }}>
-      <Header />
       
       <main className="max-w-4xl mx-auto py-8 px-4">
         {/* Profile Header */}
