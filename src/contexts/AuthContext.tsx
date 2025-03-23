@@ -13,7 +13,7 @@ interface AuthContextType {
   // signIn: (email: string, password: string) => Promise<void>;
   // signUp: (email: string, password: string, name: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  CreateEmailPasswordSession: () => Promise<void>;
+  CreateEmailPasswordSession: (userId: string, secret: string) => Promise<void>;
   signOut: () => Promise<void>;
   handleOnboarding: (
     gender: string,
@@ -209,8 +209,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //   }
   // };
 
-  const CreateEmailPasswordSession = async (): Promise<void> => {
+  const CreateEmailPasswordSession = async (userId: string, secret: string) => {
     try {
+
+      // Create a session using the token
+      console.log("creating session...");
+      
+      await account.createSession(userId, secret);
+      console.log("session created!");
+      console.log("fetching user...");
       // Fetch user details after Google sign-in
       const user: Models.User<Models.Preferences> = await account.get();
       console.log("User details:", user);
@@ -285,12 +292,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function signInWithGoogle() {
     try {
       console.log("gauth initializing");
-      const redirectUrl = `${window.location.origin}/callback`;
-      await account.createOAuth2Session(
-        OAuthProvider.Google,
-        redirectUrl,
-        `${window.location.origin}/sign`
-      );
+      console.log("Google auth initializing");
+    const baseUrl = window.location.origin;
+    
+    // Use createOAuth2Token instead of createOAuth2Session
+     await account.createOAuth2Token(
+      OAuthProvider.Google,
+      `${baseUrl}/callback`,
+      `${baseUrl}/sign-in?error=auth_failed`
+    );
+    
       // console.log("res", res);
     } catch (error) {
       console.error("Google auth error:", error);
