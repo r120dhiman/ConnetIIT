@@ -46,7 +46,7 @@ const Loader: React.FC<LoaderProps> = ({
   // Updated colors matching the new theme
   const colors = {
     primary: {
-      main: '#4f46e5', // Adjusted primary color for contrast
+      main: '#FE744D', // Adjusted primary color for contrast
       light: '#818cf8',
       dark: '#3b3b8c',
       contrast: '#ffffff'

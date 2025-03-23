@@ -341,9 +341,9 @@ const Trips: React.FC = () => {
               startIcon={<Plus size={18} />}
               onClick={handleOpen}
               sx={{
-                borderRadius: '12px',
+                borderRadius: '100px',
                 textTransform: 'none',
-                bgcolor: colors.primary.main,
+                bgcolor: '#FE744D',
                 '&:hover': { 
                   bgcolor: colors.primary.dark,
                   boxShadow: `0 0 20px ${colors.primary.main}40`
@@ -464,7 +464,8 @@ const Trips: React.FC = () => {
                     <Box sx={{ 
                       display: 'flex', 
                       justifyContent: 'space-between',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      color:"#fafafa"
                     }}>
                       <Box sx={{ 
                         display: 'flex',
@@ -515,10 +516,10 @@ const Trips: React.FC = () => {
                           }}
                           disabled={joiningTripId === trip.id}
                           sx={{ 
-                            borderRadius: '10px',
+                            borderRadius: '100px',
                             textTransform: 'none',
-                            borderColor: colors.primary.main,
-                            color: joiningTripId === trip.id ? 'transparent' : colors.primary.main,
+                            borderColor: '#04AA6D',
+                            color: joiningTripId === trip.id ? 'transparent' : "#04AA6D",
                             position: 'relative',
                             '&:hover': {
                               borderColor: colors.primary.dark,
@@ -625,15 +626,15 @@ const Trips: React.FC = () => {
 
                 <Box sx={{ 
                   p: 3,
+                  display: "flex",
+                  gap:"10px",
                   borderTop: `1px solid ${colors.background.alt}`,
                   backgroundColor: colors.background.paper
                 }}>
                   <Box sx={{ 
-                    display: 'flex',
-                    gap: 2,
-                    backgroundColor: colors.background.alt,
-                    p: 1,
-                    borderRadius: '12px'
+                    width:"100%",
+                    backgroundColor: '#fafafa',
+                    borderRadius: '100px'
                   }}>
                     <TextField
                       value={newTripMessage}
@@ -650,7 +651,7 @@ const Trips: React.FC = () => {
                         px: 2,
                         '& .MuiInputBase-input': {
                           py: 1.5,
-                          color: colors.text.primary
+                          color: '#000000'
                         }
                       }}
                       onKeyPress={(e) => {
@@ -660,15 +661,15 @@ const Trips: React.FC = () => {
                         }
                       }}
                     />
+                  </Box>
                     <Button 
                       onClick={handleSendTripMessage}
                       disabled={!newTripMessage.trim()}
                       sx={{
-                        borderRadius: '10px',
-                        px: 3,
+                        borderRadius: '100px',
                         textTransform: 'none',
-                        bgcolor: "#392639",
-                        color: "#FE744D",
+                        bgcolor: "#FE744D",
+                        color: "#fafafa",
                         '&:hover': {
                           bgcolor: colors.primary.dark
                         },
@@ -679,7 +680,6 @@ const Trips: React.FC = () => {
                     >
                       Send
                     </Button>
-                  </Box>
                 </Box>
               </>
             ) : (
@@ -830,6 +830,8 @@ const Trips: React.FC = () => {
 
                   <Box sx={{ 
                     p: 2,
+                    display: 'flex',
+                    gap: 2,
                     borderTop: `1px solid ${colors.background.alt}`,
                     backgroundColor: colors.background.paper,
                     position: 'sticky',
@@ -837,11 +839,9 @@ const Trips: React.FC = () => {
                     zIndex: 1
                   }}>
                     <Box sx={{ 
-                      display: 'flex',
-                      gap: 2,
-                      backgroundColor: colors.background.alt,
-                      p: 1,
-                      borderRadius: '12px'
+                      width:'100%',
+                      backgroundColor: '#fafafa',
+                      borderRadius: '100px'
                     }}>
                       <TextField
                         value={newTripMessage}
@@ -858,7 +858,7 @@ const Trips: React.FC = () => {
                           px: 2,
                           '& .MuiInputBase-input': {
                             py: 1.5,
-                            color: colors.text.primary
+                            color: "#000000"
                           }
                         }}
                         onKeyPress={(e) => {
@@ -868,15 +868,15 @@ const Trips: React.FC = () => {
                           }
                         }}
                       />
+                    </Box>
                       <Button 
                         onClick={handleSendTripMessage}
                         disabled={!newTripMessage.trim()}
                         sx={{
-                          borderRadius: '10px',
-                          px: 3,
+                          borderRadius: '100px',
                           textTransform: 'none',
-                          bgcolor: "#392639",
-                          color: colors.primary.contrast,
+                          bgcolor: "#FE744D",
+                          color: "#fafafa",
                           '&:hover': {
                             bgcolor: colors.primary.dark
                           },
@@ -887,7 +887,6 @@ const Trips: React.FC = () => {
                       >
                         Send
                       </Button>
-                    </Box>
                   </Box>
                 </Box>
               </>

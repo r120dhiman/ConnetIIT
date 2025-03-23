@@ -186,11 +186,11 @@ const Communities = () => {
                   {selectedCommunity.msgLogs.length > 0 ? (
                     selectedCommunity.msgLogs.map((msg, index) => (
                       <div key={index} className={`flex ${msg.senderId !== user.$id ? 'justify-start' : 'justify-end'}`}>
-                        <Card className="transform transition-all duration-200 hover:scale-[1.02]">
-                          <div className="py-1 px-2 bg-[#FE744D]">
-                            <Typography className="text-gray-700">{msg}</Typography>
+                        <div className="transform transition-all duration-200 hover:scale-[1.02]">
+                          <div className="py-1 px-3 rounded-full bg-[#FE744D]">
+                            <Typography className="text-[#fafafa] ">{msg}</Typography>
                           </div>
-                        </Card>
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -210,7 +210,7 @@ const Communities = () => {
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type your message..."
                       className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FE744D] focus:border-transparent"
-                      style={{ color: 'white', backgroundColor: '#1B1730' }} // Set input text color to white
+                      style={{ color: 'black', backgroundColor: '#fafafa' }} // Set input text color to white
                     />
                     <button
                       onClick={handleSendMessage}
