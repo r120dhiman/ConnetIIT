@@ -88,12 +88,15 @@ const Trips: React.FC = () => {
   // Updated colors matching the new theme
   const colors = {
     primary: {
+      main1:"#392639",
+      main2:"#FE744D",
       main: '#4f46e5', // Adjusted primary color for contrast
       light: '#818cf8',
       dark: '#3b3b8c',
       contrast: '#ffffff'
     },
     secondary: {
+      main1:"#fafafa",
       main: '#f43f5e',
       light: '#fb7185',
       dark: '#e11d48',
@@ -594,8 +597,8 @@ const Trips: React.FC = () => {
                       alignSelf: msg.userId === user?.$id ? 'flex-start' : 'flex-end',
                       maxWidth: '70%',
                       backgroundColor: msg.userId === user?.$id 
-                        ? colors.primary.main
-                        : colors.background.paper,
+                        ? colors.primary.main1
+                        : colors.primary.main2,
                       color: msg.userId === user?.$id 
                         ? colors.primary.contrast
                         : colors.text.primary,
@@ -794,13 +797,13 @@ const Trips: React.FC = () => {
                     backgroundColor: colors.background.default
                   }}>
                     {tripMessages.map((msg, index) => (
-                      <Box key={index} sx={{
+                      <Box key={index} className={'bg-green-300'} sx={{
                         alignSelf: msg.userId === user?.$id ? 'flex-end' : 'flex-start',
                         maxWidth: '70%',
                         backgroundColor: msg.userId === user?.$id 
                           ? colors.primary.main
                           : colors.background.paper,
-                        color: msg.userId === user?.$id 
+                        color: msg.userId == user?.$id 
                           ? colors.primary.contrast
                           : colors.text.primary,
                         p: 2.5,

@@ -73,7 +73,6 @@ const Communities = () => {
         if (userCommunities.length > 0) {
           const selectedComm = userCommunities[0];
           const messages = await getRoomChats(selectedComm.$id); // Fetch messages using community.$id
-          console.log(messages);
           const msgLogsContent = await Promise.all(
             messages.map(async (msg) => {
               const sender = await databases.getDocument(DATABASE_ID, COLLECTIONS.USERS, msg.senderId);
@@ -86,7 +85,6 @@ const Communities = () => {
             })
           );
 
-          console.log(msgLogsContent);
           setSelectedCommunity({ ...selectedComm, msgLogs: msgLogsContent }); // Set selected community with msgLogs
         }
       } catch (error) {
@@ -133,6 +131,7 @@ const Communities = () => {
     }
   };
 
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background.default }}>
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -141,20 +140,44 @@ const Communities = () => {
         {/* Community Navigation */}
         <div className="flex overflow-x-auto py-6 gap-4 mb-8 scrollbar-hide">
           {communities.map((community) => (
-            <button
-              key={community.$id}
-              onClick={() => {
-                setSelectedCommunity(community);
-                setIsChatOpen(true);
-              }}
-              className={`px-6 py-3 rounded-full whitespace-nowrap transform transition-all duration-300 hover:scale-105 shadow-md ${
-                selectedCommunity?.$id === community.$id
-                  ? 'bg-gradient-to-r from-[#FE744D] to-[#FE744D] text-white font-bold'
-                  : 'bg-white hover:bg-gray-50'
-              }`}
-            >
-              {community.name}
-            </button>
+           <button
+           key={community.$id}
+           onClick={async () => {
+             try {
+               const selectedComm = communities.find(c => c.$id === community.$id);
+               if (!selectedComm) return;
+     
+               // Fetch messages for the selected community
+               const messages = await getRoomChats(selectedComm.$id);
+               
+               const msgLogsContent = await Promise.all(
+                 messages.map(async (msg) => {
+                  console.log(msg.timestamp);
+                   const sender = await databases.getDocument(DATABASE_ID, COLLECTIONS.USERS, msg.senderId);
+                   return {
+                     content: msg.content,
+                     senderId: msg.senderId,
+                     senderName: sender.name,
+                     timeStamp: msg.timestamp,
+                   };
+                 })
+               );
+     
+     
+               setSelectedCommunity({ ...selectedComm, msgLogs: msgLogsContent });
+               setIsChatOpen(true);
+             } catch (error) {
+               console.error('Error fetching messages:', error);
+             }
+           }}
+           className={`px-6 py-3 rounded-full whitespace-nowrap transform transition-all duration-300 hover:scale-105 shadow-md ${
+             selectedCommunity?.$id === community.$id
+               ? 'bg-gradient-to-r from-[#FE744D] to-[#FE744D] text-white font-bold'
+               : 'bg-white hover:bg-gray-50'
+           }`}
+         >
+           {community.name}
+         </button>
           ))}
         </div>
 
@@ -195,13 +218,14 @@ const Communities = () => {
                 <div className="flex-1 overflow-y-auto p-4  space-y-4">
                   {selectedCommunity.msgLogs.length > 0 ? (
                     selectedCommunity.msgLogs.map((msg, index) => {
-                      console.log(msg);
                       return (
                       <div key={index} className={`flex  ${msg.senderId !== user.$id ? 'justify-start' : 'justify-end'}`}>
                         <div className="transform transition-all duration-200 hover:scale-[1.02]">
                           <div className={`py-1 px-3 rounded-full bg-[#392639] ${msg.senderId ===user.$id ? 'bg-[#392639]':""}`}>
                             <Typography className="text-[#fafafa] ">{msg.content}</Typography>
-                            <p className='text-white text-xs'>{new Date(msg.timeStamp).toISOString().slice(0, 16).replace("T", " ")}</p>
+                            <p className='text-white text-xs'>
+  {msg.timeStamp ? new Date(msg.timeStamp).toLocaleString() : "Invalid Date"}
+</p>
                           </div>
                           <p className='text-white'>{msg.senderName.split(' ')[0]}&nbsp;{msg.senderName.split(' ')[1]}</p>
                         </div>

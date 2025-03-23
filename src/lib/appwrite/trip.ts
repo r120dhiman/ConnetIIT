@@ -21,7 +21,7 @@ export async function createTrip(tripData: {
       ID.unique(),
       tripData
     );
-    console.log("Trip created successfully:", response);
+    // console.log("Trip created successfully:", response);
     return response;
   } catch (error) {
     console.error('Error creating trip:', error);
@@ -36,7 +36,7 @@ export async function getTrips() {
       COLLECTIONS.TRIPS,
       [Query.orderDesc('$createdAt')] // You can adjust the query as needed
     );
-    console.log("Trips retrieved successfully:", response);
+    // console.log("Trips retrieved successfully:", response);
     return response.documents; // Return the array of trips
   } catch (error) {
     console.error('Error retrieving trips:', error);

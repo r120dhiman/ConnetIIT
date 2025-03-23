@@ -12,14 +12,12 @@ interface RoomChatMessage {
 }
 
 export const getRoomChats = async (roomId: string) => {
-  console.log(`Fetching room chats for roomId: ${roomId}`); // Debug log for roomId
   try {
     const response = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.ROOMCHAT,
       [Query.equal('roomId', roomId)] // Use the provided roomId instead of a hardcoded value
     );
-    console.log(`Fetched ${response.documents.length} messages for roomId: ${roomId}`); // Debug log for number of messages fetched
     return response.documents;
   } catch (error) {
     console.error('Error fetching room chat:', error);
