@@ -61,7 +61,7 @@ export function Profile() {
         <div className="flex justify-end mb-4">
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-red-500 text-white rounded-lg
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-red-500 text-[#fafafa] rounded-full
               hover:bg-red-600 transition-colors duration-200 
               active:transform active:scale-95"
           >

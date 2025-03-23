@@ -44,9 +44,9 @@ const FriendSuggestions: React.FC<{ userId: string; userInterests: string[] }> =
   };
 
   return (
-    <div className="p-6 max-w-[80%] bg-white rounded-2xl shadow-md space-y-4">
-      <Typography variant="h5" className="text-zinc-800 font-bold flex items-center gap-2">
-        <Users /> Friend Suggestions
+    <div className="p-6 max-w-[80%] bg-[#262438] rounded-2xl shadow-md space-y-4">
+      <Typography variant="h5" className="text-[#fafafa] font-bold flex items-center gap-2">
+        <Users /> Online Friend Suggestions
       </Typography>
       {loading && <CircularProgress className="block" />}
       {error && <Alert severity="error">{error}</Alert>}

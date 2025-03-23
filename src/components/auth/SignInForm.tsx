@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 // import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 export function SignInForm() {
   const {  signInWithGoogle } = useAuth();
@@ -32,6 +33,7 @@ export function SignInForm() {
       await signInWithGoogle();
     } catch (err) {
       setError("Failed to sign in with Google.");
+      toast.error(error);
     }
   };
 
@@ -107,7 +109,7 @@ export function SignInForm() {
       <button
         type="button"
         onClick={handleGoogleSignIn}
-        className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 rounded-md py-2 px-4 border border-zinc-400 hover:bg-gray-50"
+        className="w-full flex items-center justify-center gap-3 bg-[#fafafa] rounded-full font-medium text-gray-900 py-2 px-4 border border-zinc-400 hover:bg-zinc-300"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24">
           <path

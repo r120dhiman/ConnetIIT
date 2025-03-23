@@ -10,6 +10,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Montserrat', 'sans-serif'], // Default sans-serif font
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
