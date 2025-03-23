@@ -136,7 +136,7 @@ function OnBoarding() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full flex justify-center py-2 bg-[#392639]  hover:bg-[#FE744D] hover:text-[#fafafa] px-4 border border-transparent  shadow-sm text-sm font-medium text-white  focus:outline-none focus:ring-2 rounded-3xl focus:ring-offset-2 focus:ring-[#FE744D] disabled:opacity-50"
+                                className="w-full flex justify-center py-2 bg-[#FE744D]  hover:bg-[#392639] hover:text-[#fafafa] px-4 border border-transparent  shadow-sm text-sm font-medium text-white  focus:outline-none focus:ring-2 rounded-3xl focus:ring-offset-2 focus:ring-[#FE744D] disabled:opacity-50"
                             >
                                 {loading ? 'Setting up...' : 'Complete Setup'}
                             </button>
