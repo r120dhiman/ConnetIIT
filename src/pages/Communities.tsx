@@ -354,20 +354,20 @@ const Communities = () => {
       );
       
       // Optimistically add the message to the UI
-      const newMessageDetails: MessageDetails = {
-        content: messageToSend,
-        senderId: user.$id,
-        senderName: userNameCache.current[user.$id] || "Me",
-        timeStamp: new Date().toISOString(),
-      };
+      // const newMessageDetails: MessageDetails = {
+      //   content: messageToSend,
+      //   senderId: user.$id,
+      //   senderName: userNameCache.current[user.$id] || "Me",
+      //   timeStamp: new Date().toISOString(),
+      // };
 
-      setSelectedCommunity(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          msgLogs: [...prev.msgLogs, newMessageDetails]
-        };
-      });
+      // setSelectedCommunity(prev => {
+      //   if (!prev) return null;
+      //   return {
+      //     ...prev,
+      //     msgLogs: [...prev.msgLogs, newMessageDetails]
+      //   };
+      // });
       
       // Scroll to bottom after sending a message
       setTimeout(scrollToBottom, 100);
