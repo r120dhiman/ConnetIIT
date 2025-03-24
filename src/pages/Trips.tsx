@@ -421,7 +421,7 @@ const Trips: React.FC = () => {
                           ? `${colors.primary.main}10`
                           : trip.createdBy === "Me"
                           ? "bg-[#392639]"
-                          : colors.background.paper,
+                          : colors.background.paper, 
                       cursor: "pointer",
                       transition: "all 0.2s ease",
                       boxShadow:
