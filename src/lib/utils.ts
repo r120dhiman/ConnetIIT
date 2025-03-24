@@ -8,7 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 export function isIITEmail(email: string): boolean {
   const iitDomains = [
     "@iitbbs.ac.in",   // IIT Bhubaneswar
-    "@iitm.ac.in",     // IIT Madras
+    "@iitm.ac.in", 
+    "@smail.iitm.ac.in",// IIT Madras
     "@iiti.ac.in",     // IIT Indore
     "@iitk.ac.in",     // IIT Kanpur
     "@iitj.ac.in",     // IIT Jodhpur
