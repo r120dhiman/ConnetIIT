@@ -22,9 +22,11 @@ import { ToastContainer } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import { LoadingScreen } from './components/shared/LoadingScreen';
 import Callback from './contexts/callback';
+// import ChatProvider from './components/notificationManager/chatProvider';
 
 function App() {
   const [appLoading, setAppLoading] = useState(true);
+  // const loggedInUserId="user-id";
 
   useEffect(() => {
     // Simulate checking session, loading fonts, or any initial setup
@@ -43,6 +45,7 @@ function App() {
     <>
     <ToastContainer/>
     <BrowserRouter>
+    {/* <ChatProvider loggedInUserId='={loggedInUserId}'/> */}
       <AuthProvider>
       <div className="min-h-screen" style={{ padding: "0px" }}>
       {/* Show Header only if current path is NOT in hideHeaderRoutes */}

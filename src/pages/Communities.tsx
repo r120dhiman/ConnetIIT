@@ -380,7 +380,7 @@ const Communities = () => {
   // Optimized selection handler
   const handleSelectCommunity = useCallback(async (communityId: string) => {
     try {
-      const selectedComm = communities.find(c => c.$id === communityId);
+      const selectedComm = await communities.find(c => c.$id === communityId);
       if (!selectedComm) return;
       
       // Set the selected community immediately with empty messages
@@ -474,7 +474,7 @@ const Communities = () => {
                 {/* Messages Container - with virtualization for performance */}
                 <div 
                   ref={messagesContainerRef}
-                  className="flex-1 overflow-y-auto p-4 space-y-4"
+                  className="flex-1 flex-row overflow-y-auto p-4 space-y-4"
                 >
                   {hasMoreMessages && currentPage > 1 && (
                     <div className="text-center py-2">
@@ -489,7 +489,7 @@ const Communities = () => {
                   )}
                   
                   {selectedCommunity.msgLogs.length > 0 ? (
-                    selectedCommunity.msgLogs.map((msg, index) => (
+                    selectedCommunity.msgLogs.slice().reverse().map((msg, index) => (
                       <div
                         key={msg.$id || index}
                         className={`flex ${
