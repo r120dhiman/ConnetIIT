@@ -39,7 +39,7 @@ export function ChatWindow({ otherUserId, otherUserName, isOnline, lastSeen }: C
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ backgroundColor: '#1B1730', color: 'white' }}>
+    <div className="flex flex-col  lg:h-full h-[78%]" style={{ backgroundColor: '#1B1730', color: 'white' }}>
       {/* Chat header */}
       <div className="p-3 sm:p-4  mt-4 rounded-t-3xl border-b" style={{ backgroundColor: '#262438' }}>
         <div className="flex items-center justify-between">
