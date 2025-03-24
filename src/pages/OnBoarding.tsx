@@ -120,7 +120,7 @@ function OnBoarding() {
                             </select>
                         </div>
 
-                        <div>
+                        {/* <div>
                             <label className="block text-sm font-medium text-[#fafafa]">
                                 Friend's ID (Optional)
                             </label>
@@ -130,7 +130,7 @@ function OnBoarding() {
                                 className="mt-1 block w-full border-gray-300 rounded-3xl bg-[#392639] py-3 px-3 text-[#fafafa] shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Enter friend's ID"
                             />
-                        </div>
+                        </div> */}
 
                         <div>
                             <button
