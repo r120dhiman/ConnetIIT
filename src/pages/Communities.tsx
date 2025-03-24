@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { databases } from "../lib/appwrite";
-import { COLLECTIONS } from "../lib/appwrite/config";
+
 import { Query } from "appwrite"; // Make sure to import Query
 import { Typography } from "@mui/material";
 import { MessageSquare, X } from "lucide-react";
@@ -14,6 +14,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const USERS = import.meta.env.VITE_APPWRITE_USERS;
+const ROOMCHAT = import.meta.env.VITE_APPWRITE_ROOMCHAT;
+const COMMUNITIES = import.meta.env.VITE_APPWRITE_COMMUNITTIES;
 const MESSAGES_PER_PAGE = 7;
 
 // Database structure
@@ -63,7 +66,7 @@ const getPagedRoomChats = async (roomId: string, limit: number, offset: number) 
     // We'll implement our own pagination since getRoomChats doesn't support it
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.ROOMCHAT,
+ROOMCHAT,
       [
         Query.equal('roomId', roomId),
         Query.orderDesc('$createdAt'), // Order by creation date descending (newest first)
@@ -123,7 +126,7 @@ const Communities = () => {
     try {
       const sender = await databases.getDocument(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+USERS,
         userId
       );
       userNameCache.current[userId] = sender.name || "Unknown";
@@ -148,7 +151,7 @@ const Communities = () => {
         setLoading(true);
         const response = await databases.listDocuments(
           DATABASE_ID,
-          COLLECTIONS.COMMUNITIES
+COMMUNITIES
         );
         const communityDocuments = response.documents as CommunityDocument[];
 

@@ -1,15 +1,16 @@
 import { ID, Query } from 'appwrite';
 import { databases } from './config';
-import { COLLECTIONS } from './config';
+
 import type { Challenge } from '../../types';
 
-const DATABASE_ID = '6775235f000aeef1a930';
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const CHALLENGES = import.meta.env.VITE_APPWRITE_CHALLENGES;
 
 export async function getChallenges() {
   try {
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.CHALLENGES,
+      CHALLENGES,
       [Query.orderDesc('$createdAt')]
     );
     return response.documents as Challenge[];
@@ -23,7 +24,7 @@ export async function joinChallenge(challengeId: string, userId: string) {
   try {
     const challenge = await databases.getDocument(
       DATABASE_ID,
-      COLLECTIONS.CHALLENGES,
+      CHALLENGES,
       challengeId
     );
     
@@ -31,7 +32,7 @@ export async function joinChallenge(challengeId: string, userId: string) {
     
     await databases.updateDocument(
       DATABASE_ID,
-      COLLECTIONS.CHALLENGES,
+      CHALLENGES,
       challengeId,
       { participants }
     );

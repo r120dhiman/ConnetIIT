@@ -1,9 +1,10 @@
 import { databases } from './config';
-import { COLLECTIONS } from './config';
+
 // import type { User } from '../../types';
 import { Query } from 'appwrite';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const USERS = import.meta.env.VITE_APPWRITE_USERS;
 
 export async function suggestFriends(userId: string, userInterests: string[], page: number = 1, limit: number = 10) {
   try {
@@ -12,7 +13,7 @@ export async function suggestFriends(userId: string, userInterests: string[], pa
       // console.log('No interests provided, returning empty array.');
       return [];
     }
-    const response = await databases.listDocuments(DATABASE_ID, COLLECTIONS.USERS, [
+    const response = await databases.listDocuments(DATABASE_ID, USERS, [
       Query.equal('interests', userInterests),
       Query.limit(limit), // Limit the number of results
       Query.offset((page - 1) * limit) // Calculate the offset for pagination

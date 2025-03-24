@@ -9,12 +9,12 @@ export function PrivateRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) return <Navigate to="/sign-in" replace />;
 
-  // console.log(userProfile,"up PR");
+
   if (user && !userProfile) return <Navigate to="/sign-in" replace />;
   
   if (user && !userProfile?.isOnBoarded) return <Navigate to="/onboarding" replace />;
 
   return children;
 
-  // return user ? <>{children}</> : <Navigate to="/sign-in" />;
+ 
 }

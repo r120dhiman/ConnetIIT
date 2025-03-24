@@ -1,11 +1,11 @@
 import { ID, Query } from 'appwrite';
 import { databases } from './config';
-import { COLLECTIONS } from './config';
 import type { Message } from '../../types/chat';
 // import { Client } from 'appwrite';
 import {client} from './config'
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const MESSAGES = import.meta.env.VITE_APPWRITE_MESSAGES;
 
 export async function sendMessage(message: Omit<Message, 'id' | 'createdAt'>) {
   console.log("msg data",message.receiverId.id);
@@ -18,7 +18,7 @@ export async function sendMessage(message: Omit<Message, 'id' | 'createdAt'>) {
 console.log(msgData);
   return databases.createDocument(
     DATABASE_ID,
-    COLLECTIONS.MESSAGES,
+    MESSAGES,
     ID.unique(),
     msgData
   );
@@ -28,7 +28,7 @@ export async function getMessages(userId: string, otherUserId: string) {
   console.log("i am from chat.ts ", otherUserId);
   const response = await databases.listDocuments(
     DATABASE_ID,
-    COLLECTIONS.MESSAGES,
+      MESSAGES,
     [
       Query.or([  // Use Query.or to get messages where either condition matches
         Query.and([  // senderId is userId and receiverId is otherUserId
@@ -51,7 +51,7 @@ export async function getMessages(userId: string, otherUserId: string) {
 
 export function subscribeToMessages(userId: string, callback: (message: Message) => void) {
   return client.subscribe(
-    `databases.${DATABASE_ID}.collections.${COLLECTIONS.MESSAGES}.documents`,
+    `databases.${DATABASE_ID}.collections.${MESSAGES}.documents`,
     (response) => {
       const message = response.payload as Message;
       if (message.senderId === userId || message.receiverId === userId) {

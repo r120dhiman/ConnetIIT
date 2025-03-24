@@ -41,7 +41,7 @@ import { toast } from "react-toastify"; // Import toast
 import Loader from "../components/shared/Loader";
 import { LoadingScreen } from "../components/shared/LoadingScreen";
 import { formatDistanceToNow } from "date-fns";
-// import { COLLECTIONS, databases } from "../lib/appwrite/config";
+
 
 interface Trip {
   tripName: string;

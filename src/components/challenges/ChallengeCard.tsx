@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Challenge } from '../../types';
 import { Calendar, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';

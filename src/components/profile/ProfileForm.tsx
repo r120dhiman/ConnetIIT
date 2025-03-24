@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { User } from '../../types';
 import { updateProfile } from '../../lib/appwrite/users';
-import { GitHubSection } from './GitHubSection';
-import { profile } from 'console';
+
 
 interface ProfileFormProps {
   user: User;

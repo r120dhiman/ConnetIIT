@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Models, OAuthProvider, Query } from "appwrite";
 import { account, databases } from "../lib/appwrite";
-import { COLLECTIONS } from "../lib/appwrite/config";
+
+const USER=import.meta.env.VITE_APPWRITE_USERS;
+const COMMUNITIES=import.meta.env.VITE_APPWRITE_COMMUNITTIES;
 import { ID } from "appwrite";
 import { toast } from "react-toastify"; // Import toast
 import { isIITEmail } from "../lib/utils";
@@ -10,8 +12,7 @@ interface AuthContextType {
   user: Models.User<Models.Preferences> | null;
   userProfile: Models.Document | null;
   loading: boolean;
-  // signIn: (email: string, password: string) => Promise<void>;
-  // signUp: (email: string, password: string, name: string) => Promise<void>;
+
   signInWithGoogle: () => Promise<void>;
   CreateEmailPasswordSession: (userId: string, secret: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const profile = await databases.getDocument(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+        USER,
         userId
       );
       setUserProfile(profile);
@@ -70,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const UserProfile = await databases.updateDocument(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+        USER,
         userId,
         { isOnline: true }
       );
@@ -83,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const UserProfile = await databases.updateDocument(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+        USER,
         userId,
         { isOnline: false }
       );
@@ -237,7 +238,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Check if user exists in the database
       const query = await databases.listDocuments(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+        USER,
         [Query.equal("$id", user.$id)]
       );
 
@@ -250,7 +251,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Create User document
         const userDoc = await databases.createDocument(
           DATABASE_ID,
-          COLLECTIONS.USERS,
+          USER,
           user.$id,
           {
             id: user.$id,
@@ -340,7 +341,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Update user profile with onboarding info
       const updatedProfile = await databases.updateDocument(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+        USER,
         user.$id,
         {
           isOnBoarded: true,
@@ -357,7 +358,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         interestsArray.map(async (interest) => {
           const communities = await databases.listDocuments(
             DATABASE_ID,
-            COLLECTIONS.COMMUNITIES,
+            COMMUNITIES,
             [Query.equal("name", interest)]
           );
 
@@ -370,7 +371,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             await databases.updateDocument(
               DATABASE_ID,
-              COLLECTIONS.COMMUNITIES,
+              COMMUNITIES,
               community.$id,
               { membersList: updatedMembers }
             );
@@ -378,7 +379,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Community doesn't exist: Create a new one
             await databases.createDocument(
               DATABASE_ID,
-              COLLECTIONS.COMMUNITIES,
+              COMMUNITIES,
               ID.unique(),
               {
                 name: interest,

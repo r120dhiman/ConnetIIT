@@ -1,31 +1,12 @@
 import React, { useState } from 'react';
-// import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
 export function SignInForm() {
   const {  signInWithGoogle } = useAuth();
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
+ 
   const [error, setError] = useState("");
-  // const [loading, setLoading] = useState(false);
-  // const [showPassword, setShowPassword] = useState(false);
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   setLoading(true);
-
-  //   try {
-  //     await signIn(email, password);
-  //     // No need to handle redirection here - it's handled in the AuthContext
-  //   } catch (err) {
-  //     console.error("Sign in error:", err);
-  //     setError("Failed to sign in. Please check your credentials.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   
   const handleGoogleSignIn = async () => {

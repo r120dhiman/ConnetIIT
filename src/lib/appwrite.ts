@@ -1,8 +1,10 @@
 import { Client, Account, Databases, Storage, Functions } from 'appwrite';
 
+const SETPROJECT=import.meta.env.VITE_APPWRITE_SET_PROJECT;
+const ENDPOINT=import.meta.env.VITE_APPWRITE_ENDPOINT;
 export const client = new Client()
-  .setEndpoint('https://auth.connectiit.tech/v1')
-  .setProject("677522710038159eedf4");
+  .setEndpoint(ENDPOINT)
+  .setProject(SETPROJECT);
 
 export const account = new Account(client);
 export const databases = new Databases(client);

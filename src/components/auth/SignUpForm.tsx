@@ -24,7 +24,7 @@ export function SignUpForm() {
 
     try {
       await signUp(email, password, name);
-      // No need to navigate - handled in AuthContext
+
     } catch (err: any) {
       console.error("Signup error:", err);
       setError(err.message || "Failed to create account. Please try again.");
