@@ -29,6 +29,20 @@ export async function createTrip(tripData: {
   }
 }
 
+export async function getTrip(tripId:string) {
+  try {
+    const response = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTIONS.TRIPS,
+      tripId // You can adjust the query as needed
+    );
+    // console.log("Trips retrieved successfully:", response);
+    return response // Return the array of trips
+  } catch (error) {
+    console.error('Error retrieving trips:', error);
+    throw error;
+  }
+}
 export async function getTrips() {
   try {
     const response = await databases.listDocuments(
@@ -44,14 +58,14 @@ export async function getTrips() {
   }
 }
 
-export async function addParticipantToTrip(tripId: string, participantId: string) {
+export async function addParticipantToTrip(tripId: string, participantIds: string[]) {
   try {
     const response = await databases.updateDocument(
       DATABASE_ID,
       COLLECTIONS.TRIPS,
       tripId,
       {
-        participants: [participantId] // Assuming participants is an array in the trip document
+        participants: participantIds // Assuming participants is an array in the trip document
       }
     );
     console.log("Participant added successfully:", response);

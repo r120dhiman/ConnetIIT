@@ -1,6 +1,6 @@
 import { ID, Query } from 'appwrite';
-import { databases } from './config';
-import { DATABASE_ID, COLLECTIONS } from '../constants';
+import { COLLECTIONS, DATABASE_ID, databases } from './config';
+// import { DATABASE_ID, COLLECTIONS } from '../constants';
 
 // Interface for a message
 interface Message {

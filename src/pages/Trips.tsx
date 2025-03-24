@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -21,16 +21,27 @@ import {
   SelectChangeEvent,
   useTheme,
   useMediaQuery,
-  SwipeableDrawer
-} from '@mui/material';
-import { Plus, MessageCircle, ArrowLeft } from 'lucide-react';
-import { addParticipantToTrip, createTrip, getTrips } from '../lib/appwrite/trip';
-import { useAuth } from '../contexts/AuthContext';
-import { getProfile } from '../lib/appwrite/users';
-import { getRoomChats, sendRoomChat, subscribeToRoomChats } from '../lib/appwrite/roomChat';
-import { toast } from 'react-toastify'; // Import toast
-import Loader from '../components/shared/Loader';
-import { LoadingScreen } from '../components/shared/LoadingScreen';
+  SwipeableDrawer,
+} from "@mui/material";
+import { Plus, MessageCircle, ArrowLeft } from "lucide-react";
+import {
+  addParticipantToTrip,
+  createTrip,
+  getTrip,
+  getTrips,
+} from "../lib/appwrite/trip";
+import { useAuth } from "../contexts/AuthContext";
+import { getProfile } from "../lib/appwrite/users";
+import {
+  getRoomChats,
+  sendRoomChat,
+  subscribeToRoomChats,
+} from "../lib/appwrite/roomChat";
+import { toast } from "react-toastify"; // Import toast
+import Loader from "../components/shared/Loader";
+import { LoadingScreen } from "../components/shared/LoadingScreen";
+import { formatDistanceToNow } from "date-fns";
+// import { COLLECTIONS, databases } from "../lib/appwrite/config";
 
 interface Trip {
   tripName: string;
@@ -59,87 +70,89 @@ interface FetchedTrip {
 
 const Trips: React.FC = () => {
   const { user } = useAuth();
-  
+
   const [trips, setTrips] = useState<FetchedTrip[]>([]);
   const [open, setOpen] = useState<boolean>(false);
   const [newTrip, setNewTrip] = useState<Trip>({
-    tripName: '',
-    description: '',
-    from: '',
-    to: '',
-    date: '',
+    tripName: "",
+    description: "",
+    from: "",
+    to: "",
+    date: "",
     isFlexibleDate: false,
-    createdBy: user ? user.$id : '',
-    modeOfTravel: '',
-    participants: [user!.$id]
+    createdBy: user ? user.$id : "",
+    modeOfTravel: "",
+    participants: [user!.$id],
   });
   const [selectedTrip, setSelectedTrip] = useState<FetchedTrip | null>(null);
   const [tripMessages, setTripMessages] = useState<any[]>([]);
-  const [isTripChatOpen, setIsTripChatOpen] = useState(false);
-  const [newTripMessage, setNewTripMessage] = useState('');
+  // const [isTripChatOpen, setIsTripChatOpen] = useState(false);
+  const [newTripMessage, setNewTripMessage] = useState("");
   const [joiningTripId, setJoiningTripId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   const muiTheme = useTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Updated colors matching the new theme
   const colors = {
     primary: {
-      main1:"#392639",
-      main2:"#FE744D",
-      main: '#4f46e5', // Adjusted primary color for contrast
-      light: '#818cf8',
-      dark: '#3b3b8c',
-      contrast: '#ffffff'
+      main1: "#392639",
+      main2: "#FE744D",
+      main: "#4f46e5", // Adjusted primary color for contrast
+      light: "#818cf8",
+      dark: "#3b3b8c",
+      contrast: "#ffffff",
     },
     secondary: {
-      main1:"#fafafa",
-      main: '#f43f5e',
-      light: '#fb7185',
-      dark: '#e11d48',
-      contrast: '#ffffff'
+      main1: "#fafafa",
+      main: "#f43f5e",
+      light: "#fb7185",
+      dark: "#e11d48",
+      contrast: "#ffffff",
     },
     background: {
-      default: '#1B1730', // New background color
-      paper: '#2A2635', // Slightly lighter for paper elements
-      alt: '#2C2A3A', // Alternative background color
+      default: "#1B1730", // New background color
+      paper: "#2A2635", // Slightly lighter for paper elements
+      alt: "#2C2A3A", // Alternative background color
     },
     text: {
-      primary: '#ffffff', // Changed to white for better contrast
-      secondary: '#e0e0e0', // Lighter gray for secondary text
-      muted: '#b0b0b0',
+      primary: "#ffffff", // Changed to white for better contrast
+      secondary: "#e0e0e0", // Lighter gray for secondary text
+      muted: "#b0b0b0",
     },
     success: {
-      light: '#dcfce7',
-      main: '#22c55e',
-    }
+      light: "#dcfce7",
+      main: "#22c55e",
+    },
   };
 
   const fetchTrips = async () => {
     setIsLoading(true);
     try {
       const fetchedTrips = await getTrips();
-      const mappedTrips = await Promise.all(fetchedTrips.map(async trip => {
-        const userProfile = await getProfile(trip.createdBy);
-        return {
-          id: trip.$id,
-          tripName: trip.tripName,
-          description: trip.description,
-          from: trip.from,
-          to: trip.to,
-          date: trip.date,
-          isFlexibleDate: trip.isFlexibleDate,
-          createdBy: trip.createdBy === user?.$id ? 'Me' : userProfile.name,
-          modeOfTravel: trip.modeOfTravel,
-          participants: trip.participants
-        };
-      }));
+      const mappedTrips = await Promise.all(
+        fetchedTrips.map(async (trip) => {
+          const userProfile = await getProfile(trip.createdBy);
+          return {
+            id: trip.$id,
+            tripName: trip.tripName,
+            description: trip.description,
+            from: trip.from,
+            to: trip.to,
+            date: trip.date,
+            isFlexibleDate: trip.isFlexibleDate,
+            createdBy: trip.createdBy === user?.$id ? "Me" : userProfile.name,
+            modeOfTravel: trip.modeOfTravel,
+            participants: trip.participants,
+          };
+        })
+      );
       setTrips(mappedTrips);
     } catch (error) {
-      console.error('Error fetching trips:', error);
+      console.error("Error fetching trips:", error);
     } finally {
       setIsLoading(false);
     }
@@ -158,9 +171,12 @@ const Trips: React.FC = () => {
 
       fetchTripChats();
 
-      const unsubscribe = subscribeToRoomChats(selectedTrip.id, (newMessage) => {
-        setTripMessages(prev => [...prev, newMessage]);
-      });
+      const unsubscribe = subscribeToRoomChats(
+        selectedTrip.id,
+        (newMessage) => {
+          setTripMessages((prev) => [...prev, newMessage]);
+        }
+      );
 
       return () => {
         unsubscribe();
@@ -178,21 +194,23 @@ const Trips: React.FC = () => {
   const handleClose = () => setOpen(false);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent<string>
   ) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
-    setNewTrip(prev => ({
+    setNewTrip((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = async () => {
     if (!user) return;
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     if (!newTrip.tripName || !newTrip.date) {
-      toast.error('Please fill in all required fields.'); // Use toast for error
+      toast.error("Please fill in all required fields."); // Use toast for error
       return;
     }
     if (newTrip.date < today) {
@@ -206,71 +224,94 @@ const Trips: React.FC = () => {
         ...newTrip,
         createdBy: user.$id,
         date: new Date(newTrip.date),
-        participants: [user.$id] // Ensure user is in participants array
+        participants: [user.$id], // Ensure user is in participants array
       };
 
       const createdTrip = await createTrip(tripData);
-      
+
       // Update local state with the new trip
-      setTrips(prev => [...prev, {
-        ...tripData,
-        id: createdTrip.$id,
-        createdBy: 'Me', // Display 'Me' for the current user
-        date: tripData.date.toISOString().split('T')[0]
-      }]);
+      setTrips((prev) => [
+        ...prev,
+        {
+          ...tripData,
+          id: createdTrip.$id,
+          createdBy: "Me", // Display 'Me' for the current user
+          date: tripData.date.toISOString().split("T")[0],
+        },
+      ]);
 
       // Reset form
       setNewTrip({
-        tripName: '',
-        description: '',
-        from: '',
-        to: '',
-        date: '',
+        tripName: "",
+        description: "",
+        from: "",
+        to: "",
+        date: "",
         isFlexibleDate: false,
         createdBy: user.$id,
-        modeOfTravel: '',
+        modeOfTravel: "",
         participants: [user.$id],
       });
       handleClose();
-      toast.success('Trip created successfully!'); // Use toast for success
+      toast.success("Trip created successfully!"); // Use toast for success
     } catch (error) {
-      console.error('Error creating trip:', error);
-      toast.error('Failed to create trip. Please try again.'); // Use toast for error
+      console.error("Error creating trip:", error);
+      toast.error("Failed to create trip. Please try again."); // Use toast for error
     }
   };
+  console.log("tips data", trips);
 
   const handleJoinTrip = async (tripId: string) => {
     if (!user) return;
 
     try {
-      // Set loading state
+      // First, get the current trip document to access the existing participants array
+      const tripDocument = await getTrip(tripId);
+      console.log("trip dic", tripDocument);
+
       setJoiningTripId(tripId);
-      
-      await addParticipantToTrip(tripId, user.$id);
-      
-      // Update the local state immediately to reflect the change
-      setTrips(prevTrips => prevTrips.map(trip => {
-        if (trip.id === tripId) {
-          return {
-            ...trip,
-            participants: [...trip.participants, user.$id]
-          };
+      // Get the current participants array
+      const currentParticipants = tripDocument.participants || [];
+
+      // Check if the participant is already in the array to avoid duplicates
+      if (!currentParticipants.includes(user.$id)) {
+        // Add the new participant to the existing array
+        const updatedParticipants = [...currentParticipants, user.$id];
+
+        // Set loading state
+
+        await addParticipantToTrip(tripId, updatedParticipants);
+
+        // Update the local state immediately to reflect the change
+        setTrips((prevTrips) =>
+          prevTrips.map((trip) => {
+            if (trip.id === tripId) {
+              return {
+                ...trip,
+                participants: [...trip.participants, user.$id],
+              };
+            }
+            return trip;
+          })
+        );
+
+        // Optional: Update the selected trip if it's the one being joined
+        if (selectedTrip?.id === tripId) {
+          setSelectedTrip((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  participants: [...prev.participants, user.$id],
+                }
+              : null
+          );
         }
-        return trip;
-      }));
 
-      // Optional: Update the selected trip if it's the one being joined
-      if (selectedTrip?.id === tripId) {
-        setSelectedTrip(prev => prev ? {
-          ...prev,
-          participants: [...prev.participants, user.$id]
-        } : null);
+        toast.success("Successfully joined the trip!");
       }
-
-      toast.success('Successfully joined the trip!');
     } catch (error) {
-      console.error('Error joining trip:', error);
-      toast.error('Failed to join trip. Please try again.');
+      console.error("Error joining trip:", error);
+      toast.error("Failed to join trip. Please try again.");
     } finally {
       // Clear loading state
       setJoiningTripId(null);
@@ -282,11 +323,11 @@ const Trips: React.FC = () => {
 
     try {
       await sendRoomChat(selectedTrip.id, newTripMessage, user.$id);
-      setNewTripMessage('');
-      toast.success('Message sent!'); // Use toast for success
+      setNewTripMessage("");
+      toast.success("Message sent!"); // Use toast for success
     } catch (error) {
-      console.error('Error sending trip message:', error);
-      toast.error('Failed to send message.'); // Use toast for error
+      console.error("Error sending trip message:", error);
+      toast.error("Failed to send message."); // Use toast for error
     }
   };
 
@@ -295,61 +336,70 @@ const Trips: React.FC = () => {
   }
 
   return (
-
-    <Box sx={{ 
-      height: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      backgroundColor: colors.background.default
-    }}>
-      
-      <Box sx={{ 
-        flex: 1, 
-        display: 'flex', 
-        gap: 3, 
-        p: { xs: 2, md: 4 },
-        height: 'calc(100vh - 64px)',
-        maxWidth: '1800px',
-        margin: '0 auto',
-        width: '100%',
-        flexDirection: { xs: 'column', md: 'row' }
-      }}>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: colors.background.default,
+      }}
+    >
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          gap: 3,
+          p: { xs: 2, md: 4 },
+          height: "calc(100vh - 64px)",
+          maxWidth: "1800px",
+          margin: "0 auto",
+          width: "100%",
+          flexDirection: { xs: "column", md: "row" },
+        }}
+      >
         {/* Left Side - Trips List */}
-        <Box sx={{ 
-          flex: { xs: 1, md: '0 0 45%' },
-          overflowY: 'auto',
-          backgroundColor: colors.background.paper,
-          borderRadius: '16px',
-          p: { xs: 2, md: 3 },
-          boxShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.1)'
-        }}>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            mb: 4
-          }}>
-            <Typography variant="h5" sx={{ 
-              fontWeight: '600',
-              color: colors.text.primary,
-              background: `linear-gradient(120deg, ${colors.primary.main}, ${colors.secondary.main})`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>
+        <Box
+          sx={{
+            flex: { xs: 1, md: "0 0 45%" },
+            overflowY: "auto",
+            backgroundColor: colors.background.paper,
+            borderRadius: "16px",
+            p: { xs: 2, md: 3 },
+            boxShadow: "0 4px 6px -1px rgba(99, 102, 241, 0.1)",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 4,
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "600",
+                color: colors.text.primary,
+                background: `linear-gradient(120deg, ${colors.primary.main}, ${colors.secondary.main})`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               Your Trips
             </Typography>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               startIcon={<Plus size={18} />}
               onClick={handleOpen}
               sx={{
-                borderRadius: '100px',
-                textTransform: 'none',
-                bgcolor: '#FE744D',
-                '&:hover': { 
+                borderRadius: "100px",
+                textTransform: "none",
+                bgcolor: "#FE744D",
+                "&:hover": {
                   bgcolor: colors.primary.dark,
-                  boxShadow: `0 0 20px ${colors.primary.main}40`
-                }
+                  boxShadow: `0 0 20px ${colors.primary.main}40`,
+                },
               }}
             >
               New Trip
@@ -358,286 +408,388 @@ const Trips: React.FC = () => {
 
           <Grid container spacing={2}>
             {trips.map((trip, index) => {
-              const length=trip.participants.length+1;
+              const length = trip.participants.length;
               return (
-              <Grid item xs={12} key={index}>
-                <Card 
-                  variant="outlined" 
-                  sx={{ 
-                    border: 'none',
-                    borderRadius: '12px',
-                    backgroundColor: selectedTrip?.id === trip.id 
-                      ? `${colors.primary.main}10`
-                      : trip.createdBy === 'Me' 
-                      ? "bg-[#392639]"
-                      : colors.background.paper,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: selectedTrip?.id === trip.id
-                      ? `0 0 0 2px ${colors.primary.main}`
-                      : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: `0 10px 15px -3px ${colors.primary.main}20`
-                    }
-                  }}
-                  onClick={() => setSelectedTrip(trip)}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Typography variant="h6" sx={{ 
-                      fontWeight: '600',
-                      color: selectedTrip?.id === trip.id 
-                      ? `white`
-                      : trip.createdBy === 'Me' 
-                      ? "bg-[#392639]"
-                      : colors.background.paper,
-                      mb: 1
-                    }}>
-                      {trip.tripName}
-                    </Typography>
-                    <Typography sx={{ 
-                      color: selectedTrip?.id === trip.id 
-                      ? `white`
-                      : trip.createdBy === 'Me' 
-                      ? "bg-[#392639]"
-                      : colors.background.paper,
-                      mb: 2,
-                      fontSize: '0.95rem'
-                    }}>
-                      {trip.description}
-                    </Typography>
-                    
-                    <Box sx={{ 
-                      display: 'flex', 
-                      gap: 3,
-                      mb: 2,
-                      color: colors.text.muted
-                    }}>
-                      <Box>
-                        <Typography variant="caption" sx={{ color: selectedTrip?.id === trip.id 
-                      ? `white`
-                      : trip.createdBy === 'Me' 
-                      ? "#FE744D"
-                      : colors.text.muted}}>
-                          From
-                        </Typography>
-                        <Typography sx={{ fontWeight: '500',
-                          color: selectedTrip?.id === trip.id 
-                          ? `white`
-                          : trip.createdBy === 'Me' 
-                          ? "#FE744D"
-                          : colors.text.muted
-                         }}>{trip.from}</Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" sx={{ color: selectedTrip?.id === trip.id 
-                      ? `white`
-                      : trip.createdBy === 'Me' 
-                      ? "#FE744D"
-                      : colors.text.muted }}>
-                          To
-                        </Typography>
-                        <Typography sx={{ fontWeight: '500',
-                          color: selectedTrip?.id === trip.id 
-                          ? `white`
-                          : trip.createdBy === 'Me' 
-                          ? "#FE744D"
-                          : colors.text.muted
-                         }}>{trip.to}</Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" sx={{ color: selectedTrip?.id === trip.id 
-                      ? `white`
-                      : trip.createdBy === 'Me' 
-                      ? "#FE744D"
-                      : colors.text.muted }}>
-                          Date
-                        </Typography>
-                        <Typography sx={{ fontWeight: '500',
-                          color: selectedTrip?.id === trip.id 
-                          ? `white`
-                          : trip.createdBy === 'Me' 
-                          ? "#FE744D"
-                          : colors.text.muted
-                         }}>{new Date(trip.date).toLocaleDateString()}</Typography>
-                      </Box>
-                    </Box>
+                <Grid item xs={12} key={index}>
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      border: "none",
+                      borderRadius: "12px",
+                      backgroundColor:
+                        selectedTrip?.id === trip.id
+                          ? `${colors.primary.main}10`
+                          : trip.createdBy === "Me"
+                          ? "bg-[#392639]"
+                          : colors.background.paper,
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      boxShadow:
+                        selectedTrip?.id === trip.id
+                          ? `0 0 0 2px ${colors.primary.main}`
+                          : "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: `0 10px 15px -3px ${colors.primary.main}20`,
+                      },
+                    }}
+                    onClick={() => setSelectedTrip(trip)}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: "600",
+                          color:
+                            selectedTrip?.id === trip.id
+                              ? `white`
+                              : trip.createdBy === "Me"
+                              ? "bg-[#392639]"
+                              : colors.background.paper,
+                          mb: 1,
+                        }}
+                      >
+                        {trip.tripName}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color:
+                            selectedTrip?.id === trip.id
+                              ? `white`
+                              : trip.createdBy === "Me"
+                              ? "bg-[#392639]"
+                              : colors.background.paper,
+                          mb: 2,
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        {trip.description}
+                      </Typography>
 
-                    <Box sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      color:"#fafafa"
-                    }}>
-                      <Box sx={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography sx={{ 
-                          fontSize: '0.875rem',
-                          color: selectedTrip?.id === trip.id 
-                      ? `white`
-                      : trip.createdBy === 'Me' 
-                      ? "#FE744D"
-                      : colors.text.muted
-                        }}>
-                          Created by <span style={{ fontWeight: '500',
-                            color: selectedTrip?.id === trip.id 
-                            ? `white`
-                            : trip.createdBy === 'Me' 
-                            ? "#FE744D"
-                            : colors.text.muted
-                           }}>{trip.createdBy}</span>
-                        </Typography>
-                        <Box sx={{ 
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          backgroundColorcolor: selectedTrip?.id === trip.id 
-                      ? `white`
-                      : trip.createdBy === 'Me' 
-                      ? "#FE744D"
-                      : colors.text.muted,
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 'full',
-                          fontSize: '0.875rem'
-                        }}>
-                          <span>👥</span> {length}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 3,
+                          mb: 2,
+                          color: colors.text.muted,
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                            }}
+                          >
+                            From
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontWeight: "500",
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                            }}
+                          >
+                            {trip.from}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                            }}
+                          >
+                            To
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontWeight: "500",
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                            }}
+                          >
+                            {trip.to}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                            }}
+                          >
+                            Date
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontWeight: "500",
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                            }}
+                          >
+                            {new Date(trip.date).toLocaleDateString()}
+                          </Typography>
                         </Box>
                       </Box>
-                      
-                      {trip.createdBy !== 'Me' && !trip.participants?.includes(user!.$id) && (
-                        <Button 
-                          variant="outlined"
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleJoinTrip(trip.id);
-                          }}
-                          disabled={joiningTripId === trip.id}
-                          sx={{ 
-                            borderRadius: '100px',
-                            textTransform: 'none',
-                            borderColor: '#04AA6D',
-                            color: joiningTripId === trip.id ? 'transparent' : "#04AA6D",
-                            position: 'relative',
-                            '&:hover': {
-                              borderColor: colors.primary.dark,
-                              backgroundColor: `${colors.primary.main}10`
-                            },
-                            minWidth: '90px',
-                            minHeight: '36px'
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          color:
+                            trip.createdBy === "Me" ? "#FE744D" : "#fafafa",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
                           }}
                         >
-                          {joiningTripId === trip.id ? (
-                            <Box sx={{ 
-                              position: 'absolute',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '100%',
-                              height: '100%',
-                            }}>
-                              <Loader size="small" showFacts={false} />
-                            </Box>
-                          ) : (
-                            "Join Trip"
+                          <Typography
+                            sx={{
+                              fontSize: "0.875rem",
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                            }}
+                          >
+                            Created by{" "}
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                color:
+                                  selectedTrip?.id === trip.id
+                                    ? `white`
+                                    : trip.createdBy === "Me"
+                                    ? "#FE744D"
+                                    : colors.text.muted,
+                              }}
+                            >
+                              {trip.createdBy}
+                            </span>
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                              backgroundColorcolor:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                              px: 1.5,
+                              py: 0.5,
+                              borderRadius: "full",
+                              fontSize: "0.875rem",
+                            }}
+                          >
+                            <span>👥</span> {length}
+                          </Box>
+                        </Box>
+
+                        {trip.createdBy !== "Me" &&
+                          !trip.participants?.includes(user!.$id) && (
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleJoinTrip(trip.id);
+                              }}
+                              disabled={joiningTripId === trip.id}
+                              sx={{
+                                borderRadius: "100px",
+                                textTransform: "none",
+                                borderColor: "#04AA6D",
+                                color:
+                                  joiningTripId === trip.id
+                                    ? "transparent"
+                                    : "#04AA6D",
+                                position: "relative",
+                                "&:hover": {
+                                  borderColor: colors.primary.dark,
+                                  backgroundColor: `${colors.primary.main}10`,
+                                },
+                                minWidth: "90px",
+                                minHeight: "36px",
+                              }}
+                            >
+                              {joiningTripId === trip.id ? (
+                                <Box
+                                  sx={{
+                                    position: "absolute",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "100%",
+                                    height: "100%",
+                                  }}
+                                >
+                                  <Loader size="small" showFacts={false} />
+                                </Box>
+                              ) : (
+                                "Join Trip"
+                              )}
+                            </Button>
                           )}
-                        </Button>
-                      )}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            )})}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
           </Grid>
         </Box>
 
         {/* Desktop Chat Section */}
         {!isMobile && (
-          <Box sx={{ 
-            flex: '0 0 55%',
-            backgroundColor: colors.background.paper,
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.1)'
-          }}>
+          <Box
+            sx={{
+              flex: "0 0 55%",
+              backgroundColor: colors.background.paper,
+              borderRadius: "16px",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 4px 6px -1px rgba(99, 102, 241, 0.1)",
+            }}
+          >
             {selectedTrip ? (
               <>
-                <Box sx={{ 
-                  p: 3,
-                  borderBottom: `1px solid ${colors.background.alt}`,
-                  background: `linear-gradient(to right, ${colors.primary.main}05, ${colors.primary.main}10)`
-                }}>
-                  <Typography variant="h5" sx={{ 
-                    fontWeight: '600',
-                    color: colors.text.primary,
-                  }}>
+                <Box
+                  sx={{
+                    p: 3,
+                    borderBottom: `1px solid ${colors.background.alt}`,
+                    background: `linear-gradient(to right, ${colors.primary.main}05, ${colors.primary.main}10)`,
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: "600",
+                      color: colors.text.primary,
+                    }}
+                  >
                     {selectedTrip.tripName}
                   </Typography>
                   <Typography sx={{ color: colors.text.secondary, mt: 0.5 }}>
                     Trip Discussion
                   </Typography>
                 </Box>
-                
-                <Box sx={{ 
-                  flex: 1, 
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 2,
-                  p: 3,
-                  backgroundColor: colors.background.default
-                }}>
+
+                <Box
+                  sx={{
+                    flex: 1,
+                    overflowY: "auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    p: 3,
+                    backgroundColor: colors.background.default,
+                  }}
+                >
                   {tripMessages.map((msg, index) => (
-                    <Box key={index} sx={{
-                      alignSelf: msg.userId === user?.$id ? 'flex-start' : 'flex-end',
-                      maxWidth: '70%',
-                      backgroundColor: msg.userId === user?.$id 
-                        ? colors.primary.main1
-                        : colors.primary.main2,
-                      color: msg.userId === user?.$id 
-                        ? colors.primary.contrast
-                        : colors.text.primary,
-                      p: 2.5,
-                      borderRadius: '16px',
-                      boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
-                    }}>
-                      <Typography sx={{ 
-                        color: msg.userId === user?.$id 
-                          ? colors.primary.contrast
-                          : colors.text.primary 
-                      }}>
+                    <Box
+                      key={index}
+                      sx={{
+                        alignSelf:
+                          msg.userId === user?.$id ? "flex-start" : "flex-end",
+                        maxWidth: "70%",
+                        backgroundColor:
+                          msg.userId === user?.$id
+                            ? colors.primary.main1
+                            : colors.primary.main2,
+                        color:
+                          msg.userId === user?.$id
+                            ? colors.primary.contrast
+                            : colors.text.primary,
+                        p: 2.5,
+                        borderRadius: "16px",
+                        boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          color:
+                            msg.userId === user?.$id
+                              ? colors.primary.contrast
+                              : colors.text.primary,
+                        }}
+                      >
                         {msg.content}
                       </Typography>
-                      <Typography variant="caption" sx={{ 
-                        color: msg.userId === user?.$id 
-                          ? `${colors.primary.contrast}80`
-                          : colors.text.muted,
-                        display: 'block',
-                        mt: 1
-                      }}>
-                        {new Date(msg.$createdAt).toLocaleTimeString()}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color:
+                            msg.userId === user?.$id
+                              ? `${colors.primary.contrast}80`
+                              : colors.text.muted,
+                          display: "block",
+                          mt: 1,
+                        }}
+                      >
+                        {msg.$createdAt
+                          ? formatDistanceToNow(new Date(msg.$createdAt), {
+                              addSuffix: true,
+                            })
+                          : ""}
                       </Typography>
                     </Box>
                   ))}
                 </Box>
 
-                <Box sx={{ 
-                  p: 3,
-                  display: "flex",
-                  gap:"10px",
-                  borderTop: `1px solid ${colors.background.alt}`,
-                  backgroundColor: colors.background.paper
-                }}>
-                  <Box sx={{ 
-                    width:"100%",
-                    backgroundColor: '#fafafa',
-                    borderRadius: '100px'
-                  }}>
+                <Box
+                  sx={{
+                    p: 3,
+                    display: "flex",
+                    gap: "10px",
+                    borderTop: `1px solid ${colors.background.alt}`,
+                    backgroundColor: colors.background.paper,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "100%",
+                      backgroundColor: "#fafafa",
+                      borderRadius: "100px",
+                    }}
+                  >
                     <TextField
                       value={newTripMessage}
                       onChange={(e) => setNewTripMessage(e.target.value)}
@@ -649,55 +801,55 @@ const Trips: React.FC = () => {
                       InputProps={{
                         disableUnderline: true,
                       }}
-                      sx={{ 
+                      sx={{
                         px: 2,
-                        '& .MuiInputBase-input': {
+                        "& .MuiInputBase-input": {
                           py: 1.5,
-                          color: '#000000'
-                        }
+                          color: "#000000",
+                        },
                       }}
                       onKeyPress={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
+                        if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
                           handleSendTripMessage();
                         }
                       }}
                     />
                   </Box>
-                    <Button 
-                      onClick={handleSendTripMessage}
-                      disabled={!newTripMessage.trim()}
-                      sx={{
-                        borderRadius: '100px',
-                        textTransform: 'none',
-                        bgcolor: "#FE744D",
-                        color: "#fafafa",
-                        '&:hover': {
-                          bgcolor: colors.primary.dark
-                        },
-                        '&.Mui-disabled': {
-                          bgcolor: colors.text.muted
-                        }
-                      }}
-                    >
-                      Send
-                    </Button>
+                  <Button
+                    onClick={handleSendTripMessage}
+                    disabled={!newTripMessage.trim()}
+                    sx={{
+                      borderRadius: "100px",
+                      textTransform: "none",
+                      bgcolor: "#FE744D",
+                      color: "#fafafa",
+                      "&:hover": {
+                        bgcolor: colors.primary.dark,
+                      },
+                      "&.Mui-disabled": {
+                        bgcolor: colors.text.muted,
+                      },
+                    }}
+                  >
+                    Send
+                  </Button>
                 </Box>
               </>
             ) : (
-              <Box sx={{ 
-                display: 'flex', 
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: 2,
-                color: colors.text.muted
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  height: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  gap: 2,
+                  color: colors.text.muted,
+                }}
+              >
                 <MessageCircle size={48} />
-                <Typography>
-                  Select a trip to view the discussion
-                </Typography>
+                <Typography>Select a trip to view the discussion</Typography>
               </Box>
             )}
           </Box>
@@ -719,42 +871,44 @@ const Trips: React.FC = () => {
             }}
             PaperProps={{
               sx: {
-                height: '90vh',
-                borderBottomLeftRadius: '20px',
-                borderBottomRightRadius: '20px',
-                overflow: 'visible',
+                height: "90vh",
+                borderBottomLeftRadius: "20px",
+                borderBottomRightRadius: "20px",
+                overflow: "visible",
                 backgroundColor: colors.background.paper,
-              }
+              },
             }}
           >
             {/* Drawer Handle */}
             <Box
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 top: -20,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                height: '4px',
-                width: '40px',
-                borderRadius: '2px',
+                left: "50%",
+                transform: "translateX(-50%)",
+                height: "4px",
+                width: "40px",
+                borderRadius: "2px",
                 backgroundColor: colors.text.muted,
-                my: 1
+                my: 1,
               }}
             />
-            
+
             {selectedTrip ? (
               <>
-                <Box sx={{ 
-                  p: 2,
-                  borderBottom: `1px solid ${colors.background.alt}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  position: 'sticky',
-                  top: 0,
-                  backgroundColor: colors.background.paper,
-                  zIndex: 1
-                }}>
+                <Box
+                  sx={{
+                    p: 2,
+                    borderBottom: `1px solid ${colors.background.alt}`,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    position: "sticky",
+                    top: 0,
+                    backgroundColor: colors.background.paper,
+                    zIndex: 1,
+                  }}
+                >
                   <Button
                     startIcon={<ArrowLeft />}
                     onClick={() => {
@@ -762,16 +916,19 @@ const Trips: React.FC = () => {
                       setTimeout(() => setSelectedTrip(null), 300);
                     }}
                     sx={{
-                      minWidth: 'auto',
+                      minWidth: "auto",
                       p: 1,
-                      color: colors.text.primary
+                      color: colors.text.primary,
                     }}
                   />
                   <Box>
-                    <Typography variant="h6" sx={{ 
-                      fontWeight: '600',
-                      color: colors.text.primary,
-                    }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: "600",
+                        color: colors.text.primary,
+                      }}
+                    >
                       {selectedTrip.tripName}
                     </Typography>
                     <Typography sx={{ color: colors.text.secondary }}>
@@ -780,71 +937,95 @@ const Trips: React.FC = () => {
                   </Box>
                 </Box>
 
-                <Box sx={{ 
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 'calc(90vh - 140px)',
-                  position: 'relative'
-                }}>
-                  <Box sx={{ 
-                    flex: 1, 
-                    overflowY: 'auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 2,
-                    p: 2,
-                    backgroundColor: colors.background.default
-                  }}>
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "calc(90vh - 140px)",
+                    position: "relative",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      flex: 1,
+                      overflowY: "auto",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                      p: 2,
+                      backgroundColor: colors.background.default,
+                    }}
+                  >
                     {tripMessages.map((msg, index) => (
-                      <Box key={index} className={'bg-green-300'} sx={{
-                        alignSelf: msg.userId === user?.$id ? 'flex-end' : 'flex-start',
-                        maxWidth: '70%',
-                        backgroundColor: msg.userId === user?.$id 
-                          ? colors.primary.main
-                          : colors.background.paper,
-                        color: msg.userId == user?.$id 
-                          ? colors.primary.contrast
-                          : colors.text.primary,
-                        p: 2.5,
-                        borderRadius: '16px',
-                        boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
-                      }}>
-                        <Typography sx={{ 
-                          color: msg.userId === user?.$id 
-                            ? colors.primary.contrast
-                            : colors.text.primary 
-                        }}>
+                      <Box
+                        key={index}
+                        className={"bg-green-300"}
+                        sx={{
+                          alignSelf:
+                            msg.userId === user?.$id
+                              ? "flex-end"
+                              : "flex-start",
+                          maxWidth: "70%",
+                          backgroundColor:
+                            msg.userId === user?.$id
+                              ? colors.primary.main
+                              : colors.background.paper,
+                          color:
+                            msg.userId == user?.$id
+                              ? colors.primary.contrast
+                              : colors.text.primary,
+                          p: 2.5,
+                          borderRadius: "16px",
+                          boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            color:
+                              msg.userId === user?.$id
+                                ? colors.primary.contrast
+                                : colors.text.primary,
+                          }}
+                        >
                           {msg.content}
                         </Typography>
-                        <Typography variant="caption" sx={{ 
-                          color: msg.userId === user?.$id 
-                            ? `${colors.primary.contrast}80`
-                            : colors.text.muted,
-                          display: 'block',
-                          mt: 1
-                        }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color:
+                              msg.userId === user?.$id
+                                ? `${colors.primary.contrast}80`
+                                : colors.text.muted,
+                            display: "block",
+                            mt: 1,
+                          }}
+                        >
                           {new Date(msg.$createdAt).toLocaleTimeString()}
                         </Typography>
                       </Box>
                     ))}
                   </Box>
 
-                  <Box sx={{ 
-                    p: 2,
-                    display: 'flex',
-                    gap: 2,
-                    borderTop: `1px solid ${colors.background.alt}`,
-                    backgroundColor: colors.background.paper,
-                    position: 'sticky',
-                    bottom: 0,
-                    zIndex: 1
-                  }}>
-                    <Box sx={{ 
-                      width:'100%',
-                      backgroundColor: '#fafafa',
-                      borderRadius: '100px'
-                    }}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      display: "flex",
+                      gap: 2,
+                      borderTop: `1px solid ${colors.background.alt}`,
+                      backgroundColor: colors.background.paper,
+                      position: "sticky",
+                      bottom: 0,
+                      zIndex: 1,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "100%",
+                        backgroundColor: "#fafafa",
+                        borderRadius: "100px",
+                      }}
+                    >
                       <TextField
                         value={newTripMessage}
                         onChange={(e) => setNewTripMessage(e.target.value)}
@@ -856,56 +1037,56 @@ const Trips: React.FC = () => {
                         InputProps={{
                           disableUnderline: true,
                         }}
-                        sx={{ 
+                        sx={{
                           px: 2,
-                          '& .MuiInputBase-input': {
+                          "& .MuiInputBase-input": {
                             py: 1.5,
-                            color: "#000000"
-                          }
+                            color: "#000000",
+                          },
                         }}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
+                          if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
                             handleSendTripMessage();
                           }
                         }}
                       />
                     </Box>
-                      <Button 
-                        onClick={handleSendTripMessage}
-                        disabled={!newTripMessage.trim()}
-                        sx={{
-                          borderRadius: '100px',
-                          textTransform: 'none',
-                          bgcolor: "#FE744D",
-                          color: "#fafafa",
-                          '&:hover': {
-                            bgcolor: colors.primary.dark
-                          },
-                          '&.Mui-disabled': {
-                            bgcolor: colors.text.muted
-                          }
-                        }}
-                      >
-                        Send
-                      </Button>
+                    <Button
+                      onClick={handleSendTripMessage}
+                      disabled={!newTripMessage.trim()}
+                      sx={{
+                        borderRadius: "100px",
+                        textTransform: "none",
+                        bgcolor: "#FE744D",
+                        color: "#fafafa",
+                        "&:hover": {
+                          bgcolor: colors.primary.dark,
+                        },
+                        "&.Mui-disabled": {
+                          bgcolor: colors.text.muted,
+                        },
+                      }}
+                    >
+                      Send
+                    </Button>
                   </Box>
                 </Box>
               </>
             ) : (
-              <Box sx={{ 
-                display: 'flex', 
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: 2,
-                color: colors.text.muted
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  height: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  gap: 2,
+                  color: colors.text.muted,
+                }}
+              >
                 <MessageCircle size={48} />
-                <Typography>
-                  Select a trip to view the discussion
-                </Typography>
+                <Typography>Select a trip to view the discussion</Typography>
               </Box>
             )}
           </SwipeableDrawer>
@@ -913,83 +1094,92 @@ const Trips: React.FC = () => {
       </Box>
 
       {/* Create Trip Dialog */}
-      <Dialog 
-        open={open} 
+      <Dialog
+        open={open}
         onClose={handleClose}
         maxWidth="sm"
         fullWidth
-        sx={{ 
-          '& .MuiDialog-paper': { 
-            borderRadius: '20px',
+        sx={{
+          "& .MuiDialog-paper": {
+            borderRadius: "20px",
             backgroundColor: colors.background.paper,
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-          }
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+          },
         }}
       >
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          overflow: 'hidden',
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            overflow: "hidden",
+          }}
+        >
           {/* Fixed Header */}
-          <DialogTitle sx={{
-            p: 3,
-            background: `linear-gradient(120deg, ${colors.primary.main}15, ${colors.primary.main}25)`,
-            borderBottom: `1px solid ${colors.background.alt}`,
-            position: 'sticky',
-            top: 0,
-            zIndex: 2,
-            color: colors.text.primary,
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
-          }}>
+          <DialogTitle
+            sx={{
+              p: 3,
+              background: `linear-gradient(120deg, ${colors.primary.main}15, ${colors.primary.main}25)`,
+              borderBottom: `1px solid ${colors.background.alt}`,
+              position: "sticky",
+              top: 0,
+              zIndex: 2,
+              color: colors.text.primary,
+              fontWeight: "600",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
             <Plus size={24} />
             Create New Trip
           </DialogTitle>
 
           {/* Scrollable Content */}
-          <DialogContent 
-            sx={{ 
+          <DialogContent
+            sx={{
               flex: 1,
               p: 3,
-              overflowY: 'auto !important',
-              WebkitOverflowScrolling: 'touch',
-              '&::-webkit-scrollbar': {
-                width: '8px',
-                display: { xs: 'none', md: 'block' }
+              overflowY: "auto !important",
+              WebkitOverflowScrolling: "touch",
+              "&::-webkit-scrollbar": {
+                width: "8px",
+                display: { xs: "none", md: "block" },
               },
-              '&::-webkit-scrollbar-track': {
+              "&::-webkit-scrollbar-track": {
                 background: colors.background.default,
               },
-              '&::-webkit-scrollbar-thumb': {
+              "&::-webkit-scrollbar-thumb": {
                 background: colors.text.muted,
-                borderRadius: '4px',
+                borderRadius: "4px",
               },
-              '&::-webkit-scrollbar-thumb:hover': {
+              "&::-webkit-scrollbar-thumb:hover": {
                 background: colors.text.secondary,
               },
-              padding: '24px !important',
+              padding: "24px !important",
             }}
           >
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: 3,
-              pb: { xs: 4, md: 2 }
-            }} >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                pb: { xs: 4, md: 2 },
+              }}
+            >
               {/* Basic Details Section */}
               <Box>
-                <Typography variant="subtitle2" sx={{ 
-                  color: colors.text.secondary,
-                  mb: 2,
-                  fontWeight: 500
-                }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: colors.text.secondary,
+                    mb: 2,
+                    fontWeight: 500,
+                  }}
+                >
                   Basic Details
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <TextField
                     label="Trip Name"
                     name="tripName"
@@ -1003,7 +1193,7 @@ const Trips: React.FC = () => {
                       style: { color: colors.text.primary },
                     }}
                     InputLabelProps={{
-                      style: { color: 'white' }
+                      style: { color: "white" },
                     }}
                   />
                   <TextField
@@ -1019,20 +1209,20 @@ const Trips: React.FC = () => {
                       style: { color: colors.text.primary },
                     }}
                     InputLabelProps={{
-                      style: { color: 'white' }
+                      style: { color: "white" },
                     }}
                     variant="outlined"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
                         backgroundColor: colors.background.default,
-                        '&:hover': {
+                        "&:hover": {
                           backgroundColor: colors.background.alt,
                         },
-                        '&.Mui-focused': {
+                        "&.Mui-focused": {
                           backgroundColor: colors.background.paper,
-                        }
-                      }
+                        },
+                      },
                     }}
                   />
                 </Box>
@@ -1040,18 +1230,23 @@ const Trips: React.FC = () => {
 
               {/* Location Section */}
               <Box>
-                <Typography variant="subtitle2" sx={{ 
-                  color: colors.text.secondary,
-                  mb: 2,
-                  fontWeight: 500
-                }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: colors.text.secondary,
+                    mb: 2,
+                    fontWeight: 500,
+                  }}
+                >
                   Location Details
                 </Typography>
-                <Box sx={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                  gap: 2
-                }}>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                    gap: 2,
+                  }}
+                >
                   <TextField
                     label="From"
                     name="from"
@@ -1064,13 +1259,13 @@ const Trips: React.FC = () => {
                       style: { color: colors.text.primary },
                     }}
                     InputLabelProps={{
-                      style: { color: 'white' }
+                      style: { color: "white" },
                     }}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
                         backgroundColor: colors.background.default,
-                      }
+                      },
                     }}
                   />
                   <TextField
@@ -1085,13 +1280,13 @@ const Trips: React.FC = () => {
                       style: { color: colors.text.primary },
                     }}
                     InputLabelProps={{
-                      style: { color: 'white' }
+                      style: { color: "white" },
                     }}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
                         backgroundColor: colors.background.default,
-                      }
+                      },
                     }}
                   />
                 </Box>
@@ -1099,14 +1294,17 @@ const Trips: React.FC = () => {
 
               {/* Date Section */}
               <Box>
-                <Typography variant="subtitle2" sx={{ 
-                  color: colors.text.secondary,
-                  mb: 2,
-                  fontWeight: 500
-                }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: colors.text.secondary,
+                    mb: 2,
+                    fontWeight: 500,
+                  }}
+                >
                   Date & Flexibility
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <TextField
                     // label="Date"
                     name="date"
@@ -1124,10 +1322,10 @@ const Trips: React.FC = () => {
                     //   style: { color: 'white' }
                     // }}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
                         backgroundColor: colors.background.default,
-                      }
+                      },
                     }}
                   />
                   <FormControlLabel
@@ -1136,10 +1334,10 @@ const Trips: React.FC = () => {
                         name="isFlexibleDate"
                         checked={newTrip.isFlexibleDate}
                         onChange={handleInputChange}
-                        sx={{ 
-                          '&.Mui-checked': { 
-                            color: "white" 
-                          }
+                        sx={{
+                          "&.Mui-checked": {
+                            color: "white",
+                          },
                         }}
                       />
                     }
@@ -1154,11 +1352,14 @@ const Trips: React.FC = () => {
 
               {/* Travel Mode Section */}
               <Box>
-                <Typography variant="subtitle2" sx={{ 
-                  color: colors.text.secondary,
-                  mb: 2,
-                  fontWeight: 500
-                }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: colors.text.secondary,
+                    mb: 2,
+                    fontWeight: 500,
+                  }}
+                >
                   Mode of Travel
                 </Typography>
                 <FormControl fullWidth>
@@ -1171,27 +1372,27 @@ const Trips: React.FC = () => {
                     sx={{
                       borderRadius: 2,
                       backgroundColor: colors.background.default,
-                      '& .MuiSelect-select': {
+                      "& .MuiSelect-select": {
                         py: 1.5,
                       },
-                      '& .MuiMenu-paper': {
-                        maxHeight: '40vh',
-                      }
+                      "& .MuiMenu-paper": {
+                        maxHeight: "40vh",
+                      },
                     }}
                     MenuProps={{
                       PaperProps: {
                         sx: {
-                          maxHeight: '40vh',
+                          maxHeight: "40vh",
                           mt: 1,
-                        }
+                        },
                       },
                       style: {
-                        maxHeight: '40vh',
-                      }
+                        maxHeight: "40vh",
+                      },
                     }}
                   >
-                    <MenuItem disabled value=""  >
-                      <em className='text-white'>Select travel mode</em>
+                    <MenuItem disabled value="">
+                      <em className="text-white">Select travel mode</em>
                     </MenuItem>
                     <MenuItem value="Airways">Airways</MenuItem>
                     <MenuItem value="Railways">Railways</MenuItem>
@@ -1199,8 +1400,8 @@ const Trips: React.FC = () => {
                     <MenuItem value="Other">Other</MenuItem>
                   </Select>
                 </FormControl>
-                
-                {newTrip.modeOfTravel === 'Other' && (
+
+                {newTrip.modeOfTravel === "Other" && (
                   <TextField
                     label="Specify Other"
                     name="modeOfTravel"
@@ -1210,14 +1411,14 @@ const Trips: React.FC = () => {
                     variant="outlined"
                     InputProps={{
                       style: { color: colors.text.primary },
-                      placeholder: { color: 'white' }
+                      placeholder: { color: "white" },
                     }}
                     sx={{
                       mt: 2,
-                      '& .MuiOutlinedInput-root': {
+                      "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
                         backgroundColor: colors.background.default,
-                      }
+                      },
                     }}
                   />
                 )}
@@ -1226,43 +1427,45 @@ const Trips: React.FC = () => {
           </DialogContent>
 
           {/* Fixed Footer */}
-          <DialogActions sx={{ 
-            p: 3,
-            borderTop: `1px solid ${colors.background.alt}`,
-            gap: 2,
-            position: 'sticky',
-            bottom: 0,
-            backgroundColor: colors.background.paper,
-            zIndex: 2,
-            mt: 'auto',
-            boxShadow: '0 -4px 6px -1px rgba(0, 0, 0, 0.05)'
-          }}>
-            <Button 
-              onClick={handleClose} 
-              variant="outlined" 
-              sx={{ 
+          <DialogActions
+            sx={{
+              p: 3,
+              borderTop: `1px solid ${colors.background.alt}`,
+              gap: 2,
+              position: "sticky",
+              bottom: 0,
+              backgroundColor: colors.background.paper,
+              zIndex: 2,
+              mt: "auto",
+              boxShadow: "0 -4px 6px -1px rgba(0, 0, 0, 0.05)",
+            }}
+          >
+            <Button
+              onClick={handleClose}
+              variant="outlined"
+              sx={{
                 borderRadius: 2,
                 borderColor: colors.text.muted,
                 color: colors.text.secondary,
-                '&:hover': {
+                "&:hover": {
                   borderColor: colors.text.primary,
-                  backgroundColor: colors.background.alt
-                }
+                  backgroundColor: colors.background.alt,
+                },
               }}
             >
               Cancel
             </Button>
-            <Button 
-              onClick={handleSubmit} 
-              variant="contained" 
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
               startIcon={<Plus />}
-              sx={{ 
+              sx={{
                 borderRadius: 2,
                 bgcolor: colors.primary.main,
-                '&:hover': {
-                  bgcolor: colors.primary.dark
+                "&:hover": {
+                  bgcolor: colors.primary.dark,
                 },
-                px: 3
+                px: 3,
               }}
             >
               Create Trip

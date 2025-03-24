@@ -4,28 +4,69 @@ import { subscribeToLikes } from '../lib/appwrite/realtime';
 import { useAuth } from '../contexts/AuthContext';
 import type { Post } from '../types';
 
+// Number of posts to fetch per page
+const POSTS_PER_PAGE = 10;
+
 export function usePosts() {
   const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
-  const fetchPosts = useCallback(async () => {
+  const fetchPosts = useCallback(async (page = 0, reset = true) => {
     try {
-      const fetchedPosts = await getPosts();
-      setPosts(fetchedPosts);
+      if (reset) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      // Calculate offset based on page
+      const offset = page * POSTS_PER_PAGE;
+      
+      // Update the getPosts function to accept limit and offset parameters
+      const fetchedPosts = await getPosts(POSTS_PER_PAGE, offset);
+      
+      if (fetchedPosts.length < POSTS_PER_PAGE) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+
+      if (reset) {
+        setPosts(fetchedPosts);
+      } else {
+        setPosts(prevPosts => [...prevPosts, ...fetchedPosts]);
+      }
+      
+      setCurrentPage(page);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch posts'));
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchPosts();
+  const loadMorePosts = useCallback(() => {
+    if (!loadingMore && hasMore) {
+      fetchPosts(currentPage + 1, false);
+    }
+  }, [fetchPosts, currentPage, loadingMore, hasMore]);
+
+  const refreshPosts = useCallback(() => {
+    return fetchPosts(0, true);
   }, [fetchPosts]);
 
-  // Subscribe to likes for each post
+  // Initial load
+  useEffect(() => {
+    fetchPosts(0);
+  }, [fetchPosts]);
+
+  // Realtime subscriptions for likes
   useEffect(() => {
     const subscriptions = posts.map(post => {
       return subscribeToLikes(post.id, (likes) => {
@@ -69,9 +110,12 @@ export function usePosts() {
   return {
     posts,
     loading,
+    loadingMore,
     error,
+    hasMore,
     handleLike,
+    loadMorePosts,
     addNewPost: (newPost: Post) => setPosts(currentPosts => [newPost, ...currentPosts]),
-    refreshPosts: fetchPosts
+    refreshPosts
   };
 }

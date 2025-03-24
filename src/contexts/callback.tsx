@@ -37,7 +37,7 @@ export default function Callback() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen text-[#fafafa]">
         <p>Processing your login...</p>
       </div>
     );
@@ -45,7 +45,7 @@ export default function Callback() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen ">
         <p className="text-red-500">{error}</p>
         <a href="/sign-in" className="text-blue-500 ml-2">Go back to sign in</a>
       </div>
@@ -53,7 +53,7 @@ export default function Callback() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen text-[#fafafa]">
       <p>Authentication successful! Redirecting...</p>
     </div>
   );

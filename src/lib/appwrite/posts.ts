@@ -5,21 +5,42 @@ import type { Post } from '../../types';
 
 const DATABASE_ID = '6775235f000aeef1a930';
 
-export async function getPosts() {
+// export async function getPosts() {
+//   try {
+//     const response = await databases.listDocuments(
+//       DATABASE_ID,
+//       COLLECTIONS.POSTS,
+//       [Query.orderDesc('$createdAt'), Query.limit(20)]
+//     );
+//     console.log("response", response);
+    
+//     return response.documents as Post[];
+//   } catch (error) {
+//     console.error('Error fetching posts:', error);
+//     return [];
+//   }
+// }
+
+export async function getPosts(limit = 10, offset = 0) {
   try {
     const response = await databases.listDocuments(
       DATABASE_ID,
       COLLECTIONS.POSTS,
-      [Query.orderDesc('$createdAt'), Query.limit(20)]
+      [
+        // Add your queries, for example:
+        Query.orderDesc('$createdAt'), // Sort by creation date, newest first
+        Query.limit(limit),
+        Query.offset(offset)
+      ]
     );
-    console.log("response", response);
-    
+
     return response.documents as Post[];
   } catch (error) {
     console.error('Error fetching posts:', error);
-    return [];
+    throw error;
   }
 }
+
 
 export async function createPost(post: {
   userId: string;

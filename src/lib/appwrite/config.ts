@@ -10,6 +10,8 @@ export const databases = new Databases(client);
 export const storage = new Storage(client);
 export const functions = new Functions(client);
 
+export const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+
 export const COLLECTIONS = {
   POSTS: '67d8715d001f8d445d4b', //done
   CHALLENGES: '67d72ff10031f16751cd',//done

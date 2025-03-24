@@ -11,6 +11,7 @@ import {
   subscribeToRoomChats,
 } from "../lib/appwrite/roomChat";
 import { useAuth } from "../contexts/AuthContext";
+import { formatDistanceToNow } from "date-fns";
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const MESSAGES_PER_PAGE = 7;
@@ -507,9 +508,7 @@ const Communities = () => {
                               {msg.content}
                             </Typography>
                             <p className="text-white text-xs">
-                              {msg.timeStamp
-                                ? new Date(msg.timeStamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                : ""}
+                            {msg.timeStamp ? formatDistanceToNow(new Date(msg.timeStamp), { addSuffix: true }) : ""}
                             </p>
                           </div>
                           <p className="text-white text-sm truncate">

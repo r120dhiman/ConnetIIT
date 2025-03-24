@@ -54,7 +54,7 @@ function App() {
           <Route path="/callback" element={<Callback />} />
           <Route path="/" element={<PrivateRoute><Header/><Feed /></PrivateRoute>} />
           <Route path="/chat" element={<PrivateRoute><Header/><Chat /></PrivateRoute>} />
-          <Route path="/chat-room" element={<PrivateRoute><Header/><ChatRoom /></PrivateRoute>} />
+          <Route path="/chat-room" element={<PrivateRoute><ChatRoom /></PrivateRoute>} />
           <Route path="/chat-anonymously" element={<PrivateRoute><AnonymousChat /></PrivateRoute>} />
           <Route path="/onboarding" element={<OnBoarding />} />
           <Route path="/profile" element={<PrivateRoute><Header/><Profile /></PrivateRoute>} />
