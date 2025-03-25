@@ -436,29 +436,18 @@ const Trips: React.FC = () => {
                     onClick={() => setSelectedTrip(trip)}
                   >
                     <CardContent sx={{ p: 3 }}>
-                      <Typography
+                      <Typography className={`${trip.createdBy === 'Me'? "text-black":"text-white"}`}
                         variant="h6"
                         sx={{
                           fontWeight: "600",
-                          color:
-                            selectedTrip?.id === trip.id
-                              ? `white`
-                              : trip.createdBy === "Me"
-                              ? "bg-[#392639]"
-                              : colors.background.paper,
                           mb: 1,
                         }}
                       >
                         {trip.tripName}
                       </Typography>
                       <Typography
+                      className={`${trip.createdBy==='Me'?"text-black":"text-white"}`}
                         sx={{
-                          color:
-                            selectedTrip?.id === trip.id
-                              ? `white`
-                              : trip.createdBy === "Me"
-                              ? "bg-[#392639]"
-                              : colors.background.paper,
                           mb: 2,
                           fontSize: "0.95rem",
                         }}

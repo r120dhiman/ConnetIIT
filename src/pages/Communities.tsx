@@ -6,7 +6,6 @@ import { Typography } from "@mui/material";
 import { MessageSquare, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  getRoomChats,
   sendRoomChat,
   subscribeToRoomChats,
 } from "../lib/appwrite/roomChat";
@@ -492,13 +491,11 @@ COMMUNITIES
                   )}
                   
                   {selectedCommunity.msgLogs.length > 0 ? (
-                    selectedCommunity.msgLogs.map((msg, index) => (
+                    [...selectedCommunity.msgLogs].reverse().map((msg, index) => (
                       <div
                         key={msg.$id || index}
                         className={`flex ${
-                          msg.senderId !== user?.$id
-                            ? "justify-start"
-                            : "justify-end"
+                          msg.senderId !== user?.$id ? "justify-start" : "justify-end"
                         }`}
                       >
                         <div className="transform transition-all duration-200 hover:scale-[1.02] max-w-[80%]">
@@ -511,17 +508,16 @@ COMMUNITIES
                               {msg.content}
                             </Typography>
                             <p className="text-white text-xs">
-                            {msg.timeStamp ? formatDistanceToNow(new Date(msg.timeStamp), { addSuffix: true }) : ""}
+                              {msg.timeStamp
+                                ? formatDistanceToNow(new Date(msg.timeStamp), { addSuffix: true })
+                                : ""}
                             </p>
                           </div>
                           <p className="text-white text-sm truncate">
-                            {msg.senderName
-                              ? `${msg.senderName.split(" ")[0]}`
-                              : "Unknown"}
+                            {msg.senderName ? `${msg.senderName.split(" ")[0]}` : "Unknown"}
                           </p>
                         </div>
-                      </div>
-                    ))
+                      </div>))
                   ) : (
                     <Typography className="text-gray-500 text-center italic">
                       {loading ? "Loading messages..." : "Start the conversation..."}
