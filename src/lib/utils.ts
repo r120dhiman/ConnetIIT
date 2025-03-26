@@ -21,7 +21,9 @@ export function isIITEmail(email: string): boolean {
     "@iitd.ac.in",     // IIT Delhi
     "@iitrpr.ac.in",   // IIT Ropar
     "@iitmandi.ac.in", // IIT Mandi
+    "@students.iitmandi.ac.in", // IIT Mandi
     "@iitr.ac.in",     // IIT Roorkee
+    "@ch.iitr.ac.in",     // IIT Roorkee
     "@iitbhu.ac.in",   // IIT (BHU) Varanasi
     "@itbhu.ac.in",   // IIT (BHU) Varanas
     "@iitjammu.ac.in", // IIT Jammu
@@ -33,6 +35,7 @@ export function isIITEmail(email: string): boolean {
     "@iitgn.ac.in",    // IIT Gandhinagar
     "@iitg.ac.in",      // IIT Guwahati
     "@iitg.ernet.in",      // IIT Guwahati
+    "@iitism.ac.in",      // IIT ISM Dhanbad
   ];
   return iitDomains.some(domain => email.endsWith(domain));
 }
