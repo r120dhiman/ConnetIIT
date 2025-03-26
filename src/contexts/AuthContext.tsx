@@ -16,7 +16,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   CreateEmailPasswordSession: (userId: string, secret: string) => Promise<void>;
   signOut: () => Promise<void>;
-  handleOnboarding: (
+  handleOnboarding: ( 
     gender: string,
     interests: string,
     friendId: string
