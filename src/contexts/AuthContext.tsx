@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Models, OAuthProvider, Query } from "appwrite";
 import { account, databases } from "../lib/appwrite";
+import { addMember } from "../lib/appwrite/community";
+// const{ COMMUNITIES} = import.meta.env.VITE_APPWRITE_COMMUNITTIES;
+
 
 const USER=import.meta.env.VITE_APPWRITE_USERS;
 const COMMUNITIES=import.meta.env.VITE_APPWRITE_COMMUNITTIES;
@@ -365,28 +368,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (communities.total > 0) {
             // Community exists: Add user to it
             const community = communities.documents[0];
-            const updatedMembers = Array.isArray(community.membersList)
-              ? [...new Set([...community.membersList, user.$id])]
-              : [user.$id];
+            // const updatedMembers = Array.isArray(community.membersList)
+            //   ? [...new Set([...community.membersList, user.$id])]
+            //   : [user.$id];
 
-            await databases.updateDocument(
-              DATABASE_ID,
-              COMMUNITIES,
-              community.$id,
-              { membersList: updatedMembers }
-            );
+            // async function getCommunityMembers(communityId) {
+            //   const response = await databases.listDocuments(
+            //     "database_id",
+            //     "communityMembers_collection_id",
+            //     [
+            //       Query.equal("communityId", communityId)
+            //     ]
+            //   );
+            
+            //   return response.documents;  // List of members
+            // }
+
+
+            await addMember(community.$id, user.$id);
+
+             // 2️⃣ Fetch the latest membersCount
+        const res = await databases.getDocument(DATABASE_ID,COMMUNITIES, community.$id);
+        const newCount = (res.members || 0) + 1; // If null, start from 0
+
+        // 3️⃣ Update the membersCount in Community document
+        await databases.updateDocument(DATABASE_ID,COMMUNITIES, community.$id, {
+            members: newCount,
+        });
+
+            // await databases.updateDocument(
+            //   DATABASE_ID,
+            //   COLLECTIONS.COMMUNITIES,
+            //   community.$id,
+            //   { membersList:  }
+            // );
+
+            // await databases.updateDocument(
+            //   DATABASE_ID,
+            //   COMMUNITIES,
+            //   community.$id,
+            //   { membersList: updatedMembers }
+            // );
           } else {
             // Community doesn't exist: Create a new one
+            const newCommunityId = ID.unique();
             await databases.createDocument(
               DATABASE_ID,
               COMMUNITIES,
-              ID.unique(),
+              newCommunityId,
               {
                 name: interest,
-                membersList: [user.$id],
+                // membersList: [user.$id],
                 msgLogs: [],
+                members: 1, // New community starts with 1 member
               }
             );
+
+            // 🔹 Now add the user to the community members collection
+          await addMember(newCommunityId, user.$id);
+
           }
         })
       );
