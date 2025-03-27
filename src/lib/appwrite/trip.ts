@@ -1,8 +1,9 @@
 import { ID, Query } from 'appwrite';
 import { databases } from './config';
-import { COLLECTIONS } from './config';
+
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const TRIPS = import.meta.env.VITE_APPWRITE_TRIPS;
 
 export async function createTrip(tripData: {
   tripName: string;
@@ -17,7 +18,7 @@ export async function createTrip(tripData: {
   try {
     const response = await databases.createDocument(
       DATABASE_ID,
-      COLLECTIONS.TRIPS,
+TRIPS,
       ID.unique(),
       tripData
     );
@@ -33,7 +34,7 @@ export async function getTrip(tripId:string) {
   try {
     const response = await databases.getDocument(
       DATABASE_ID,
-      COLLECTIONS.TRIPS,
+TRIPS,
       tripId // You can adjust the query as needed
     );
     // console.log("Trips retrieved successfully:", response);
@@ -47,7 +48,7 @@ export async function getTrips() {
   try {
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.TRIPS,
+TRIPS,
       [Query.orderDesc('$createdAt')] // You can adjust the query as needed
     );
     // console.log("Trips retrieved successfully:", response);
@@ -62,7 +63,7 @@ export async function addParticipantToTrip(tripId: string, participantIds: strin
   try {
     const response = await databases.updateDocument(
       DATABASE_ID,
-      COLLECTIONS.TRIPS,
+TRIPS,
       tripId,
       {
         participants: participantIds // Assuming participants is an array in the trip document

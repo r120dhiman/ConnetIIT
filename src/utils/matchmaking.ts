@@ -1,8 +1,10 @@
 
-import { databases, COLLECTIONS } from '../lib/appwrite/config';
+import { databases } from '../lib/appwrite/config';
 import { Query, ID } from 'appwrite';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const ANONYMOUS_CHATS = import.meta.env.VITE_APPWRITE_ANONYMOUS_CHATS;
+const QUEUE = import.meta.env.VITE_APPWRITE_QUEUE;
 
 enum ChatStatus { ACTIVE = "active", ENDED = "ended", PENDING = "pending" }
 
@@ -14,7 +16,7 @@ export async function requestAnonymousChat(
   try {
     const activeChats = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.ANONYMOUS_CHATS,
+ANONYMOUS_CHATS,
       [
         Query.equal("status", ChatStatus.ACTIVE),
         Query.or([
@@ -35,7 +37,7 @@ export async function requestAnonymousChat(
     // Add new queue entry
     const queueEntry = await databases.createDocument(
       DATABASE_ID,
-      COLLECTIONS.QUEUE,
+QUEUE,
       ID.unique(),
       {
         userId,
@@ -49,7 +51,7 @@ export async function requestAnonymousChat(
     // Find a match
     const potentialMatches = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.QUEUE,
+QUEUE,
       [
         Query.notEqual("userId", userId),
         Query.equal("mode", mode),
@@ -87,13 +89,13 @@ export async function requestAnonymousChat(
 async function removeFromQueue(userId: string) {
   const existingInQueue = await databases.listDocuments(
     DATABASE_ID,
-    COLLECTIONS.QUEUE,
+QUEUE,
     [Query.equal("userId", userId)]
   );
   if (existingInQueue.total > 0) {
     await databases.deleteDocument(
       DATABASE_ID,
-      COLLECTIONS.QUEUE,
+QUEUE,
       existingInQueue.documents[0].$id
     );
   }
@@ -104,7 +106,7 @@ async function updateQueueStatus(queueId: string, chatId: string) {
     // First verify the document exists
     const queueDoc = await databases.getDocument(
       DATABASE_ID,
-      COLLECTIONS.QUEUE,
+QUEUE,
       queueId
     );
 
@@ -115,7 +117,7 @@ async function updateQueueStatus(queueId: string, chatId: string) {
 
     await databases.updateDocument(
       DATABASE_ID,
-      COLLECTIONS.QUEUE,
+QUEUE,
       queueId,
       { 
         status: "matched", 
@@ -134,7 +136,7 @@ async function createChat(senderId: string, receiverId: string) {
 
   const newChat = await databases.createDocument(
     DATABASE_ID,
-    COLLECTIONS.ANONYMOUS_CHATS,
+ANONYMOUS_CHATS,
     ID.unique(),
     {
       senderId,
@@ -158,7 +160,7 @@ export async function checkForChatMatch(userId: string) {
   try {
     const queueEntries = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.QUEUE,
+QUEUE,
       [
         Query.equal("userId", userId),
         Query.equal("status", "matched")
@@ -168,7 +170,7 @@ export async function checkForChatMatch(userId: string) {
     if (queueEntries.total > 0 && queueEntries.documents[0].chatId) {
       return await databases.getDocument(
         DATABASE_ID,
-        COLLECTIONS.ANONYMOUS_CHATS,
+ANONYMOUS_CHATS,
         queueEntries.documents[0].chatId
       );
     }

@@ -1,16 +1,18 @@
 import { Query } from 'appwrite';
 import { databases } from './config';
-import { COLLECTIONS } from './config';
+
 import type { User } from '../../types';
 
 // Update these values with your actual Appwrite configuration
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
-const USERS_COLLECTION_ID = COLLECTIONS.USERS; // Your users collection ID
+const USERS = import.meta.env.VITE_APPWRITE_USERS;
+const MESSAGES = import.meta.env.VITE_APPWRITE_MESSAGES;
+const USERS_COLLECTION_ID = USERS; // Your users collection ID
 
 export async function searchUsers(query: string) {
   return databases.listDocuments(
     DATABASE_ID,
-    COLLECTIONS.USERS,
+USERS,
     [
       Query.search('name', query),
       Query.limit(10)
@@ -22,7 +24,7 @@ export async function updateUserStatus(userId: string, isOnline: boolean) {
   console.log("isOnline updating", userId);
   const updated = await databases.updateDocument(
     DATABASE_ID,
-    COLLECTIONS.USERS,
+USERS,
     userId,
     { isOnline, lastSeen: new Date().toISOString() }
   );
@@ -40,7 +42,7 @@ export async function updateProfile(userData: Partial<User>) {
 
   return databases.updateDocument(
     DATABASE_ID,
-    COLLECTIONS.USERS,
+USERS,
     userData.id!,
     userData
   );
@@ -53,7 +55,7 @@ export async function getProfile(userId: string) {
 
   return databases.getDocument(
     DATABASE_ID,
-    COLLECTIONS.USERS,
+USERS,
     userId
   );
 }
@@ -103,7 +105,7 @@ export const allfriends = async (userId: string): Promise<string[]> => {
     // Get all messages where user is either sender or receiver in a single query
     const messages = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.MESSAGES,
+MESSAGES,
       [
         Query.or([
           Query.equal('senderId', userId),

@@ -5,9 +5,6 @@ import type { User } from '../../types';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '../../contexts/AuthContext';
 import Loader from '../shared/Loader';
-import { databases } from "../../lib/appwrite";
-import { COLLECTIONS } from "../../lib/appwrite/config";
-const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 interface UserListProps {
   searchQuery: string;

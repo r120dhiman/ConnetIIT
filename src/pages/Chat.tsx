@@ -162,7 +162,6 @@ export function Chat() {
                 </div>
               </div>
             </div>
-            
             <ChatWindow
               otherUserId={selectedUser}
               otherUserName={selectedUser.name}
@@ -174,7 +173,7 @@ export function Chat() {
       ) : (
         // User list view with search
         <>
-          <div className="sticky top-0 z-10 bg-[#1B1730] p-4">
+          {/* <div className="sticky top-0 z-10 bg-[#1B1730] p-4">
             <input
               type="text"
               placeholder="Search users..."
@@ -182,7 +181,7 @@ export function Chat() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full p-2 rounded-md bg-[#262438] text-white"
             />
-          </div>
+          </div> */}
           
           <div className="flex-grow overflow-auto">
             <div className="bg-[#1B1730] h-full">

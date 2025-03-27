@@ -15,7 +15,7 @@
 //     // Check for active chats first
 //     const activeChats = await databases.listDocuments(
 //       DATABASE_ID,
-//       COLLECTIONS.ANONYMOUS_CHATS,
+//       COLLECTIONS.ANONYMOUS_CHATS,  
 //       [
 //         Query.equal("status", ChatStatus.ACTIVE),
 //         Query.or(

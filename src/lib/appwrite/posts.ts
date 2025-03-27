@@ -1,9 +1,10 @@
 import { ID, Query } from 'appwrite';
 import { databases } from './config';
-import { COLLECTIONS } from './config';
 import type { Post } from '../../types';
 
-const DATABASE_ID = '6775235f000aeef1a930';
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const POSTS = import.meta.env.VITE_APPWRITE_POSTS;
+const USERS = import.meta.env.VITE_APPWRITE_USERS;
 
 // export async function getPosts() {
 //   try {
@@ -25,7 +26,7 @@ export async function getPosts(limit = 10, offset = 0) {
   try {
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.POSTS,
+POSTS,
       [
         // Add your queries, for example:
         Query.orderDesc('$createdAt'), // Sort by creation date, newest first
@@ -57,7 +58,7 @@ export async function createPost(post: {
 
     const response = await databases.createDocument(
       DATABASE_ID,
-      COLLECTIONS.POSTS,
+POSTS,
       ID.unique(),
       {
         userId: post.userId,
@@ -83,7 +84,7 @@ export async function likePost(postId: string, userId: string) {
   try {
     const post = await databases.getDocument(
       DATABASE_ID,
-      COLLECTIONS.POSTS,
+POSTS,
       postId
     );
     console.log("liked post", post);
@@ -91,7 +92,7 @@ export async function likePost(postId: string, userId: string) {
     // Check if the user has already liked the post
     const user = await databases.getDocument(
       DATABASE_ID,
-      COLLECTIONS.USERS,
+USERS,
       userId
     );
 
@@ -103,7 +104,7 @@ export async function likePost(postId: string, userId: string) {
     // Increment the likes count
     await databases.updateDocument(
       DATABASE_ID,
-      COLLECTIONS.POSTS,
+POSTS,
       postId,
       { likes: (post.likes || 0) + 1 }
     );
@@ -111,7 +112,7 @@ export async function likePost(postId: string, userId: string) {
     // Update user's posts_liked array
     await databases.updateDocument(
       DATABASE_ID,
-      COLLECTIONS.USERS,
+USERS,
       userId,
       { posts_liked: [...(user.posts_liked || []), postId] }
     );

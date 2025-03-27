@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { databases } from "../lib/appwrite";
-import { COLLECTIONS } from "../lib/appwrite/config";
+
 import { Query } from "appwrite"; // Make sure to import Query
 import { Typography } from "@mui/material";
 import { MessageSquare, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  getRoomChats,
   sendRoomChat,
   subscribeToRoomChats,
 } from "../lib/appwrite/roomChat";
@@ -14,6 +13,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const USERS = import.meta.env.VITE_APPWRITE_USERS;
+const ROOMCHAT = import.meta.env.VITE_APPWRITE_ROOMCHAT;
+const COMMUNITIES = import.meta.env.VITE_APPWRITE_COMMUNITTIES;
 const MESSAGES_PER_PAGE = 7;
 
 // Database structure
@@ -63,7 +65,7 @@ const getPagedRoomChats = async (roomId: string, limit: number, offset: number) 
     // We'll implement our own pagination since getRoomChats doesn't support it
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.ROOMCHAT,
+ROOMCHAT,
       [
         Query.equal('roomId', roomId),
         Query.orderDesc('$createdAt'), // Order by creation date descending (newest first)
@@ -123,7 +125,7 @@ const Communities = () => {
     try {
       const sender = await databases.getDocument(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+USERS,
         userId
       );
       userNameCache.current[userId] = sender.name || "Unknown";
@@ -148,7 +150,7 @@ const Communities = () => {
         setLoading(true);
         const response = await databases.listDocuments(
           DATABASE_ID,
-          COLLECTIONS.COMMUNITIES
+COMMUNITIES
         );
         const communityDocuments = response.documents as CommunityDocument[];
 
@@ -489,13 +491,15 @@ const Communities = () => {
                   )}
                   
                   {selectedCommunity.msgLogs.length > 0 ? (
+<<<<<<< HEAD
                     selectedCommunity.msgLogs.slice().reverse().map((msg, index) => (
+=======
+                    [...selectedCommunity.msgLogs].reverse().map((msg, index) => (
+>>>>>>> 428e27261cb45ced1ed09cbc2a4a19d840dfb605
                       <div
                         key={msg.$id || index}
                         className={`flex ${
-                          msg.senderId !== user?.$id
-                            ? "justify-start"
-                            : "justify-end"
+                          msg.senderId !== user?.$id ? "justify-start" : "justify-end"
                         }`}
                       >
                         <div className="transform transition-all duration-200 hover:scale-[1.02] max-w-[80%]">
@@ -508,17 +512,16 @@ const Communities = () => {
                               {msg.content}
                             </Typography>
                             <p className="text-white text-xs">
-                            {msg.timeStamp ? formatDistanceToNow(new Date(msg.timeStamp), { addSuffix: true }) : ""}
+                              {msg.timeStamp
+                                ? formatDistanceToNow(new Date(msg.timeStamp), { addSuffix: true })
+                                : ""}
                             </p>
                           </div>
                           <p className="text-white text-sm truncate">
-                            {msg.senderName
-                              ? `${msg.senderName.split(" ")[0]}`
-                              : "Unknown"}
+                            {msg.senderName ? `${msg.senderName.split(" ")[0]}` : "Unknown"}
                           </p>
                         </div>
-                      </div>
-                    ))
+                      </div>))
                   ) : (
                     <Typography className="text-gray-500 text-center italic">
                       {loading ? "Loading messages..." : "Start the conversation..."}

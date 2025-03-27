@@ -24,7 +24,7 @@ const AnonymousChat: React.FC = () => {
   useEffect(() => {
     if (userProfile) {
       setAnonymousId(userProfile.anonymousId || `anon_${Math.random().toString(36).substring(2, 10)}`);
-      // console.log("User anonymous ID set:", anonymousId);
+
     }
   }, [userProfile]);
 
@@ -35,13 +35,12 @@ const AnonymousChat: React.FC = () => {
     });
 
     socket.on('queued', (data) => {
-      console.log('Added to queue:', data);
+
       setIsInQueue(true);
       setQueuePosition(data.position);
     });
 
     socket.on('matched', ({ roomId, matchedUser }) => {
-      // console.log(`Matched! Room ID: ${roomId}, Matched User:`, matchedUser);
       setLoading(false);
       setIsInQueue(false);
       // Navigate to chat room with match information
@@ -58,20 +57,20 @@ const AnonymousChat: React.FC = () => {
     });
 
     socket.on('queue-left', (data) => {
-      console.log('Left queue:', data);
+
       setIsInQueue(false);
       setLoading(false);
     });
 
     socket.on('error', (error) => {
-      console.error("Socket error:", error);
+
       setLoading(false);
       setIsInQueue(false);
       alert(`Error: ${error.message || 'Something went wrong'}`);
     });
 
     socket.on('disconnect', () => {
-      console.log('Disconnected from socket server');
+
       setIsInQueue(false);
       setLoading(false);
     });
@@ -112,7 +111,7 @@ const AnonymousChat: React.FC = () => {
       mode
     };
 
-    console.log("Joining queue with:", user);
+
     socket.emit('join-queue', user);
   };
 

@@ -1,14 +1,16 @@
 import { Query } from 'appwrite';
 import { databases } from './config';
-import { COLLECTIONS } from './config';
+
 // import type { Post, User } from '../../types';
 
-const DATABASE_ID = "6775235f000aeef1a930";
+const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABSE_ID;
+const POSTS = import.meta.env.VITE_APPWRITE_POSTS;
+const USERS = import.meta.env.VITE_APPWRITE_USERS;
 
 export async function searchPosts(query: string) {
   return databases.listDocuments(
     DATABASE_ID,
-    COLLECTIONS.POSTS,
+POSTS,
     [
       Query.search('title', query),
       Query.limit(10)
@@ -26,7 +28,7 @@ export async function searchUsers(query: string) {
 
     return databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.USERS,
+USERS,
       [
         Query.search('name', searchQuery),
         Query.limit(20),
@@ -42,7 +44,7 @@ export async function searchUsers(query: string) {
 export async function searchByTags(tags: string[]) {
   return databases.listDocuments(
     DATABASE_ID,
-    COLLECTIONS.POSTS,
+POSTS,
     [
       Query.search('tags', tags.join(',')),
       Query.limit(10)

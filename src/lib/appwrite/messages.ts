@@ -1,6 +1,6 @@
 import { ID, Query } from 'appwrite';
-import { COLLECTIONS, DATABASE_ID, databases } from './config';
-// import { DATABASE_ID, COLLECTIONS } from '../constants';
+import {  DATABASE_ID, databases } from './config';
+const  MESSAGES=import.meta.env.VITE_APPWRITE_USERS
 
 // Interface for a message
 interface Message {
@@ -36,7 +36,7 @@ export const getMessages = async (currentUserId: string, otherUserId: string): P
     // (currentUser is sender AND otherUser is receiver) OR (currentUser is receiver AND otherUser is sender)
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.MESSAGES,
+MESSAGES,
       [
         Query.or([
           Query.and([
@@ -82,7 +82,7 @@ export const sendMessage = async (messageData: MessagePayload): Promise<Message>
     // Create the message document
     const response = await databases.createDocument(
       DATABASE_ID,
-      COLLECTIONS.MESSAGES,
+MESSAGES,
       ID.unique(), // Generate a unique ID
       {
         content: messageData.content,
@@ -119,7 +119,7 @@ export const markMessagesAsRead = async (currentUserId: string, senderId: string
     // Find all unread messages sent to currentUser by senderId
     const unreadMessages = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.MESSAGES,
+MESSAGES,
       [
         Query.equal('receiverId', currentUserId),
         Query.equal('senderId', senderId),
@@ -131,7 +131,7 @@ export const markMessagesAsRead = async (currentUserId: string, senderId: string
     const updatePromises = unreadMessages.documents.map(doc => 
       databases.updateDocument(
         DATABASE_ID,
-        COLLECTIONS.MESSAGES,
+MESSAGES,
         doc.$id,
         { read: true }
       )
@@ -156,7 +156,7 @@ export const getUnreadMessageCounts = async (userId: string): Promise<Record<str
     // Find all unread messages for this user
     const unreadMessages = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.MESSAGES,
+MESSAGES,
       [
         Query.equal('receiverId', userId),
         Query.equal('read', false)

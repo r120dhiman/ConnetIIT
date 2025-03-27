@@ -1,13 +1,14 @@
-import { databases, COLLECTIONS } from './config';
+import { databases } from './config';
 import { Query } from 'appwrite';
 import { Comment } from '../../types/comment';
-import { useAuth } from '../../contexts/AuthContext';
+
 
 // Update these values with your actual Appwrite configuration
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const COMMENTS = import.meta.env.VITE_APPWRITE_COMMETNS;
 // const {user}=useAuth();
 // console.log("i am from comments.ts",user);
-const COMMENTS_COLLECTION_ID = COLLECTIONS.COMMENTS; // Fix: Use COMMENTS collection, not USERS
+const COMMENTS_COLLECTION_ID = COMMENTS; // Fix: Use COMMENTS collection, not USERS
 
 export const getCommentsByPostId = async (postId: string): Promise<Comment[]> => {
   try {

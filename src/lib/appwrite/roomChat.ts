@@ -1,8 +1,9 @@
 import { ID, Query } from 'appwrite';
 import { databases } from '../appwrite';
-import { client, COLLECTIONS } from './config';
+import { client } from './config';
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const ROOMCHAT = import.meta.env.VITE_APPWRITE_ROOMCHAT;
 
 interface RoomChatMessage {
   roomId: string;
@@ -15,7 +16,7 @@ export const getRoomChats = async (roomId: string) => {
   try {
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTIONS.ROOMCHAT,
+ROOMCHAT,
       [Query.equal('roomId', roomId)] // Use the provided roomId instead of a hardcoded value
     );
     return response.documents;
@@ -36,7 +37,7 @@ export const sendRoomChat = async (roomId: string, content: string, senderId: st
 
     const response = await databases.createDocument(
       DATABASE_ID,
-      COLLECTIONS.ROOMCHAT,
+ROOMCHAT,
       ID.unique(),
       chatMessage
     );
@@ -52,7 +53,7 @@ export const sendRoomChat = async (roomId: string, content: string, senderId: st
 export const subscribeToRoomChats = (roomId: string, callback: (message: RoomChatMessage) => void) => {
   try {
     const unsubscribe = client.subscribe(
-      [`databases.${DATABASE_ID}.collections.${COLLECTIONS.ROOMCHAT}.documents`],
+      [`databases.${DATABASE_ID}.collections.${ROOMCHAT}.documents`],
       (response) => {
         // Only process if it's a create event and matches the room
         if (

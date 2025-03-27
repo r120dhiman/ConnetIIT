@@ -41,7 +41,7 @@ import { toast } from "react-toastify"; // Import toast
 import Loader from "../components/shared/Loader";
 import { LoadingScreen } from "../components/shared/LoadingScreen";
 import { formatDistanceToNow } from "date-fns";
-// import { COLLECTIONS, databases } from "../lib/appwrite/config";
+
 
 interface Trip {
   tripName: string;
@@ -421,7 +421,7 @@ const Trips: React.FC = () => {
                           ? `${colors.primary.main}10`
                           : trip.createdBy === "Me"
                           ? "bg-[#392639]"
-                          : colors.background.paper,
+                          : colors.background.paper, 
                       cursor: "pointer",
                       transition: "all 0.2s ease",
                       boxShadow:
@@ -436,29 +436,18 @@ const Trips: React.FC = () => {
                     onClick={() => setSelectedTrip(trip)}
                   >
                     <CardContent sx={{ p: 3 }}>
-                      <Typography
+                      <Typography className={`${trip.createdBy === 'Me'? "text-black":"text-white"}`}
                         variant="h6"
                         sx={{
                           fontWeight: "600",
-                          color:
-                            selectedTrip?.id === trip.id
-                              ? `white`
-                              : trip.createdBy === "Me"
-                              ? "bg-[#392639]"
-                              : colors.background.paper,
                           mb: 1,
                         }}
                       >
                         {trip.tripName}
                       </Typography>
                       <Typography
+                      className={`${trip.createdBy==='Me'?"text-black":"text-white"}`}
                         sx={{
-                          color:
-                            selectedTrip?.id === trip.id
-                              ? `white`
-                              : trip.createdBy === "Me"
-                              ? "bg-[#392639]"
-                              : colors.background.paper,
                           mb: 2,
                           fontSize: "0.95rem",
                         }}

@@ -1,7 +1,8 @@
-import { databases, COLLECTIONS } from "./config";
+import { databases} from "./config";
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const COLLECTION_ID = import.meta.env.VITE_APPWRITE_ANONYMOUS_CHATS;
+const ANONYMOUS_CHATS = import.meta.env.VITE_APPWRITE_ANONYMOUS_CHATS;
 
 // Enum for chat status
 enum ChatStatus {
@@ -44,7 +45,7 @@ export async function createChat(user1: string, user2: string) {
   try {
     const newChat = await databases.createDocument(
       DATABASE_ID,
-      COLLECTIONS.ANONYMOUS_CHATS,
+      ANONYMOUS_CHATS,
       "unique()",
       chatData
     );

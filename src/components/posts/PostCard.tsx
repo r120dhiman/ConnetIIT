@@ -7,10 +7,10 @@ import { getUsersByIds } from '../../lib/appwrite/users';
 import { getCommentsByPostId } from '../../lib/appwrite/comments';
 import { CommentUser } from '../../types/comment';
 import { databases } from '../../lib/appwrite'
-import { COLLECTIONS } from '../../lib/appwrite/config';
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+const USER = import.meta.env.VITE_APPWRITE_USERS;
+const POSTS = import.meta.env.VITE_APPWRITE_POSTS;
 import { useAuth } from '../../contexts/AuthContext';
-
 
 
 interface PostCardProps {
@@ -62,7 +62,7 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
         try {
           const userDoc = await databases.getDocument(
             DATABASE_ID,
-            COLLECTIONS.USERS,
+            USER,
             user.$id
           );
           setLiked(userDoc.posts_liked.includes(post.$id)); // Set liked state based on user's liked posts
@@ -83,7 +83,7 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
     try {
       const isLiked = await databases.getDocument(
         DATABASE_ID,
-        COLLECTIONS.USERS,
+        USER,
         user.$id
       );
 
@@ -92,7 +92,7 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
         post.likes -= 1;
         await databases.updateDocument(
           DATABASE_ID,
-          COLLECTIONS.POSTS,
+          POSTS,
           post.$id,
           {
             likes: post.likes // Correctly update the likes count
@@ -101,7 +101,7 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
         isLiked.posts_liked = isLiked.posts_liked.filter(id => id !== post.$id);
         await databases.updateDocument(
           DATABASE_ID,
-          COLLECTIONS.USERS,
+          USER,
           user.$id,
           {
             posts_liked: isLiked.posts_liked // Update the user's posts_liked array
@@ -114,7 +114,7 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
         isLiked.posts_liked.push(post.$id);
         await databases.updateDocument(
           DATABASE_ID,
-          COLLECTIONS.POSTS,
+          POSTS,
           post.$id,
           {
             likes: post.likes // Correctly update the likes count
@@ -122,7 +122,7 @@ export function PostCard({ post, onLike, onShare, users }: PostCardProps) {
         );
         await databases.updateDocument(
           DATABASE_ID,
-          COLLECTIONS.USERS,
+          USER,
           user.$id,
           {
             posts_liked: isLiked.posts_liked // Update the user's posts_liked array
