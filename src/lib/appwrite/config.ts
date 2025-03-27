@@ -14,16 +14,17 @@ export const functions = new Functions(client);
 export const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 
 export const COLLECTIONS = {
-  POSTS: '67d8715d001f8d445d4b', //done
-  CHALLENGES: '67d72ff10031f16751cd',//done
-  COMMENTS: '67d72f6d000023e6d4d7',//done
-  MESSAGES: '67d73087000ea52a269e',//done /
-  USERS:'67d72ad6003d7b11ce21', //done
-  ANONYMOUS_CHATS:'67d72d80003bc5b385d8',//done
-  COMMUNITIES:'67d72f09002b0ffee954',//done /
-  QUEUE:'67d72e120024fcb04feb', //done
-  TRIPS:'67d732dc003598f63d28',//done /
-  ROOMCHAT:'67d7312400351aed23a4',//done
-  TOTAL_ROOMS:'67d733ea0007250da40e',//done
+  POSTS: import.meta.env.VITE_APPWRITE_POSTS, //done
+  CHALLENGES: import.meta.env.VITE_APPWRITE_CHALLENGES,//done
+  COMMENTS: import.meta.env.VITE_APPWRITE_COMMETNS,//done
+  MESSAGES: import.meta.env.VITE_APPWRITE_MESSAGES,//done /
+  USERS:import.meta.env.VITE_APPWRITE_USERS, //done
+  ANONYMOUS_CHATS:import.meta.env.VITE_APPWRITE_ANONYMOUS_CHATS,//done
+  COMMUNITIES:import.meta.env.VITE_APPWRITE_COMMUNITTIES,//done /
+  QUEUE:import.meta.env.VITE_APPWRITE_QUEUE, //done
+  TRIPS:import.meta.env.VITE_APPWRITE_TRIPS,//done /
+  ROOMCHAT:import.meta.env.VITE_APPWRITE_ROOMCHAT,//done
+  TOTAL_ROOMS:import.meta.env.VITE_APPWRITE_TOTAL_ROOMS,//done
+  COMMUNITY_MEMBERS:import.meta.env.VITE_APPWRITE_COMMUNITY_MEMBERS,//done
 } as const;
 

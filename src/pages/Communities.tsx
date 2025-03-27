@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { databases } from "../lib/appwrite";
+import { COLLECTIONS } from "../lib/appwrite/config";
 
 import { Query } from "appwrite"; // Make sure to import Query
 import { Typography } from "@mui/material";
@@ -144,34 +145,64 @@ USERS,
   }, []);
 
   // Fetch communities once on component mount
+  // Fetch communities once on component mount
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
         setLoading(true);
-        const response = await databases.listDocuments(
+        // const response = await databases.listDocuments(
+        //   DATABASE_ID,
+        //   COMMUNITIES
+        // );
+        // const communityDocuments = response.documents as CommunityDocument[];
+
+        // Fetch the communities the user is a part of
+        const userMemberships = await databases.listDocuments(
           DATABASE_ID,
-COMMUNITIES
+          COLLECTIONS.COMMUNITY_MEMBERS, // Ensure this is the correct collection ID
+          [Query.equal("userId", user!.$id)]
         );
-        const communityDocuments = response.documents as CommunityDocument[];
+
+        if (userMemberships.total === 0) {
+          setCommunities([]);
+          return;
+        }
+
+        const communityIds = userMemberships.documents.map(
+          (doc) => doc.communityId
+        );
+
+        if (communityIds.length === 0) {
+          setCommunities([]);
+          return;
+        }
+
+        // Fetch community details for these communityIds
+        const communityQueries = communityIds.map((id) =>
+          databases.getDocument(DATABASE_ID, COLLECTIONS.COMMUNITIES, id)
+        );
+
+        const communityDocuments = await Promise.all(communityQueries);
+
+        // Ensure proper mapping to the Community interface
+        const uiCommunities: Community[] = communityDocuments.map((comm) => ({
+          $id: comm.$id,
+          name: comm.name || "Unnamed Community",
+          membersList: comm.membersList || [],
+          msgLogs: [], // Initially empty, will be populated later
+          posts: comm.posts || [],
+        }));
 
         // Filter communities to only include those where the user is a participant
-        const userCommunities = communityDocuments.filter((community) =>
-          community.membersList.includes(user ? user.$id : "")
-        );
+        // const userCommunities = communityDocuments.filter((community) =>
+        //   community.membersList.includes(user ? user.$id : "")
+        // );
 
-        if (userCommunities.length > 0) {
-          // Convert to UI representation with minimal data initially
-          const uiCommunities = userCommunities.map((comm) => ({
-            ...comm,
-            msgLogs: [] as MessageDetails[],
-          })) as Community[];
+        setCommunities(uiCommunities);
 
-          setCommunities(uiCommunities);
-
-          // Only load messages if we have communities
-          if (uiCommunities.length > 0) {
-            setSelectedCommunity(uiCommunities[0]);
-          }
+        // Only load messages if we have communities
+        if (uiCommunities.length > 0) {
+          setSelectedCommunity(uiCommunities[0]);
         }
       } catch (error) {
         console.error("Error fetching communities:", error);
@@ -183,7 +214,7 @@ COMMUNITIES
     if (user) {
       fetchCommunities();
     }
-    
+
     // Cleanup function
     return () => {
       unsubscribeRef.current();
@@ -491,11 +522,11 @@ COMMUNITIES
                   )}
                   
                   {selectedCommunity.msgLogs.length > 0 ? (
-<<<<<<< HEAD
+// <<<<<<< HEAD
                     selectedCommunity.msgLogs.slice().reverse().map((msg, index) => (
-=======
+// =======
                     [...selectedCommunity.msgLogs].reverse().map((msg, index) => (
->>>>>>> 428e27261cb45ced1ed09cbc2a4a19d840dfb605
+// >>>>>>> 428e27261cb45ced1ed09cbc2a4a19d840dfb605
                       <div
                         key={msg.$id || index}
                         className={`flex ${
@@ -522,7 +553,7 @@ COMMUNITIES
                           </p>
                         </div>
                       </div>))
-                  ) : (
+                  ))) : (
                     <Typography className="text-gray-500 text-center italic">
                       {loading ? "Loading messages..." : "Start the conversation..."}
                     </Typography>
