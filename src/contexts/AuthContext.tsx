@@ -364,16 +364,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (communities.total > 0) {
             // Community exists: Add user to it
             const community = communities.documents[0];
-            const updatedMembers = Array.isArray(community.membersList)
-              ? [...new Set([...community.membersList, user.$id])]
-              : [user.$id];
+            // const updatedMembers = Array.isArray(community.membersList)
+            //   ? [...new Set([...community.membersList, user.$id])]
+            //   : [user.$id];
 
-            await databases.updateDocument(
-              DATABASE_ID,
-              COLLECTIONS.COMMUNITIES,
-              community.$id,
-              { membersList: updatedMembers }
-            );
+            async function getCommunityMembers(communityId) {
+              const response = await databases.listDocuments(
+                "database_id",
+                "communityMembers_collection_id",
+                [
+                  Query.equal("communityId", communityId)
+                ]
+              );
+            
+              return response.documents;  // List of members
+            }
+            
+
+            // await databases.updateDocument(
+            //   DATABASE_ID,
+            //   COLLECTIONS.COMMUNITIES,
+            //   community.$id,
+            //   { membersList:  }
+            // );
           } else {
             // Community doesn't exist: Create a new one
             await databases.createDocument(
