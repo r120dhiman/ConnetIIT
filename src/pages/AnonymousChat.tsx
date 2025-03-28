@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/shared/Loader';
 
-const SOCKET_SERVER_URL = import.meta.env.SERVER;
+const SOCKET_SERVER_URL = import.meta.env.VITE_APPWRITE_SERVER;
 // const SOCKET_SERVER_URL = 'http://localhost:3000';
 // Initialize socket connection
 const socket = io(SOCKET_SERVER_URL);
