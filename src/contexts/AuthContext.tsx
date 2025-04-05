@@ -422,9 +422,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.location.href = "/";
       toast.success("Onboarding completed successfully!");
     } catch (error) {
-      console.error("❌ Onboarding error:", error);
+
+      console.error("Onboarding error:", error);
       window.location.href = "/";
-      toast.error("Onboarding failed. Please try again.");
+      toast.error("Onboarding failed. Please try again."); // Add error toast
       throw error;
     }
   };
