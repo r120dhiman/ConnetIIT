@@ -336,12 +336,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     friendId: string
   ) => {
     try {
+      console.log("🚀 Onboarding started...");
+
       if (!user) throw new Error("User not authenticated");
+
+      console.log("✅ User authenticated:", user.$id);
 
       const interestsArray = interests.split(",");
       const friendIdArray = friendId.split(",");
 
+      console.log("📌 Parsed interests:", interestsArray);
+      console.log("📌 Parsed friend IDs:", friendIdArray);
+
       // Update user profile with onboarding info
+      console.log("📝 Updating user profile...");
       const updatedProfile = await databases.updateDocument(
         DATABASE_ID,
         USER,
@@ -354,11 +362,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       );
 
+      console.log("✅ User profile updated:", updatedProfile);
       setUserProfile(updatedProfile);
 
       // Process community memberships
+      console.log("🔄 Processing community memberships...");
       await Promise.all(
         interestsArray.map(async (interest) => {
+          console.log(`🔍 Checking community for interest: ${interest}`);
           const communities = await databases.listDocuments(
             DATABASE_ID,
             COMMUNITIES,
@@ -366,51 +377,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           );
 
           if (communities.total > 0) {
+            console.log(`✅ Community found for ${interest}:`, communities.documents[0]);
+
             // Community exists: Add user to it
             const community = communities.documents[0];
-            // const updatedMembers = Array.isArray(community.membersList)
-            //   ? [...new Set([...community.membersList, user.$id])]
-            //   : [user.$id];
-
-            // async function getCommunityMembers(communityId) {
-            //   const response = await databases.listDocuments(
-            //     "database_id",
-            //     "communityMembers_collection_id",
-            //     [
-            //       Query.equal("communityId", communityId)
-            //     ]
-            //   );
-            
-            //   return response.documents;  // List of members
-            // }
-
-
             await addMember(community.$id, user.$id);
+            console.log(`👥 User added to existing community: ${community.$id}`);
 
-             // 2️⃣ Fetch the latest membersCount
-        const res = await databases.getDocument(DATABASE_ID,COMMUNITIES, community.$id);
-        const newCount = (res.members || 0) + 1; // If null, start from 0
+            // Fetch the latest membersCount
+            const res = await databases.getDocument(DATABASE_ID, COMMUNITIES, community.$id);
+            console.log(`📊 Current members count: ${res.members}`);
 
-        // 3️⃣ Update the membersCount in Community document
-        await databases.updateDocument(DATABASE_ID,COMMUNITIES, community.$id, {
-            members: newCount,
-        });
+            const newCount = (res.members || 0) + 1;
+            await databases.updateDocument(DATABASE_ID, COMMUNITIES, community.$id, {
+                members: newCount,
+            });
 
-            // await databases.updateDocument(
-            //   DATABASE_ID,
-            //   COLLECTIONS.COMMUNITIES,
-            //   community.$id,
-            //   { membersList:  }
-            // );
-
-            // await databases.updateDocument(
-            //   DATABASE_ID,
-            //   COMMUNITIES,
-            //   community.$id,
-            //   { membersList: updatedMembers }
-            // );
+            console.log(`✅ Updated members count for ${community.$id}: ${newCount}`);
           } else {
-            // Community doesn't exist: Create a new one
+            console.log(`❌ No community found for ${interest}, creating a new one...`);
+            
             const newCommunityId = ID.unique();
             await databases.createDocument(
               DATABASE_ID,
@@ -418,28 +404,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               newCommunityId,
               {
                 name: interest,
-                // membersList: [user.$id],
-                msgLogs: [],
                 members: 1, // New community starts with 1 member
               }
             );
 
-            // 🔹 Now add the user to the community members collection
-          await addMember(newCommunityId, user.$id);
+            console.log(`✅ New community created: ${newCommunityId}`);
 
+            // Add the user to the new community
+            await addMember(newCommunityId, user.$id);
+            console.log(`👥 User added to new community: ${newCommunityId}`);
           }
         })
       );
 
+      console.log("🎉 Onboarding process completed!");
       // Redirect to home page after successful onboarding
       window.location.href = "/";
-      toast.success("Onboarding completed successfully!"); // Add success toast
+      toast.success("Onboarding completed successfully!");
     } catch (error) {
-      console.error("Onboarding error:", error);
-      toast.error("Onboarding failed. Please try again."); // Add error toast
+      console.error("❌ Onboarding error:", error);
+      window.location.href = "/";
+      toast.error("Onboarding failed. Please try again.");
       throw error;
     }
   };
+
 
   return (
     <AuthContext.Provider

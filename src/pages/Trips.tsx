@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+// import CircularProgress from "@mui/material/CircularProgress";
 import {
   Box,
   Button,
@@ -22,6 +23,7 @@ import {
   useTheme,
   useMediaQuery,
   SwipeableDrawer,
+  Pagination,
 } from "@mui/material";
 import { Plus, MessageCircle, ArrowLeft } from "lucide-react";
 import {
@@ -41,7 +43,6 @@ import { toast } from "react-toastify"; // Import toast
 import Loader from "../components/shared/Loader";
 import { LoadingScreen } from "../components/shared/LoadingScreen";
 import { formatDistanceToNow } from "date-fns";
-
 
 interface Trip {
   tripName: string;
@@ -71,7 +72,121 @@ interface FetchedTrip {
 const Trips: React.FC = () => {
   const { user } = useAuth();
 
+  // For pagination of members
+  const [paginatedParticipants, setPaginatedParticipants] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const membersPerPage = 5; // Number of members to show per page
+  
+  // Calculate total pages and update paginated participants
+  const updateMembersPagination = (participants: string[]) => {
+    const total = Math.ceil(participants.length / membersPerPage);
+    setTotalPages(total);
+    updatePaginatedMembers(1, participants);
+  };
+  const [selectedTrip, setSelectedTrip] = useState<FetchedTrip | null>(null);
+
+// Update paginated members based on current page
+const updatePaginatedMembers = (page: number, allParticipants: string[]) => {
+  const startIndex = (page - 1) * membersPerPage;
+  const endIndex = Math.min(startIndex + membersPerPage, allParticipants.length);
+  setPaginatedParticipants(allParticipants.slice(startIndex, endIndex));
+};
+
+// Handle page change
+const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  setCurrentPage(value);
+  if (selectedTrip) {
+    updatePaginatedMembers(value, selectedTrip.participants);
+    // Fetch participant names for this page if not already loaded
+    fetchPageParticipantNames(selectedTrip.participants.slice((value - 1) * membersPerPage, value * membersPerPage));
+  }
+};
+
+// Fetch only the names of participants on the current page
+const fetchPageParticipantNames = async (pageParticipants: string[]) => {
+  const notLoadedParticipants = pageParticipants.filter(id => !participantNames[id]);
+  if (notLoadedParticipants.length === 0) return;
+
+  setIsFetchingParticipantNames(true);
+  try {
+    const names = { ...participantNames };
+    for (const userId of notLoadedParticipants) {
+      if (userId === user?.$id) {
+        names[userId] = "You";
+      } else {
+        const profile = await getProfile(userId);
+        names[userId] = profile.name;
+      }
+    }
+    setParticipantNames(names);
+  } catch (error) {
+    console.error("Error fetching participant names:", error);
+  } finally {
+    setIsFetchingParticipantNames(false);
+  }
+};
+
   const [trips, setTrips] = useState<FetchedTrip[]>([]);
+
+  const [isMembersModalOpen, setIsMembersModalOpen] = useState<boolean>(false);
+  const [participantNames, setParticipantNames] = useState<{
+    [key: string]: string;
+  }>({});
+  const [isFetchingParticipantNames, setIsFetchingParticipantNames] = useState(false);
+
+  // const fetchParticipantNames = async (participants: string[]) => {
+  //   const names: { [key: string]: string } = {};
+  //   setIsFetchingParticipantNames(true);
+  //   try {
+  //     for (const userId of participants) {
+  //       if (userId === user?.$id) {
+  //         names[userId] = "You";
+  //       } else {
+  //         const profile = await getProfile(userId);
+  //         names[userId] = profile.name;
+  //       }
+  //     }
+  //     setParticipantNames(names);
+  //   } catch (error) {
+  //     console.error("Error fetching participant names:", error);
+  //   } finally {
+  //     setIsFetchingParticipantNames(false);
+  //   }
+  // };
+  
+  const fetchParticipantNames = async (participants: string[]) => {
+    setIsFetchingParticipantNames(true);
+    try {
+      // Only fetch names for first page initially
+      const firstPageParticipants = participants.slice(0, membersPerPage);
+      const names: { [key: string]: string } = {};
+      
+      for (const userId of firstPageParticipants) {
+        if (userId === user?.$id) {
+          names[userId] = "You";
+        } else {
+          const profile = await getProfile(userId);
+          names[userId] = profile.name;
+        }
+      }
+      setParticipantNames(names);
+    } catch (error) {
+      console.error("Error fetching participant names:", error);
+    } finally {
+      setIsFetchingParticipantNames(false);
+    }
+  };
+
+  // Update pagination when selected trip changes
+useEffect(() => {
+  if (selectedTrip && selectedTrip.participants?.length > 0) {
+    setCurrentPage(1);
+    updateMembersPagination(selectedTrip.participants);
+    fetchParticipantNames(selectedTrip.participants);
+  }
+}, [selectedTrip]);
+  
   const [open, setOpen] = useState<boolean>(false);
   const [newTrip, setNewTrip] = useState<Trip>({
     tripName: "",
@@ -84,7 +199,6 @@ const Trips: React.FC = () => {
     modeOfTravel: "",
     participants: [user!.$id],
   });
-  const [selectedTrip, setSelectedTrip] = useState<FetchedTrip | null>(null);
   const [tripMessages, setTripMessages] = useState<any[]>([]);
   // const [isTripChatOpen, setIsTripChatOpen] = useState(false);
   const [newTripMessage, setNewTripMessage] = useState("");
@@ -189,6 +303,11 @@ const Trips: React.FC = () => {
       setIsDrawerOpen(true);
     }
   }, [selectedTrip, isMobile]);
+  useEffect(() => {
+    if (selectedTrip && selectedTrip.participants?.length > 0) {
+      fetchParticipantNames(selectedTrip.participants);
+    }
+  }, [selectedTrip]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -421,7 +540,7 @@ const Trips: React.FC = () => {
                           ? `${colors.primary.main}10`
                           : trip.createdBy === "Me"
                           ? "bg-[#392639]"
-                          : colors.background.paper, 
+                          : colors.background.paper,
                       cursor: "pointer",
                       transition: "all 0.2s ease",
                       boxShadow:
@@ -436,7 +555,10 @@ const Trips: React.FC = () => {
                     onClick={() => setSelectedTrip(trip)}
                   >
                     <CardContent sx={{ p: 3 }}>
-                      <Typography className={`${trip.createdBy === 'Me'? "text-black":"text-white"}`}
+                      <Typography
+                        className={`${
+                          trip.createdBy === "Me" ? "text-black" : "text-white"
+                        }`}
                         variant="h6"
                         sx={{
                           fontWeight: "600",
@@ -446,7 +568,9 @@ const Trips: React.FC = () => {
                         {trip.tripName}
                       </Typography>
                       <Typography
-                      className={`${trip.createdBy==='Me'?"text-black":"text-white"}`}
+                        className={`${
+                          trip.createdBy === "Me" ? "text-black" : "text-white"
+                        }`}
                         sx={{
                           mb: 2,
                           fontSize: "0.95rem",
@@ -591,7 +715,7 @@ const Trips: React.FC = () => {
                               {trip.createdBy}
                             </span>
                           </Typography>
-                          <Box
+                          {/* <Box
                             sx={{
                               display: "flex",
                               alignItems: "center",
@@ -609,7 +733,35 @@ const Trips: React.FC = () => {
                             }}
                           >
                             <span>👥</span> {length}
-                          </Box>
+                          </Box> */}
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedTrip(trip);
+                              setIsMembersModalOpen(true);
+                            }}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                              px: 1.5,
+                              py: 0.5,
+                              minWidth: "auto",
+                              borderRadius: "100px",
+                              fontSize: "0.875rem",
+                              color:
+                                selectedTrip?.id === trip.id
+                                  ? `white`
+                                  : trip.createdBy === "Me"
+                                  ? "#FE744D"
+                                  : colors.text.muted,
+                              "&:hover": {
+                                bgcolor: colors.background.alt,
+                              },
+                            }}
+                          >
+                            <span>👥</span> {length} • Show Members
+                          </Button>
                         </Box>
 
                         {trip.createdBy !== "Me" &&
@@ -1081,7 +1233,6 @@ const Trips: React.FC = () => {
           </SwipeableDrawer>
         )}
       </Box>
-
       {/* Create Trip Dialog */}
       <Dialog
         open={open}
@@ -1462,7 +1613,268 @@ const Trips: React.FC = () => {
           </DialogActions>
         </Box>
       </Dialog>
+      {/* Members Dialog */}
+      
+      {/* {selectedTrip?.participants.map((userId) => {
+        const name = participantNames[userId];
+
+        return (
+          <Box
+            key={userId}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              py: 1.5,
+              borderBottom: `1px solid ${colors.background.alt}`,
+            }}
+          >
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                bgcolor: colors.primary.main,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: colors.primary.contrast,
+                fontWeight: "bold",
+                mr: 2,
+              }}
+            >
+              {name ? name.charAt(0).toUpperCase() : "U"}
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              {name ? (
+                <Typography sx={{ color: colors.text.primary }}>
+                  {name}
+                </Typography>
+              ) : (
+                <CircularProgress
+                  size={16}
+                  sx={{ color: colors.text.primary }}
+                />
+              )}
+              {userId === selectedTrip.createdBy && name && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    ml: 1,
+                    px: 1,
+                    py: 0.5,
+                    borderRadius: "4px",
+                    bgcolor: colors.primary.main,
+                    color: colors.primary.contrast,
+                  }}
+                >
+                  Creator
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        );
+      })} */}
+
+{/* Members Dialog */}
+{/* <Dialog
+  open={isMembersModalOpen}
+  onClose={() => setIsMembersModalOpen(false)}
+  maxWidth="xs"
+  fullWidth
+  sx={{
+    "& .MuiDialog-paper": {
+      borderRadius: "20px",
+      backgroundColor: colors.background.paper,
+      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+    },
+    zIndex: 9999, // Add a high z-index value here
+  }}
+>
+  <DialogTitle sx={{ color: colors.text.primary }}>
+    Trip Members
+  </DialogTitle>
+  <DialogContent dividers>
+    <Box sx={{ py: 1 }}>
+      {isFetchingParticipantNames ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <Loader size="medium" showFacts={false} />
+        </Box>
+      ) : (
+        selectedTrip?.participants.map((userId) => (
+          <Box
+            key={userId}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              py: 1.5,
+              borderBottom: `{1px solid ${colors.background.alt}}`,
+            }}
+          >
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                bgcolor: colors.primary.main,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: colors.primary.contrast,
+                fontWeight: "bold",
+                mr: 2,
+              }}
+            >
+              {participantNames[userId]?.charAt(0).toUpperCase() || "U"}
+            </Box>
+            <Typography sx={{ color: colors.text.primary }}>
+              {participantNames[userId] || "User"}
+            </Typography>
+            {userId === selectedTrip?.createdBy && (
+              <Typography
+                variant="caption"
+                sx={{
+                  ml: 1,
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: "4px",
+                  bgcolor: colors.primary.main,
+                  color: colors.primary.contrast,
+                }}
+              >
+                Creator
+              </Typography>
+            )}
+          </Box>
+        ))
+      )}
     </Box>
+  </DialogContent>
+  <DialogActions>
+    <Button
+      onClick={() => setIsMembersModalOpen(false)}
+      sx={{
+        color: colors.text.primary,
+      }}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog> */}
+
+{/* Members Dialog */}
+<Dialog
+  open={isMembersModalOpen}
+  onClose={() => setIsMembersModalOpen(false)}
+  maxWidth="xs"
+  fullWidth
+  sx={{
+    "& .MuiDialog-paper": {
+      borderRadius: "20px",
+      backgroundColor: colors.background.paper,
+      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+    },
+    zIndex: 9999,
+  }}
+>
+  <DialogTitle sx={{ color: colors.text.primary }}>
+    Trip Members ({selectedTrip?.participants.length})
+  </DialogTitle>
+  <DialogContent dividers>
+    <Box sx={{ py: 1 }}>
+      {isFetchingParticipantNames && Object.keys(participantNames).length === 0 ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <Loader size="medium" showFacts={false} />
+        </Box>
+      ) : (
+        paginatedParticipants.map((userId) => (
+          <Box
+            key={userId}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              py: 1.5,
+              borderBottom: `{1px solid ${colors.background.alt}}`,
+            }}
+          >
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                bgcolor: colors.primary.main,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: colors.primary.contrast,
+                fontWeight: "bold",
+                mr: 2,
+              }}
+            >
+              {participantNames[userId]?.charAt(0).toUpperCase() || 
+                (isFetchingParticipantNames ? "..." : "U")}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              {participantNames[userId] ? (
+                <Typography sx={{ color: colors.text.primary }}>
+                  {participantNames[userId]}
+                </Typography>
+              ) : (
+                <Box sx={{ width: '80%', height: 16, bgcolor: `{${colors.background.alt}}`, borderRadius: 1 }} />
+              )}
+            </Box>
+            {userId === selectedTrip?.createdBy && (
+              <Typography
+                variant="caption"
+                sx={{
+                  ml: 1,
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: "4px",
+                  bgcolor: colors.primary.main,
+                  color: colors.primary.contrast,
+                }}
+              >
+                Creator
+              </Typography>
+            )}
+          </Box>
+        ))
+      )}
+    </Box>
+    {selectedTrip && selectedTrip.participants.length > membersPerPage && (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Pagination 
+          count={totalPages} 
+          page={currentPage} 
+          onChange={handlePageChange}
+          size="small"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: colors.text.secondary,
+            },
+            "& .Mui-selected": {
+              bgcolor: `{${colors.primary.main}30}`,
+              color: colors.text.primary,
+            }
+          }}
+        />
+      </Box>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button
+      onClick={() => setIsMembersModalOpen(false)}
+      sx={{
+        color: colors.text.primary,
+      }}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+      
+    </Box>
+    
   );
 };
 
