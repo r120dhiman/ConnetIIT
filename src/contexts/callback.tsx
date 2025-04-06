@@ -17,7 +17,7 @@ export default function Callback() {
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('userId');
         const secret = urlParams.get('secret');
-        
+          
         if (!userId || !secret) {
           throw new Error("Missing authentication parameters");
         }
