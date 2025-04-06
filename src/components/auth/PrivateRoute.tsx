@@ -13,7 +13,7 @@ export function PrivateRoute({ children }: { children: React.ReactNode }) {
   if (user && !userProfile) return <Navigate to="/sign-in" replace />;
   
   if (user && !userProfile?.isOnBoarded) return <Navigate to="/onboarding" replace />;
-
+ 
   return children;
 
  
