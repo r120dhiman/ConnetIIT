@@ -29,6 +29,7 @@ export function isIITEmail(email: string): boolean {
     "@itbhu.ac.in",   // IIT (BHU) Varanas
     "@iitjammu.ac.in", // IIT Jammu
     "@iitpkd.ac.in",   // IIT Palakkad
+    "@smail.iitpkd.ac.in",   //Alternative for IIT Palakkad
     "@iittp.ac.in",    // IIT Tirupati
     "@iitgoa.ac.in",   // IIT Goa
     "@iitbhilai.ac.in",// IIT Bhilai
