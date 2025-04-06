@@ -16,7 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const USERS = import.meta.env.VITE_APPWRITE_USERS;
 const ROOMCHAT = import.meta.env.VITE_APPWRITE_ROOMCHAT;
-const COMMUNITIES = import.meta.env.VITE_APPWRITE_COMMUNITTIES;
+// const COMMUNITIES = import.meta.env.VITE_APPWRITE_COMMUNITTIES;
 const MESSAGES_PER_PAGE = 7;
 
 // Database structure
@@ -149,21 +149,19 @@ USERS,
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
+        console.log("🚀 Fetching communities...");
         setLoading(true);
-        // const response = await databases.listDocuments(
-        //   DATABASE_ID,
-        //   COMMUNITIES
-        // );
-        // const communityDocuments = response.documents as CommunityDocument[];
 
-        // Fetch the communities the user is a part of
+        console.log("🔍 Checking user memberships...");
         const userMemberships = await databases.listDocuments(
           DATABASE_ID,
           COLLECTIONS.COMMUNITY_MEMBERS, // Ensure this is the correct collection ID
           [Query.equal("userId", user!.$id)]
         );
 
+        console.log("📌 User memberships retrieved:", userMemberships);
         if (userMemberships.total === 0) {
+          console.log("⚠️ User is not part of any community.");
           setCommunities([]);
           return;
         }
@@ -171,20 +169,22 @@ USERS,
         const communityIds = userMemberships.documents.map(
           (doc) => doc.communityId
         );
+        console.log("📌 Extracted community IDs:", communityIds);
 
         if (communityIds.length === 0) {
+          console.log("⚠️ No valid community IDs found.");
           setCommunities([]);
           return;
         }
 
-        // Fetch community details for these communityIds
+        console.log("🔄 Fetching community details...");
         const communityQueries = communityIds.map((id) =>
           databases.getDocument(DATABASE_ID, COLLECTIONS.COMMUNITIES, id)
         );
 
         const communityDocuments = await Promise.all(communityQueries);
+        console.log("✅ Retrieved community details:", communityDocuments);
 
-        // Ensure proper mapping to the Community interface
         const uiCommunities: Community[] = communityDocuments.map((comm) => ({
           $id: comm.$id,
           name: comm.name || "Unnamed Community",
@@ -193,33 +193,34 @@ USERS,
           posts: comm.posts || [],
         }));
 
-        // Filter communities to only include those where the user is a participant
-        // const userCommunities = communityDocuments.filter((community) =>
-        //   community.membersList.includes(user ? user.$id : "")
-        // );
-
+        console.log("📌 Mapped communities for UI:", uiCommunities);
         setCommunities(uiCommunities);
 
-        // Only load messages if we have communities
         if (uiCommunities.length > 0) {
+          console.log("✅ Setting selected community:", uiCommunities[0]);
           setSelectedCommunity(uiCommunities[0]);
         }
       } catch (error) {
-        console.error("Error fetching communities:", error);
+        console.error("❌ Error fetching communities:", error);
       } finally {
+        console.log("🔄 Fetch process completed, updating loading state.");
         setLoading(false);
       }
     };
 
     if (user) {
+      console.log("👤 User detected, initiating fetch.");
       fetchCommunities();
+    } else {
+      console.log("⚠️ No user detected, skipping fetch.");
     }
 
-    // Cleanup function
     return () => {
+      console.log("🧹 Cleanup: Unsubscribing from updates.");
       unsubscribeRef.current();
     };
   }, [user]);
+
 
   // Load messages for selected community with pagination
   useEffect(() => {
