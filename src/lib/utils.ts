@@ -23,6 +23,7 @@ export function isIITEmail(email: string): boolean {
     "@iitrpr.ac.in",   // IIT Ropar
     "@iitmandi.ac.in", // IIT Mandi
     "@students.iitmandi.ac.in", // IIT Mandi
+    "@students.iitmandi.ac.in", // IIT Mandi
     "iitr.ac.in",     // IIT Roorkee
     "@ch.iitr.ac.in",     // IIT Roorkee
     "@iitbhu.ac.in",   // IIT (BHU) Varanasi
